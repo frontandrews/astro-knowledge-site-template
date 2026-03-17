@@ -1,5 +1,5 @@
 import { getDeckById } from '@prepdeck/content'
-import { screen } from '@testing-library/react'
+import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 import {
@@ -41,10 +41,11 @@ describe('app routes', () => {
 
     await user.click(screen.getByRole('button', { name: 'JavaScript (1)' }))
 
-    expect(screen.getByRole('heading', { name: 'JavaScript' })).toBeInTheDocument()
-    expect(screen.queryByRole('heading', { name: 'React' })).not.toBeInTheDocument()
-    expect(screen.getByText('JavaScript Runtime Core')).toBeInTheDocument()
-    expect(screen.queryByText('React Rendering Core')).not.toBeInTheDocument()
+    const deckLibrary = screen.getByRole('region', { name: 'Deck library' })
+
+    expect(within(deckLibrary).getByText('Showing 1 deck in JavaScript.')).toBeInTheDocument()
+    expect(within(deckLibrary).getByText('JavaScript Runtime Core')).toBeInTheDocument()
+    expect(within(deckLibrary).queryByText('React Rendering Core')).not.toBeInTheDocument()
   })
 
   it('renders deck detail counts and actions', () => {

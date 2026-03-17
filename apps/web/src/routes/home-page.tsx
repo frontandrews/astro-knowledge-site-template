@@ -1,67 +1,210 @@
+import type { Deck, DeckManifestEntry } from '@prepdeck/schemas'
 import { getDeckById, getDecksByTopic } from '@prepdeck/content'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { ConfirmDialog } from '@/components/confirm-dialog'
 import { DeckCard } from '@/components/deck-card'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { LinkButton } from '@/components/ui/link-button'
-import { ProgressMeter } from '@/components/ui/progress-meter'
 import { Panel } from '@/components/ui/panel'
+import { ProgressMeter } from '@/components/ui/progress-meter'
 import {
   combineDeckCounts,
   getDeckCounts,
   getMostRecentlyStudiedDeckId,
+  type DeckCounts,
 } from '@/lib/progress'
 import { getTopicLabel } from '@/lib/topic-labels'
 import { useProgress } from '@/state/progress-context'
 
+type DeckRecord = {
+  counts: DeckCounts
+  deck: Deck
+  summary: DeckManifestEntry
+}
+
 export function HomePage() {
   const { progressStore, resetAllProgress } = useProgress()
   const [isResetAllOpen, setIsResetAllOpen] = useState(false)
-  const decksByTopic = getDecksByTopic()
   const [selectedTopic, setSelectedTopic] = useState<'all' | string>('all')
+  const decksByTopic = getDecksByTopic()
   const topicEntries = Object.entries(decksByTopic)
-  const allDeckCounts = Object.values(decksByTopic)
-    .flat()
-    .map((summary) => {
-      const deck = getDeckById(summary.id)
-      return deck ? getDeckCounts(progressStore, deck) : null
-    })
-    .filter((counts): counts is NonNullable<typeof counts> => Boolean(counts))
-  const overallCounts = combineDeckCounts(allDeckCounts)
+
+  const deckRecords = useMemo(
+    () =>
+      topicEntries
+        .flatMap(([, summaries]) =>
+          summaries.map((summary) => {
+            const deck = getDeckById(summary.id)
+
+            if (!deck) {
+              return null
+            }
+
+            return {
+              counts: getDeckCounts(progressStore, deck),
+              deck,
+              summary,
+            }
+          }),
+        )
+        .filter((record): record is DeckRecord => Boolean(record)),
+    [progressStore, topicEntries],
+  )
+
+  const overallCounts = combineDeckCounts(deckRecords.map((record) => record.counts))
+  const totalDecks = deckRecords.length
   const lastStudiedDeckId = getMostRecentlyStudiedDeckId(progressStore)
-  const lastStudiedDeck = lastStudiedDeckId ? getDeckById(lastStudiedDeckId) : undefined
-  const lastStudiedCounts = lastStudiedDeck ? getDeckCounts(progressStore, lastStudiedDeck) : null
-  const visibleTopics =
-    selectedTopic === 'all'
-      ? topicEntries
-      : topicEntries.filter(([topic]) => topic === selectedTopic)
+  const latestRecord =
+    deckRecords.find((record) => record.deck.id === lastStudiedDeckId) ?? null
+  const weakestRecord = getWeakestDeckRecord(deckRecords)
+  const starterRecord = getStarterDeckRecord(deckRecords)
+  const alternateStarterRecord = getStarterDeckRecord(
+    deckRecords,
+    starterRecord?.deck.id ?? null,
+  )
+  const visibleDeckRecords = getVisibleDeckRecords(deckRecords, selectedTopic)
+  const topicCards = topicEntries.map(([topic, summaries]) => {
+    const topicDecks = deckRecords.filter((record) => record.summary.topic === topic)
+
+    return {
+      counts: combineDeckCounts(topicDecks.map((record) => record.counts)),
+      deckCount: summaries.length,
+      topic,
+    }
+  })
+
+  const primaryAction = getPrimaryAction(latestRecord, starterRecord)
+  const secondaryAction = getSecondaryAction(weakestRecord, alternateStarterRecord)
 
   return (
     <>
-      <Panel className="mb-5 flex flex-col gap-3 bg-[var(--retro-surface)] p-5 sm:flex-row sm:items-center sm:justify-between">
-        <div className="max-w-3xl space-y-3">
-          <p className="text-sm leading-6 text-white/80">
-          Track what you truly know, keep momentum on a phone-sized screen, and come
-          back later without losing your place.
-          </p>
-          <div className="grid gap-3 sm:grid-cols-3">
-            <SummaryStat label="Learned" value={`${overallCounts.learned}`} />
-            <SummaryStat label="Seen" value={`${overallCounts.seen}/${overallCounts.total}`} />
-            <SummaryStat label="Need review" value={`${overallCounts.partial + overallCounts.notLearned}`} />
-          </div>
-        </div>
-        <Button onClick={() => setIsResetAllOpen(true)} type="button" variant="danger">
-          Reset all progress
-        </Button>
-      </Panel>
+      <section aria-labelledby="home-hero-heading" className="mb-6">
+        <Panel className="overflow-hidden bg-[linear-gradient(145deg,rgba(32,52,87,0.98),rgba(14,24,40,0.96))] p-5 sm:p-6">
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)]">
+            <div>
+              <div className="flex flex-wrap gap-2">
+                <Badge tone="accent">Focus next</Badge>
+                <Badge>Local-first</Badge>
+                <Badge tone="success">Notes stay on this device</Badge>
+              </div>
+              <h1
+                className="mt-4 text-3xl font-black tracking-tight text-[var(--retro-ink)] sm:text-4xl"
+                id="home-hero-heading"
+              >
+                Study the next right deck.
+              </h1>
+              <p className="mt-4 max-w-2xl text-sm leading-7 text-white/80 sm:text-base">
+                Prepdeck keeps your interview practice short, local, and easy to
+                resume. Pick up where you left off, tighten weak spots, and keep your
+                own notes attached to the cards that matter.
+              </p>
+              <div className="mt-5 flex flex-wrap gap-3">
+                <LinkButton to={primaryAction.href} variant="primary">
+                  {primaryAction.label}
+                </LinkButton>
+                <LinkButton to={secondaryAction.href} variant="secondary">
+                  {secondaryAction.label}
+                </LinkButton>
+                <Button
+                  onClick={() => setSelectedTopic('all')}
+                  type="button"
+                  variant="ghost"
+                >
+                  Browse all decks
+                </Button>
+              </div>
+            </div>
 
-      <div className="mb-6 grid gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
-        <Panel className="bg-[var(--retro-surface)] p-4">
-          <p className="text-[0.68rem] font-bold uppercase tracking-[0.22em] text-[var(--retro-line)]">
-            Browse by topic
-          </p>
-          <div className="-mx-1 mt-3 flex gap-2 overflow-x-auto px-1 pb-1">
+            <Panel className="bg-[color:rgba(6,12,23,0.42)] p-4">
+              <p className="text-[0.68rem] font-bold uppercase tracking-[0.22em] text-[var(--retro-line)]">
+                Today&apos;s snapshot
+              </p>
+              <div className="mt-4 grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
+                <SummaryStat label="Decks" value={`${totalDecks}`} />
+                <SummaryStat label="Cards learned" value={`${overallCounts.learned}`} />
+                <SummaryStat
+                  label="Need review"
+                  value={`${overallCounts.partial + overallCounts.notLearned}`}
+                />
+              </div>
+              <div className="mt-4">
+                <div className="flex items-center justify-between text-[0.72rem] font-semibold uppercase tracking-[0.16em] text-[var(--retro-ink-soft)]">
+                  <span>Cards seen</span>
+                  <span>
+                    {overallCounts.seen} of {overallCounts.total}
+                  </span>
+                </div>
+                <ProgressMeter current={overallCounts.seen} total={overallCounts.total} />
+              </div>
+            </Panel>
+          </div>
+        </Panel>
+      </section>
+
+      <section
+        aria-labelledby="focus-next-heading"
+        className="mb-6 grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]"
+      >
+        <FocusCard
+          actionHref={primaryAction.href}
+          actionLabel={primaryAction.label}
+          detail={primaryAction.detail}
+          eyebrow={primaryAction.eyebrow}
+          title={primaryAction.title}
+        />
+        <FocusCard
+          actionHref={secondaryAction.href}
+          actionLabel={secondaryAction.label}
+          detail={secondaryAction.detail}
+          eyebrow={secondaryAction.eyebrow}
+          title={secondaryAction.title}
+        />
+      </section>
+
+      <section aria-labelledby="topic-paths-heading" className="mb-6">
+        <div className="mb-4 flex items-center justify-between gap-4">
+          <div>
+            <h2 className="text-2xl font-black text-[var(--retro-ink)]" id="topic-paths-heading">
+              Topic paths
+            </h2>
+            <p className="mt-1 text-sm leading-6 text-white/75">
+              Jump into a lane fast and keep the deck library filtered around that
+              topic.
+            </p>
+          </div>
+          <Button onClick={() => setSelectedTopic('all')} size="sm" type="button" variant="ghost">
+            Show all
+          </Button>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {topicCards.map((topicCard) => (
+            <TopicPathCard
+              counts={topicCard.counts}
+              deckCount={topicCard.deckCount}
+              isActive={selectedTopic === topicCard.topic}
+              key={topicCard.topic}
+              onSelect={() => setSelectedTopic(topicCard.topic)}
+              topic={topicCard.topic}
+            />
+          ))}
+        </div>
+      </section>
+
+      <section aria-labelledby="deck-library-heading">
+        <div className="mb-4 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <h2 className="text-2xl font-black text-[var(--retro-ink)]" id="deck-library-heading">
+              Deck library
+            </h2>
+            <p className="mt-1 text-sm leading-6 text-white/75">
+              {selectedTopic === 'all'
+                ? `Showing all ${visibleDeckRecords.length} decks.`
+                : `Showing ${visibleDeckRecords.length} deck${visibleDeckRecords.length === 1 ? '' : 's'} in ${getTopicLabel(selectedTopic)}.`}
+            </p>
+          </div>
+          <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
             <Button
               onClick={() => setSelectedTopic('all')}
               size="sm"
@@ -82,79 +225,25 @@ export function HomePage() {
               </Button>
             ))}
           </div>
-        </Panel>
+        </div>
 
-        <Panel className="bg-[var(--retro-surface)] p-4">
-          <p className="text-[0.68rem] font-bold uppercase tracking-[0.22em] text-[var(--retro-line)]">
-            Jump back in
-          </p>
-          {lastStudiedDeck && lastStudiedCounts ? (
-            <div className="mt-3 space-y-3">
-              <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[var(--retro-ink-soft)]">
-                  {getTopicLabel(lastStudiedDeck.topic)}
-                </p>
-                <h2 className="mt-1 text-lg font-black text-[var(--retro-ink)]">
-                  {lastStudiedDeck.title}
-                </h2>
-              </div>
-              <ProgressMeter current={lastStudiedCounts.seen} total={lastStudiedCounts.total} />
-              <div className="flex flex-wrap gap-2">
-                <LinkButton
-                  size="sm"
-                  to={
-                    lastStudiedCounts.allSeen
-                      ? `/decks/${lastStudiedDeck.id}/review`
-                      : `/study/${lastStudiedDeck.id}?mode=continue`
-                  }
-                  variant="primary"
-                >
-                  {lastStudiedCounts.allSeen ? 'Review latest deck' : 'Continue latest deck'}
-                </LinkButton>
-                <LinkButton size="sm" to={`/decks/${lastStudiedDeck.id}`} variant="ghost">
-                  Open deck
-                </LinkButton>
-              </div>
-            </div>
-          ) : (
-            <p className="mt-3 text-sm leading-6 text-white/80">
-              Start with one deck, and Prepdeck will keep your latest session easy to reach.
-            </p>
-          )}
-        </Panel>
-      </div>
-
-      <div className="space-y-8">
-        {visibleTopics.map(([topic, summaries]) => (
-          <section key={topic}>
-            <TopicSummary
-              progressStore={progressStore}
-              summaries={summaries}
-              title={getTopicLabel(topic)}
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {visibleDeckRecords.map((record) => (
+            <DeckCard
+              detailHref={`/decks/${record.summary.id}`}
+              key={record.summary.id}
+              learnedCount={record.counts.learned}
+              summary={record.summary}
+              totalCards={record.counts.total}
             />
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-              {summaries.map((summary) => {
-                const deck = getDeckById(summary.id)
+          ))}
+        </div>
+      </section>
 
-                if (!deck) {
-                  return null
-                }
-
-                const counts = getDeckCounts(progressStore, deck)
-
-                return (
-                  <DeckCard
-                    detailHref={`/decks/${summary.id}`}
-                    key={summary.id}
-                    learnedCount={counts.learned}
-                    summary={summary}
-                    totalCards={counts.total}
-                  />
-                )
-              })}
-            </div>
-          </section>
-        ))}
+      <div className="mt-6 flex justify-end">
+        <Button onClick={() => setIsResetAllOpen(true)} type="button" variant="danger">
+          Reset all progress
+        </Button>
       </div>
 
       <ConfirmDialog
@@ -172,39 +261,79 @@ export function HomePage() {
   )
 }
 
-function TopicSummary({
-  progressStore,
-  summaries,
+function FocusCard({
+  actionHref,
+  actionLabel,
+  detail,
+  eyebrow,
   title,
 }: {
-  progressStore: ReturnType<typeof useProgress>['progressStore']
-  summaries: ReturnType<typeof getDecksByTopic>[string]
+  actionHref: string
+  actionLabel: string
+  detail: string
+  eyebrow: string
   title: string
 }) {
-  const counts = combineDeckCounts(
-    summaries
-      .map((summary) => {
-        const deck = getDeckById(summary.id)
-        return deck ? getDeckCounts(progressStore, deck) : null
-      })
-      .filter((item): item is NonNullable<typeof item> => Boolean(item)),
-  )
-
   return (
-    <div className="mb-4 space-y-3">
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <h2 className="text-xl font-black text-[var(--retro-ink)]">{title}</h2>
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--retro-ink-soft)]">
-            {counts.learned} learned · {counts.partial + counts.notLearned} need review
-          </p>
-        </div>
-        <span className="text-sm font-semibold uppercase tracking-[0.16em] text-[var(--retro-line)]">
-          {summaries.length} decks
-        </span>
+    <Panel className="p-5">
+      <p className="text-[0.68rem] font-bold uppercase tracking-[0.22em] text-[var(--retro-line)]">
+        {eyebrow}
+      </p>
+      <h3 className="mt-3 text-2xl font-black text-[var(--retro-ink)]">{title}</h3>
+      <p className="mt-3 text-sm leading-6 text-white/80">{detail}</p>
+      <div className="mt-5">
+        <LinkButton to={actionHref} variant="primary">
+          {actionLabel}
+        </LinkButton>
       </div>
-      <ProgressMeter current={counts.learned} total={counts.total} />
-    </div>
+    </Panel>
+  )
+}
+
+function TopicPathCard({
+  counts,
+  deckCount,
+  isActive,
+  onSelect,
+  topic,
+}: {
+  counts: DeckCounts
+  deckCount: number
+  isActive: boolean
+  onSelect: () => void
+  topic: string
+}) {
+  return (
+    <Panel
+      className={
+        isActive
+          ? 'border-[var(--retro-line-strong)] bg-[var(--retro-surface-strong)] p-5'
+          : 'p-5'
+      }
+    >
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="text-[0.68rem] font-bold uppercase tracking-[0.22em] text-[var(--retro-line)]">
+            Topic
+          </p>
+          <h3 className="mt-2 text-xl font-black text-[var(--retro-ink)]">
+            {getTopicLabel(topic)}
+          </h3>
+        </div>
+        <Badge>{deckCount} decks</Badge>
+      </div>
+      <p className="mt-3 text-sm leading-6 text-white/80">
+        {counts.learned} learned · {counts.partial + counts.notLearned} need review
+      </p>
+      <div className="mt-4">
+        <ProgressMeter current={counts.learned} total={counts.total} />
+      </div>
+      <div className="mt-4">
+        <Button onClick={onSelect} size="sm" type="button" variant={isActive ? 'primary' : 'ghost'}>
+          {isActive ? 'Showing topic' : 'Show topic decks'}
+        </Button>
+      </div>
+    </Panel>
   )
 }
 
@@ -217,4 +346,135 @@ function SummaryStat({ label, value }: { label: string; value: string }) {
       <p className="mt-1 text-lg font-black text-[var(--retro-ink)]">{value}</p>
     </Panel>
   )
+}
+
+function getVisibleDeckRecords(records: DeckRecord[], selectedTopic: string) {
+  const nextRecords =
+    selectedTopic === 'all'
+      ? records
+      : records.filter((record) => record.summary.topic === selectedTopic)
+
+  return [...nextRecords].sort((a, b) => {
+    const aUrgency = a.counts.notLearned * 3 + a.counts.partial * 2 + (a.counts.unseen > 0 ? 1 : 0)
+    const bUrgency = b.counts.notLearned * 3 + b.counts.partial * 2 + (b.counts.unseen > 0 ? 1 : 0)
+
+    if (aUrgency !== bUrgency) {
+      return bUrgency - aUrgency
+    }
+
+    if (a.summary.estimatedMinutes !== b.summary.estimatedMinutes) {
+      return a.summary.estimatedMinutes - b.summary.estimatedMinutes
+    }
+
+    return a.summary.title.localeCompare(b.summary.title)
+  })
+}
+
+function getWeakestDeckRecord(records: DeckRecord[]) {
+  return [...records]
+    .filter((record) => record.counts.partial + record.counts.notLearned > 0)
+    .sort((a, b) => {
+      const aWeak = a.counts.partial + a.counts.notLearned
+      const bWeak = b.counts.partial + b.counts.notLearned
+
+      if (aWeak !== bWeak) {
+        return bWeak - aWeak
+      }
+
+      return b.counts.seen - a.counts.seen
+    })[0] ?? null
+}
+
+function getStarterDeckRecord(records: DeckRecord[], excludeDeckId?: string | null) {
+  return [...records]
+    .filter((record) => record.counts.seen === 0 && record.deck.id !== excludeDeckId)
+    .sort((a, b) => {
+      const difficultyRank = getDifficultyRank(a.summary.difficulty) - getDifficultyRank(b.summary.difficulty)
+
+      if (difficultyRank !== 0) {
+        return difficultyRank
+      }
+
+      if (a.summary.estimatedMinutes !== b.summary.estimatedMinutes) {
+        return a.summary.estimatedMinutes - b.summary.estimatedMinutes
+      }
+
+      return a.summary.title.localeCompare(b.summary.title)
+    })[0] ?? null
+}
+
+function getPrimaryAction(latestRecord: DeckRecord | null, starterRecord: DeckRecord | null) {
+  if (latestRecord && !latestRecord.counts.allSeen) {
+    return {
+      detail: `Resume ${latestRecord.deck.title} without losing your last position or note.`,
+      eyebrow: 'Continue',
+      href: `/study/${latestRecord.deck.id}?mode=continue`,
+      label: 'Continue latest session',
+      title: latestRecord.deck.title,
+    }
+  }
+
+  if (starterRecord) {
+    return {
+      detail: `Start with a shorter deck and build confidence before you branch out.`,
+      eyebrow: 'Start here',
+      href: `/study/${starterRecord.deck.id}?mode=start`,
+      label: 'Start a focused deck',
+      title: starterRecord.deck.title,
+    }
+  }
+
+  if (latestRecord) {
+    return {
+      detail: `You have already seen every card here. Review it again and tighten the phrasing.`,
+      eyebrow: 'Latest deck',
+      href: `/decks/${latestRecord.deck.id}/review`,
+      label: 'Review latest deck',
+      title: latestRecord.deck.title,
+    }
+  }
+
+  return {
+    detail: 'Jump into the library and pick the topic that matters for the next interview.',
+    eyebrow: 'Get started',
+    href: '/decks/react-rendering-core',
+    label: 'Open a deck',
+    title: 'Start with a focused deck',
+  }
+}
+
+function getSecondaryAction(weakestRecord: DeckRecord | null, starterRecord: DeckRecord | null) {
+  if (weakestRecord) {
+    return {
+      detail: `${weakestRecord.counts.partial + weakestRecord.counts.notLearned} cards still need work in ${weakestRecord.deck.title}.`,
+      eyebrow: 'Weak spots',
+      href: `/decks/${weakestRecord.deck.id}/review`,
+      label: 'Review weak spots',
+      title: weakestRecord.deck.title,
+    }
+  }
+
+  if (starterRecord) {
+    return {
+      detail: `No weak cards yet. Open another lane and build breadth before the review queue starts growing.`,
+      eyebrow: 'Explore',
+      href: `/decks/${starterRecord.deck.id}`,
+      label: 'Explore another lane',
+      title: starterRecord.deck.title,
+    }
+  }
+
+  return {
+    detail: 'Everything is currently clean. Open any deck and keep the habit going.',
+    eyebrow: 'Keep momentum',
+    href: '/decks/coding-arrays-hashmaps-basics',
+    label: 'Open another deck',
+    title: 'Everything looks stable',
+  }
+}
+
+function getDifficultyRank(difficulty: DeckManifestEntry['difficulty']) {
+  if (difficulty === 'easy') return 0
+  if (difficulty === 'medium') return 1
+  return 2
 }

@@ -2,6 +2,7 @@ import { getDeckById } from '@prepdeck/content'
 import type { PropsWithChildren } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 
+import { Badge } from '@/components/ui/badge'
 import { LinkButton } from '@/components/ui/link-button'
 import { Panel } from '@/components/ui/panel'
 import { getTopicLabel } from '@/lib/topic-labels'
@@ -14,8 +15,8 @@ export function AppShell({ children }: PropsWithChildren) {
     <div className="min-h-screen bg-transparent text-[var(--retro-ink)]">
       <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-4 pb-24 pt-5 sm:px-6">
         {shell.mode === 'home' ? (
-          <Panel className="mb-6 bg-[var(--retro-surface)] px-5 py-4">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <Panel className="mb-6 bg-[var(--retro-surface)] px-4 py-3">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <Link
                   to="/"
@@ -23,16 +24,15 @@ export function AppShell({ children }: PropsWithChildren) {
                 >
                   Prepdeck
                 </Link>
-                <h1 className="mt-2 text-3xl font-black tracking-tight text-[var(--retro-ink)]">
-                  Technical interview prep that feels manageable.
-                </h1>
                 <p className="mt-2 max-w-2xl text-sm leading-6 text-white/80">
-                  Mobile-first flashcards for React, JavaScript, Node, system design,
-                  leadership, and coding challenges.
+                  Local-first interview prep with phone-sized study flows, saved notes,
+                  and no signup wall.
                 </p>
               </div>
-              <div className="rounded-[1rem] border-2 border-[var(--retro-line-strong)] bg-[var(--retro-bg-strong)] px-4 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-[var(--retro-ink)] shadow-[4px_4px_0_var(--retro-shadow-soft)]">
-                Pick a deck. Flip cards. Track progress.
+              <div className="flex flex-wrap gap-2">
+                <Badge tone="accent">Local notes</Badge>
+                <Badge>PWA</Badge>
+                <Badge tone="success">No signup</Badge>
               </div>
             </div>
           </Panel>
