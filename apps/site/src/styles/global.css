@@ -1,14 +1,14 @@
 :root {
   --radius: 0.5rem;
-  --site-bg: #fff;
-  --site-surface: #fff;
+  --site-bg: #fefefe;
+  --site-surface: #cad0d9;
   --site-surface-strong: #fae583;
   --site-line: #000;
   --site-line-strong: #000;
   --site-ink: #000;
   --site-ink-soft: rgba(0, 0, 0, 0.78);
   --site-ink-muted: rgba(0, 0, 0, 0.58);
-  --site-accent: #ffdb33;
+  --site-accent: #2687e8;
   --site-accent-soft: #fae583;
   --site-success: #3f8f63;
   color: var(--site-ink);
@@ -160,6 +160,18 @@ pre {
   width: 0.9rem;
   height: 0.9rem;
   flex-shrink: 0;
+}
+
+.site-theme-toggle__icon--sun {
+  display: none;
+}
+
+:root.dark .site-theme-toggle__icon--sun {
+  display: inline-flex;
+}
+
+:root.dark .site-theme-toggle__icon--moon {
+  display: none;
 }
 
 .site-nav__link--active {
