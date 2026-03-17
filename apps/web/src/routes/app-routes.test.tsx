@@ -63,6 +63,7 @@ describe('app routes', () => {
     expect(screen.getByText('Not learned')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Start deck' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Continue' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Study weak cards' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Review progress' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Reset deck' })).toBeInTheDocument()
   })
@@ -175,6 +176,46 @@ describe('app routes', () => {
     expect(
       await screen.findByRole('heading', {
         name: 'You have seen every card in this deck.',
+      }),
+    ).toBeInTheDocument()
+  })
+
+  it('runs a weak-card session and clears the weak queue when cards are marked learned', async () => {
+    const user = userEvent.setup()
+    const deck = getReactDeck()
+    let store = createEmptyProgressStore()
+    store = setCardStatus(store, deck.id, deck.cards[0].id, 'learned')
+    store = setCardStatus(store, deck.id, deck.cards[1].id, 'partial')
+    seedProgress(store)
+
+    renderApp([`/study/${deck.id}?mode=start&scope=weak`])
+
+    expect(screen.getByText('Weak cards only')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: '1 of 1' })).toBeInTheDocument()
+    expect(screen.getByText(deck.cards[1].question)).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Show answer' }))
+    await user.click(screen.getByRole('button', { name: 'Learned' }))
+
+    expect(
+      await screen.findByRole('heading', {
+        name: 'You cleared every weak card in this deck.',
+      }),
+    ).toBeInTheDocument()
+  })
+
+  it('sends an empty weak-card session straight to the weak success state', async () => {
+    const deck = getReactDeck()
+    let store = createEmptyProgressStore()
+    store = setCardStatus(store, deck.id, deck.cards[0].id, 'learned')
+    store = setCardStatus(store, deck.id, deck.cards[1].id, 'learned')
+    seedProgress(store)
+
+    renderApp([`/study/${deck.id}?mode=start&scope=weak`])
+
+    expect(
+      await screen.findByRole('heading', {
+        name: 'You cleared every weak card in this deck.',
       }),
     ).toBeInTheDocument()
   })

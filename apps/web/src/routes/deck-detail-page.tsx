@@ -30,6 +30,7 @@ export function DeckDetailPage() {
   }
 
   const counts = getDeckCounts(progressStore, deck)
+  const weakCardCount = counts.partial + counts.notLearned
 
   return (
     <>
@@ -69,6 +70,15 @@ export function DeckDetailPage() {
           <Button onClick={() => navigate(`/study/${deck.id}?mode=continue`)} type="button" variant="secondary">
             Continue
           </Button>
+          {weakCardCount > 0 ? (
+            <Button
+              onClick={() => navigate(`/study/${deck.id}?mode=start&scope=weak`)}
+              type="button"
+              variant="warning"
+            >
+              Study weak cards
+            </Button>
+          ) : null}
           <LinkButton to={`/decks/${deck.id}/review`} variant="ghost">
             Review progress
           </LinkButton>

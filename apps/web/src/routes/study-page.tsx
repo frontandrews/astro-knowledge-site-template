@@ -10,7 +10,14 @@ import { Button } from '@/components/ui/button'
 import { LinkButton } from '@/components/ui/link-button'
 import { Panel } from '@/components/ui/panel'
 import { ProgressMeter } from '@/components/ui/progress-meter'
-import { getDeckCounts, getFirstUnseenCardIndex } from '@/lib/progress'
+import { getDeckCounts } from '@/lib/progress'
+import {
+  getStudyCards,
+  getStudyInitialIndex,
+  getStudyScope,
+  getStudyScopeLabel,
+  type StudyScope,
+} from '@/lib/study-session'
 import { useProgress } from '@/state/progress-context'
 
 export function StudyPage() {
@@ -20,28 +27,39 @@ export function StudyPage() {
   const deck = deckId ? getDeckById(deckId) : undefined
   const successState = searchParams.get('state') === 'success'
   const mode = searchParams.get('mode') ?? 'start'
-  const continueIndex = deck ? getFirstUnseenCardIndex(progressStore, deck) : null
+  const scope = getStudyScope(searchParams.get('scope'))
 
   if (!deckId || !deck) {
     return <Navigate replace to="/" />
   }
 
+  const studyCards = getStudyCards(progressStore, deck, scope)
+
   if (successState) {
-    return <StudySuccess deck={deck} />
+    return <StudySuccess deck={deck} scope={scope} />
   }
 
-  if (mode === 'continue' && continueIndex === null) {
-    return <Navigate replace to={`/study/${deck.id}?state=success`} />
+  const initialIndex = getStudyInitialIndex(progressStore, deck, scope, mode)
+
+  if (initialIndex === null || studyCards.length === 0) {
+    return <Navigate replace to={`/study/${deck.id}?state=success&scope=${scope}`} />
   }
 
-  const initialIndex = mode === 'continue' ? continueIndex ?? 0 : 0
-
-  return <StudySession deck={deck} initialIndex={initialIndex} key={`${deck.id}:${mode}`} />
+  return (
+    <StudySession
+      cards={studyCards}
+      deck={deck}
+      initialIndex={initialIndex}
+      key={`${deck.id}:${mode}:${scope}`}
+      scope={scope}
+    />
+  )
 }
 
-function StudySuccess({ deck }: { deck: Deck }) {
+function StudySuccess({ deck, scope }: { deck: Deck; scope: StudyScope }) {
   const { progressStore } = useProgress()
   const counts = getDeckCounts(progressStore, deck)
+  const hasRemainingWeakCards = counts.partial + counts.notLearned > 0
 
   return (
     <Panel className="bg-[var(--retro-surface)] p-6">
@@ -49,22 +67,36 @@ function StudySuccess({ deck }: { deck: Deck }) {
         Session complete
       </p>
       <h2 className="mt-3 text-3xl font-black text-[var(--retro-ink)]">
-        {counts.allLearned
-          ? 'Everything in this deck is marked learned.'
-          : 'You have seen every card in this deck.'}
+        {scope === 'weak'
+          ? hasRemainingWeakCards
+            ? 'You finished this weak-card session.'
+            : 'You cleared every weak card in this deck.'
+          : counts.allLearned
+            ? 'Everything in this deck is marked learned.'
+            : 'You have seen every card in this deck.'}
       </h2>
       <p className="mt-3 max-w-2xl text-sm leading-6 text-white/80">
-        {counts.allLearned
-          ? 'Great. Use review to sanity-check what you learned or restart the deck later.'
-          : 'Review the cards marked partial or not learned to tighten the weak spots.'}
+        {scope === 'weak'
+          ? hasRemainingWeakCards
+            ? 'Some cards still need work. Run the weak-card session again or inspect them in review mode.'
+            : 'Nice. The weak-card queue for this deck is empty right now.'
+          : counts.allLearned
+            ? 'Great. Use review to sanity-check what you learned or restart the deck later.'
+            : 'Review the cards marked partial or not learned to tighten the weak spots.'}
       </p>
       <div className="mt-6 flex flex-wrap gap-3">
         <LinkButton to={`/decks/${deck.id}/review`} variant="primary">
           Review this deck
         </LinkButton>
-        <LinkButton to={`/study/${deck.id}?mode=start`} variant="secondary">
-          Restart deck
-        </LinkButton>
+        {scope === 'weak' ? (
+          <LinkButton to={`/study/${deck.id}?mode=start&scope=weak`} variant="secondary">
+            Run weak cards again
+          </LinkButton>
+        ) : (
+          <LinkButton to={`/study/${deck.id}?mode=start`} variant="secondary">
+            Restart deck
+          </LinkButton>
+        )}
         <LinkButton to={`/decks/${deck.id}`} variant="ghost">
           Back to deck
         </LinkButton>
@@ -73,7 +105,17 @@ function StudySuccess({ deck }: { deck: Deck }) {
   )
 }
 
-function StudySession({ deck, initialIndex }: { deck: Deck; initialIndex: number }) {
+function StudySession({
+  cards,
+  deck,
+  initialIndex,
+  scope,
+}: {
+  cards: Deck['cards']
+  deck: Deck
+  initialIndex: number
+  scope: StudyScope
+}) {
   const navigate = useNavigate()
   const {
     clearCardNote,
@@ -85,7 +127,7 @@ function StudySession({ deck, initialIndex }: { deck: Deck; initialIndex: number
   const [currentIndex, setCurrentIndex] = useState(initialIndex)
   const [isAnswerVisible, setIsAnswerVisible] = useState(false)
   const [isLearnMoreOpen, setIsLearnMoreOpen] = useState(false)
-  const currentCard = deck.cards[currentIndex]
+  const currentCard = cards[currentIndex]
   const currentNote = getCardNote(deck.id, currentCard.id)
 
   useEffect(() => {
@@ -103,12 +145,12 @@ function StudySession({ deck, initialIndex }: { deck: Deck; initialIndex: number
   const handleRateCard = (status: ProgressStatus) => {
     setCardStatus(deck.id, currentCard.id, status)
 
-    if (currentIndex >= deck.cards.length - 1) {
-      navigate(`/study/${deck.id}?state=success`)
+    if (currentIndex >= cards.length - 1) {
+      navigate(`/study/${deck.id}?state=success&scope=${scope}`)
       return
     }
 
-    const nextCard = deck.cards[currentIndex + 1]
+    const nextCard = cards[currentIndex + 1]
     setCurrentIndex((previousIndex) => previousIndex + 1)
     setIsAnswerVisible(false)
     setIsLearnMoreOpen(false)
@@ -123,8 +165,12 @@ function StudySession({ deck, initialIndex }: { deck: Deck; initialIndex: number
             <p className="text-xs font-bold uppercase tracking-[0.25em] text-[var(--retro-line)]">
               {deck.title}
             </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Badge tone="accent">{getStudyScopeLabel(scope)}</Badge>
+              <Badge>{currentCard.difficulty}</Badge>
+            </div>
             <h2 className="mt-2 text-2xl font-black text-[var(--retro-ink)]">
-              {currentIndex + 1} of {deck.cards.length}
+              {currentIndex + 1} of {cards.length}
             </h2>
           </div>
           <Link
@@ -135,14 +181,13 @@ function StudySession({ deck, initialIndex }: { deck: Deck; initialIndex: number
           </Link>
         </div>
         <div className="mt-4">
-          <ProgressMeter current={currentIndex + 1} total={deck.cards.length} />
+          <ProgressMeter current={currentIndex + 1} total={cards.length} />
         </div>
       </Panel>
 
       <Panel className="bg-[var(--retro-surface)] p-5">
         <div className="flex flex-wrap gap-2">
           <Badge tone="accent">{isAnswerVisible ? 'Answer side' : 'Question side'}</Badge>
-          <Badge>{currentCard.difficulty}</Badge>
         </div>
         <p className="mt-4 text-sm font-bold uppercase tracking-[0.25em] text-[var(--retro-line)]">
           {isAnswerVisible ? 'Answer side' : 'Question side'}
