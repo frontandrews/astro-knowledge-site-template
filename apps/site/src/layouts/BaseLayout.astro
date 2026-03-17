@@ -3,6 +3,7 @@ import '../styles/global.css'
 import { Icon } from 'astro-icon/components'
 
 import { getAppHref } from '../lib/app-links'
+import { getGuideIndexHref, getGuideLocaleFromPathname } from '../lib/guide-links'
 
 type Props = {
   description: string
@@ -16,6 +17,8 @@ const {
 
 const pageTitle = `${title} | Prepdeck`
 const pathname = Astro.url.pathname
+const guideLocale = getGuideLocaleFromPathname(pathname)
+const guideIndexHref = getGuideIndexHref(guideLocale)
 
 function getNavClass(href: string) {
   const isActive =
@@ -59,7 +62,7 @@ function getNavClass(href: string) {
         <div class="site-header__inner">
           <nav class="site-nav">
             <a class={getNavClass('/')} href="/">Home</a>
-            <a class={getNavClass('/guides')} href="/guides">Path</a>
+            <a class={getNavClass(guideIndexHref)} href={guideIndexHref}>Path</a>
             <a class={getNavClass('/map')} href="/map">Map</a>
             <a class="site-nav__link" href={getAppHref('/')}>Practice</a>
             <button aria-label="Toggle theme" class="site-theme-toggle" data-theme-toggle type="button">

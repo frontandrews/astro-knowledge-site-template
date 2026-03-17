@@ -1,5 +1,6 @@
 ---
 import { getAppHref } from '../lib/app-links'
+import { getGuideHrefFromEntryId } from '../lib/guide-links'
 import type { GuideMapItem } from '../lib/guide-map'
 
 type Props = {
@@ -16,7 +17,7 @@ const primaryDeckId = item.relatedDeckIds[0] ?? null
   <h3>{item.title}</h3>
 
   <div class="meta-list">
-    <a class="button-link button-link--primary" href={`/guides/${item.routePath}`}>Learn</a>
+    <a class="button-link button-link--primary" href={getGuideHrefFromEntryId(item.routePath)}>Learn</a>
     {primaryDeckId ? (
       <a class="button-link" href={getAppHref(`/decks/${primaryDeckId}`)}>Practice</a>
     ) : null}
@@ -26,7 +27,7 @@ const primaryDeckId = item.relatedDeckIds[0] ?? null
     <div class="guide-map-card__connections">
       <div class="guide-map-card__connection-list">
         {item.connections.map((connection) => (
-          <a class="guide-connection" href={`/guides/${connection.routePath}`}>
+          <a class="guide-connection" href={getGuideHrefFromEntryId(connection.routePath)}>
             <span>{connection.title}</span>
           </a>
         ))}

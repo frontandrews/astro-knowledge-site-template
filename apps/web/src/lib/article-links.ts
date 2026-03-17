@@ -1,22 +1,27 @@
 import { getGuideRoutePath } from '@prepdeck/content'
 import type { Deck } from '@prepdeck/schemas'
 
-const GUIDES_PATH = '/guides'
+const LEGACY_GUIDE_SEGMENTS = ['/guides', '/guias']
 
-function getGuidesBase(siteBaseUrl?: string): string {
+function getSiteBase(siteBaseUrl?: string): string {
   const normalizedBase = siteBaseUrl?.trim().replace(/\/+$/, '') ?? ''
 
   if (!normalizedBase) {
-    return GUIDES_PATH
+    return ''
   }
 
-  return normalizedBase.endsWith(GUIDES_PATH)
-    ? normalizedBase
-    : `${normalizedBase}${GUIDES_PATH}`
+  const legacySegment = LEGACY_GUIDE_SEGMENTS.find((segment) => normalizedBase.endsWith(segment))
+
+  return legacySegment
+    ? normalizedBase.slice(0, normalizedBase.length - legacySegment.length)
+    : normalizedBase
 }
 
 export function resolveArticleHref(routePath: string, siteBaseUrl?: string): string {
-  return `${getGuidesBase(siteBaseUrl)}/${routePath}`
+  const normalizedRoutePath = routePath.replace(/^\/+/, '')
+  const siteBase = getSiteBase(siteBaseUrl)
+
+  return siteBase ? `${siteBase}/${normalizedRoutePath}` : `/${normalizedRoutePath}`
 }
 
 export function getArticleHref(guideId: string): string | null {

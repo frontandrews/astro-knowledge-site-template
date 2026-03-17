@@ -2,6 +2,7 @@
 import type { CollectionEntry } from 'astro:content'
 
 import { getAppHref } from '../lib/app-links'
+import { getGuideHrefFromEntryId } from '../lib/guide-links'
 import type { GuideTreeNode } from '../lib/guide-tree'
 
 type Props = {
@@ -33,11 +34,11 @@ function getPrimaryDeckHref(post: CollectionEntry<'guides'>) {
       <div class="guide-tree__posts">
         {node.posts.map((post) => (
           <article class="guide-tree__post" data-guide-post={post.data.guideId}>
-            <a class="guide-tree__post-link" href={`/guides/${post.id}`}>
+            <a class="guide-tree__post-link" href={getGuideHrefFromEntryId(post.id)}>
               <h3 class="guide-tree__post-title">{post.data.title}</h3>
             </a>
             <div class="guide-tree__post-actions">
-              <a class="button-link button-link--primary" href={`/guides/${post.id}`}>Learn</a>
+              <a class="button-link button-link--primary" href={getGuideHrefFromEntryId(post.id)}>Learn</a>
               {getPrimaryDeckHref(post) ? (
                 <a class="button-link" href={getPrimaryDeckHref(post)!}>Practice</a>
               ) : null}

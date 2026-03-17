@@ -196,9 +196,9 @@ describe('app routes', () => {
     expect(screen.getByTestId(testIds.deckDetail.reviewLink)).toBeInTheDocument()
     expect(screen.getByTestId(testIds.deckDetail.resetButton)).toBeInTheDocument()
     expect(screen.getByTestId(testIds.deckDetail.learnMoreSection)).toBeInTheDocument()
-    expect(screen.getByTestId(testIds.deckDetail.learnMoreLink('en/state-and-ui-thinking/react-derived-state-without-extra-bugs'))).toHaveAttribute(
+    expect(screen.getByTestId(testIds.deckDetail.learnMoreLink('en/guides/state-and-ui-thinking/react-derived-state-without-extra-bugs'))).toHaveAttribute(
       'href',
-      '/guides/en/state-and-ui-thinking/react-derived-state-without-extra-bugs',
+      '/en/guides/state-and-ui-thinking/react-derived-state-without-extra-bugs',
     )
   })
 
@@ -369,7 +369,7 @@ describe('app routes', () => {
     expect(screen.getByText(/const visibleUsers = users\.filter/i)).toBeInTheDocument()
     expect(screen.getByTestId(testIds.study.learnMoreLink)).toHaveAttribute(
       'href',
-      '/guides/en/state-and-ui-thinking/react-derived-state-without-extra-bugs',
+      '/en/guides/state-and-ui-thinking/react-derived-state-without-extra-bugs',
     )
   })
 

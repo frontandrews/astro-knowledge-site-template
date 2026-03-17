@@ -1,11 +1,25 @@
 ---
 import { getCollection } from 'astro:content'
+import { getGuideSectionSegment } from '@prepdeck/content'
 
-import ArticleCard from '../../components/ArticleCard.astro'
-import BaseLayout from '../../layouts/BaseLayout.astro'
-import { sortGuides } from '../../lib/guide-tree'
+import ArticleCard from '../../../components/ArticleCard.astro'
+import BaseLayout from '../../../layouts/BaseLayout.astro'
+import { sortGuides } from '../../../lib/guide-tree'
 
-const posts = sortGuides(await getCollection('guides'))
+export async function getStaticPaths() {
+  const posts = await getCollection('guides')
+  const locales = [...new Set(posts.map((post) => post.data.locale))]
+
+  return locales.map((locale) => ({
+    params: {
+      locale,
+      section: getGuideSectionSegment(locale),
+    },
+  }))
+}
+
+const { locale = 'en' } = Astro.params
+const posts = sortGuides((await getCollection('guides')).filter((post) => post.data.locale === locale))
 const categories = [...new Set(posts.map((post) => post.data.category))]
 const topics = [...new Set(posts.map((post) => post.data.topic).filter(Boolean))]
 ---

@@ -2,18 +2,21 @@
 import type { CollectionEntry } from 'astro:content'
 import { getCollection, render } from 'astro:content'
 import { getDeckSummaryById } from '@prepdeck/content/manifest'
-import { getTopicLabel } from '@prepdeck/content'
+import { getGuideSectionSegment, getTopicLabel } from '@prepdeck/content'
 
-import BaseLayout from '../../layouts/BaseLayout.astro'
-import { getAppHref } from '../../lib/app-links'
-import { sortGuides } from '../../lib/guide-tree'
+import BaseLayout from '../../../layouts/BaseLayout.astro'
+import { getAppHref } from '../../../lib/app-links'
+import { getGuideHrefFromEntryId } from '../../../lib/guide-links'
+import { sortGuides } from '../../../lib/guide-tree'
 
 export async function getStaticPaths() {
   const posts = await getCollection('guides')
 
   return posts.map((post) => ({
     params: {
-      slug: post.id,
+      locale: post.data.locale,
+      section: getGuideSectionSegment(post.data.locale),
+      slug: post.id.split('/').slice(1).join('/'),
     },
     props: {
       post,
@@ -27,7 +30,9 @@ type Props = {
 
 const { post } = Astro.props
 const { Content } = await render(post)
-const allPosts = sortGuides(await getCollection('guides'))
+const allPosts = sortGuides(
+  (await getCollection('guides')).filter((entry) => entry.data.locale === post.data.locale),
+)
 const parentPathKey = post.data.path.slice(0, -1).join('>')
 const relatedDecks = post.data.relatedDeckIds
   .map((deckId) => getDeckSummaryById(deckId))
@@ -204,7 +209,7 @@ const articlePath = post.data.path[0] === post.data.category
         </div>
         <div class="panel-grid panel-grid--summary">
           {nextReads.map((entry) => (
-            <a class="panel next-read-card" href={`/guides/${entry.id}`}>
+            <a class="panel next-read-card" href={getGuideHrefFromEntryId(entry.id)}>
               <h3>{entry.data.title}</h3>
               <p class="article-excerpt">{entry.data.summary}</p>
             </a>
@@ -259,56 +264,42 @@ const articlePath = post.data.path[0] === post.data.category
 
     if (completeButton) {
       completeButton.textContent = isComplete ? 'Completed' : 'Mark as completed'
-      completeButton.classList.toggle('button-link--primary', isComplete)
+      completeButton.classList.toggle('button-link--primary', !isComplete)
+      completeButton.classList.toggle('button-link--success', isComplete)
     }
-  }
-
-  const updateGuideCompletion = (nextComplete) => {
-    if (!guideId) {
-      return
-    }
-
-    const completed = readCompletedGuides()
-
-    if (nextComplete) {
-      completed.add(guideId)
-    } else {
-      completed.delete(guideId)
-    }
-
-    writeCompletedGuides(completed)
-    syncCompleteButton()
   }
 
   completeButton?.addEventListener('click', () => {
-    if (!guideId || !(completeDialog instanceof HTMLDialogElement)) {
+    const completed = readCompletedGuides()
+    const isComplete = Boolean(guideId && completed.has(guideId))
+
+    if (isComplete && guideId) {
+      completed.delete(guideId)
+      writeCompletedGuides(completed)
+      syncCompleteButton()
       return
     }
 
-    const completed = readCompletedGuides()
-    const isComplete = completed.has(guideId)
-
-    if (dialogTitle) {
-      dialogTitle.textContent = isComplete ? 'Mark this guide as incomplete?' : 'Mark this guide as completed?'
+    if (completeDialog instanceof HTMLDialogElement) {
+      dialogTitle.textContent = 'Mark this guide as completed?'
+      dialogCopy.textContent =
+        'When you mark this as complete, it will stop showing up in suggestions. You can still practice the topic later. Do you want to continue?'
+      completeDialog.showModal()
     }
-
-    if (dialogCopy) {
-      dialogCopy.textContent = isComplete
-        ? 'When you remove the completed state, this guide can appear in suggestions again. You can still keep reading or practice it later. Do you want to continue?'
-        : 'When you mark this as complete, it will stop showing up in suggestions. You can still practice the topic later. Do you want to continue?'
-    }
-
-    confirmButton?.setAttribute('data-next-complete', isComplete ? 'false' : 'true')
-    completeDialog.showModal()
   })
 
   confirmButton?.addEventListener('click', () => {
-    if (!(completeDialog instanceof HTMLDialogElement)) {
-      return
+    if (guideId) {
+      const completed = readCompletedGuides()
+      completed.add(guideId)
+      writeCompletedGuides(completed)
     }
 
-    updateGuideCompletion(confirmButton.getAttribute('data-next-complete') !== 'false')
-    completeDialog.close()
+    if (completeDialog instanceof HTMLDialogElement) {
+      completeDialog.close()
+    }
+
+    syncCompleteButton()
   })
 
   cancelButton?.addEventListener('click', () => {
