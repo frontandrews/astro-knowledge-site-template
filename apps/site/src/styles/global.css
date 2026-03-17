@@ -266,6 +266,51 @@ pre {
   gap: 0.9rem;
 }
 
+.guide-tree__details {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.guide-tree__summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+.guide-tree__summary::-webkit-details-marker {
+  display: none;
+}
+
+.guide-tree__summary::marker {
+  content: "";
+}
+
+.guide-tree__summary .guide-tree__label-row {
+  position: relative;
+  padding-left: 1.8rem;
+}
+
+.guide-tree__summary .guide-tree__label-row::before {
+  content: "+";
+  position: absolute;
+  left: 0;
+  top: 0.05rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.1rem;
+  height: 1.1rem;
+  border: 2px solid var(--site-line);
+  border-radius: 0.35rem;
+  color: var(--site-line-strong);
+  font-size: 0.85rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.guide-tree__details[open] > .guide-tree__summary .guide-tree__label-row::before {
+  content: "−";
+}
+
 .guide-tree__label-row {
   display: flex;
   flex-wrap: wrap;
@@ -345,6 +390,10 @@ pre {
 
 .article-breadcrumbs {
   margin-top: 0.9rem;
+}
+
+.article-connections {
+  margin-top: 1rem;
 }
 
 .article-section {

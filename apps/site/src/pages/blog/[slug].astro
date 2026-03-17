@@ -32,17 +32,27 @@ const allPosts = sortGuides(await getCollection('blog'))
 const relatedDecks = post.data.relatedDeckIds
   .map((deckId) => getDeckSummaryById(deckId))
   .filter((deck): deck is NonNullable<typeof deck> => Boolean(deck))
+const connectedPosts = allPosts.filter((entry) => {
+  if (entry.id === post.id) {
+    return false
+  }
+
+  return post.data.relationships.includes(entry.id)
+})
 const relatedPosts = allPosts
   .filter((entry) => {
     if (entry.id === post.id) {
       return false
     }
 
-    const isExplicitRelationship = post.data.relationships.includes(entry.id)
+    if (post.data.relationships.includes(entry.id)) {
+      return false
+    }
+
     const sharesTopic = entry.data.topic && entry.data.topic === post.data.topic
     const sharesTag = entry.data.tags.some((tag) => post.data.tags.includes(tag))
 
-    return Boolean(isExplicitRelationship || sharesTopic || sharesTag)
+    return Boolean(sharesTopic || sharesTag)
   })
   .slice(0, 2)
 const currentIndex = allPosts.findIndex((entry) => entry.id === post.id)
@@ -65,6 +75,14 @@ const nextPost = currentIndex > 0 ? allPosts[currentIndex - 1] ?? null : null
           <span class="badge">{segment}</span>
         ))}
       </div>
+      {connectedPosts.length > 0 ? (
+        <div class="meta-list article-connections">
+          <span class="badge badge--accent">Connected guides</span>
+          {connectedPosts.map((entry) => (
+            <a class="badge" href={`/blog/${entry.id}`}>{entry.data.title}</a>
+          ))}
+        </div>
+      ) : null}
       <h1 class="article-title">{post.data.title}</h1>
       <p class="article-excerpt">{post.data.description}</p>
       <div class="meta-list">
@@ -125,6 +143,22 @@ const nextPost = currentIndex > 0 ? allPosts[currentIndex - 1] ?? null : null
       <Content />
     </div>
 
+    {connectedPosts.length > 0 ? (
+      <section class="article-section">
+        <div class="section-header">
+          <div>
+            <p class="section-eyebrow">Connections</p>
+            <h2 class="section-heading section-heading--compact">Guides directly tied to this one</h2>
+          </div>
+        </div>
+        <div class="panel-grid panel-grid--articles">
+          {connectedPosts.map((entry) => (
+            <ArticleCard post={entry} />
+          ))}
+        </div>
+      </section>
+    ) : null}
+
     {relatedDecks.length > 0 ? (
       <section class="article-section">
         <div class="section-header">
@@ -159,7 +193,7 @@ const nextPost = currentIndex > 0 ? allPosts[currentIndex - 1] ?? null : null
         <div class="section-header">
           <div>
             <p class="section-eyebrow">Keep reading</p>
-            <h2 class="section-heading section-heading--compact">More articles around this topic</h2>
+            <h2 class="section-heading section-heading--compact">More guides around this area</h2>
           </div>
         </div>
         <div class="panel-grid panel-grid--articles">

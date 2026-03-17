@@ -9,6 +9,8 @@ type Props = {
 }
 
 const { node } = Astro.props
+const hasChildren = node.children.length > 0
+const shouldStartOpen = node.depth === 0
 
 function getPrimaryDeckHref(post: CollectionEntry<'blog'>) {
   const deckId = post.data.relatedDeckIds[0]
@@ -17,41 +19,76 @@ function getPrimaryDeckHref(post: CollectionEntry<'blog'>) {
 ---
 
 <li class={`guide-tree__item guide-tree__item--depth-${node.depth}`}>
-  <div class="guide-tree__branch">
-    <div class="guide-tree__label-row">
-      <p class="guide-tree__label">{node.label}</p>
-      <span class="badge">{node.guideCount} guide{node.guideCount === 1 ? '' : 's'}</span>
-    </div>
+  {hasChildren ? (
+    <details class="guide-tree__details" open={shouldStartOpen}>
+      <summary class="guide-tree__summary">
+        <div class="guide-tree__label-row">
+          <p class="guide-tree__label">{node.label}</p>
+          <span class="badge">{node.guideCount} guide{node.guideCount === 1 ? '' : 's'}</span>
+          <span class="badge">{node.children.length} branch{node.children.length === 1 ? '' : 'es'}</span>
+        </div>
+      </summary>
 
-    {node.posts.length > 0 ? (
-      <div class="guide-tree__posts">
-        {node.posts.map((post) => (
-          <article class="panel guide-tree__post">
-            <div class="meta-list">
-              <span class="badge badge--accent">{post.data.category}</span>
-              {post.data.topic ? <span class="badge">{post.data.topic}</span> : null}
-            </div>
-            <div>
-              <h3>{post.data.title}</h3>
-              <p class="article-excerpt">{post.data.summary}</p>
-            </div>
-            <div class="meta-list">
-              <a class="button-link button-link--primary" href={`/blog/${post.id}`}>Open guide</a>
-              {getPrimaryDeckHref(post) ? (
-                <a class="button-link" href={getPrimaryDeckHref(post)!}>Open practice</a>
-              ) : null}
-            </div>
-          </article>
-        ))}
+      <div class="guide-tree__branch">
+        {node.posts.length > 0 ? (
+          <div class="guide-tree__posts">
+            {node.posts.map((post) => (
+              <article class="panel guide-tree__post">
+                <div class="meta-list">
+                  <span class="badge badge--accent">{post.data.category}</span>
+                  {post.data.topic ? <span class="badge">{post.data.topic}</span> : null}
+                </div>
+                <div>
+                  <h3>{post.data.title}</h3>
+                  <p class="article-excerpt">{post.data.summary}</p>
+                </div>
+                <div class="meta-list">
+                  <a class="button-link button-link--primary" href={`/blog/${post.id}`}>Open guide</a>
+                  {getPrimaryDeckHref(post) ? (
+                    <a class="button-link" href={getPrimaryDeckHref(post)!}>Open practice</a>
+                  ) : null}
+                </div>
+              </article>
+            ))}
+          </div>
+        ) : null}
+
+        <ul class="guide-tree">
+          {node.children.map((child) => (
+            <Astro.self node={child} />
+          ))}
+        </ul>
       </div>
-    ) : null}
-  </div>
+    </details>
+  ) : (
+    <div class="guide-tree__branch">
+      <div class="guide-tree__label-row">
+        <p class="guide-tree__label">{node.label}</p>
+        <span class="badge">{node.guideCount} guide{node.guideCount === 1 ? '' : 's'}</span>
+      </div>
 
-  {node.children.length > 0 ? (
-    <ul class="guide-tree">
-      {node.children.map((child) => (
-        <Astro.self node={child} />
-      ))}
-    </ul>
-  ) : null}
+      {node.posts.length > 0 ? (
+        <div class="guide-tree__posts">
+          {node.posts.map((post) => (
+            <article class="panel guide-tree__post">
+              <div class="meta-list">
+                <span class="badge badge--accent">{post.data.category}</span>
+                {post.data.topic ? <span class="badge">{post.data.topic}</span> : null}
+              </div>
+              <div>
+                <h3>{post.data.title}</h3>
+                <p class="article-excerpt">{post.data.summary}</p>
+              </div>
+              <div class="meta-list">
+                <a class="button-link button-link--primary" href={`/blog/${post.id}`}>Open guide</a>
+                {getPrimaryDeckHref(post) ? (
+                  <a class="button-link" href={getPrimaryDeckHref(post)!}>Open practice</a>
+                ) : null}
+              </div>
+            </article>
+          ))}
+        </div>
+      ) : null}
+    </div>
+  )}
 </li>
