@@ -60,14 +60,6 @@ const guideTree = buildGuideTree(posts)
     <div class="panel tree-controls">
       <div class="tree-controls__header">
         <p class="section-eyebrow">Filter by category</p>
-        <div class="meta-list">
-          <button class="guide-filter-chip" data-tree-action="expand-all" type="button">
-            Expand all
-          </button>
-          <button class="guide-filter-chip" data-tree-action="collapse-all" type="button">
-            Collapse all
-          </button>
-        </div>
       </div>
       <div class="meta-list">
         {guideTree.map((node) => (
@@ -87,7 +79,6 @@ const guideTree = buildGuideTree(posts)
 </BaseLayout>
 
 <script is:inline>
-  const treeDetails = [...document.querySelectorAll('[data-guide-tree-details]')]
   const rootNodes = [...document.querySelectorAll('[data-guide-node]')]
   const categoryButtons = [...document.querySelectorAll('[data-tree-filter]')]
   const activeCategories = new Set()
@@ -126,14 +117,6 @@ const guideTree = buildGuideTree(posts)
       node.toggleAttribute('hidden', !shouldShow)
     })
   }
-
-  document.querySelector('[data-tree-action="expand-all"]')?.addEventListener('click', () => {
-    treeDetails.forEach((detail) => detail.setAttribute('open', ''))
-  })
-
-  document.querySelector('[data-tree-action="collapse-all"]')?.addEventListener('click', () => {
-    treeDetails.forEach((detail) => detail.removeAttribute('open'))
-  })
 
   categoryButtons.forEach((button) => {
     button.addEventListener('click', () => {
