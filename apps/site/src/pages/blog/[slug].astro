@@ -74,16 +74,19 @@ const nextReads = [...new Map(
     .map((entry) => [entry.id, entry]),
 ).values()].slice(0, 3)
 const primaryDeck = relatedDecks[0] ?? null
+const articleKicker = post.data.topic && post.data.topic !== post.data.category
+  ? `${post.data.category} / ${post.data.topic}`
+  : post.data.category
+const articlePath = post.data.path[0] === post.data.category
+  ? post.data.path.slice(1)
+  : post.data.path
 ---
 
 <BaseLayout description={post.data.description} title={post.data.title}>
   <article class="article-shell">
     <header class="article-header">
-      <p class="article-kicker">
-        {post.data.category}
-        {post.data.topic ? ` / ${post.data.topic}` : ''}
-      </p>
-      <p class="article-path">{post.data.path.join(' / ')}</p>
+      <p class="article-kicker">{articleKicker}</p>
+      {articlePath.length > 0 ? <p class="article-path">{articlePath.join(' / ')}</p> : null}
       <h1 class="article-title">{post.data.title}</h1>
       <p class="article-excerpt">{post.data.description}</p>
       <div class="article-author-row">
@@ -109,11 +112,11 @@ const primaryDeck = relatedDecks[0] ?? null
       <div class="meta-list article-header-actions">
         {primaryDeck ? (
           <a class="button-link button-link--primary" href={getAppHref(`/decks/${primaryDeck.id}`)}>
-            Test
+            Test knowledge
           </a>
         ) : null}
         <button class="button-link" data-guide-complete-toggle data-guide-id={post.id} type="button">
-          Mark complete
+          Mark as completed
         </button>
       </div>
       {post.data.tags.length > 0 ? (
@@ -210,11 +213,33 @@ const primaryDeck = relatedDecks[0] ?? null
       </section>
     ) : null}
   </article>
+
+  <dialog class="confirm-dialog" data-guide-complete-dialog>
+    <div class="confirm-dialog__content">
+      <h2 class="section-heading section-heading--compact" data-guide-dialog-title>Mark this guide as completed?</h2>
+      <p class="section-copy" data-guide-dialog-copy>
+        When you mark this as complete, it will stop showing up in suggestions. You can still practice the topic later. Do you want to continue?
+      </p>
+      <div class="meta-list confirm-dialog__actions">
+        <button class="button-link button-link--primary" data-guide-complete-confirm type="button">
+          Yes, continue
+        </button>
+        <button class="button-link" data-guide-complete-cancel type="button">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </dialog>
 </BaseLayout>
 
 <script is:inline>
   const guideId = document.querySelector('[data-guide-complete-toggle]')?.getAttribute('data-guide-id')
   const completeButton = document.querySelector('[data-guide-complete-toggle]')
+  const completeDialog = document.querySelector('[data-guide-complete-dialog]')
+  const confirmButton = document.querySelector('[data-guide-complete-confirm]')
+  const cancelButton = document.querySelector('[data-guide-complete-cancel]')
+  const dialogTitle = document.querySelector('[data-guide-dialog-title]')
+  const dialogCopy = document.querySelector('[data-guide-dialog-copy]')
 
   const readCompletedGuides = () => {
     try {
@@ -233,25 +258,63 @@ const primaryDeck = relatedDecks[0] ?? null
     const isComplete = Boolean(guideId && completed.has(guideId))
 
     if (completeButton) {
-      completeButton.textContent = isComplete ? 'Completed' : 'Mark complete'
+      completeButton.textContent = isComplete ? 'Completed' : 'Mark as completed'
       completeButton.classList.toggle('button-link--primary', isComplete)
     }
   }
 
-  completeButton?.addEventListener('click', () => {
+  const updateGuideCompletion = (nextComplete) => {
     if (!guideId) {
       return
     }
 
     const completed = readCompletedGuides()
-    if (completed.has(guideId)) {
-      completed.delete(guideId)
-    } else {
+
+    if (nextComplete) {
       completed.add(guideId)
+    } else {
+      completed.delete(guideId)
     }
 
     writeCompletedGuides(completed)
     syncCompleteButton()
+  }
+
+  completeButton?.addEventListener('click', () => {
+    if (!guideId || !(completeDialog instanceof HTMLDialogElement)) {
+      return
+    }
+
+    const completed = readCompletedGuides()
+    const isComplete = completed.has(guideId)
+
+    if (dialogTitle) {
+      dialogTitle.textContent = isComplete ? 'Mark this guide as incomplete?' : 'Mark this guide as completed?'
+    }
+
+    if (dialogCopy) {
+      dialogCopy.textContent = isComplete
+        ? 'When you remove the completed state, this guide can appear in suggestions again. You can still keep reading or practice it later. Do you want to continue?'
+        : 'When you mark this as complete, it will stop showing up in suggestions. You can still practice the topic later. Do you want to continue?'
+    }
+
+    confirmButton?.setAttribute('data-next-complete', isComplete ? 'false' : 'true')
+    completeDialog.showModal()
+  })
+
+  confirmButton?.addEventListener('click', () => {
+    if (!(completeDialog instanceof HTMLDialogElement)) {
+      return
+    }
+
+    updateGuideCompletion(confirmButton.getAttribute('data-next-complete') !== 'false')
+    completeDialog.close()
+  })
+
+  cancelButton?.addEventListener('click', () => {
+    if (completeDialog instanceof HTMLDialogElement) {
+      completeDialog.close()
+    }
   })
 
   syncCompleteButton()

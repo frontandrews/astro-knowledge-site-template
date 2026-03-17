@@ -606,6 +606,10 @@ pre {
   margin-top: 1rem;
 }
 
+.article-header-actions {
+  justify-content: flex-start;
+}
+
 .article-section {
   margin-top: 2rem;
   padding-top: 1.75rem;
@@ -683,6 +687,30 @@ pre {
   border-color: var(--site-line-strong);
   background: var(--site-surface-strong);
   transform: translateY(-2px);
+}
+
+.confirm-dialog {
+  width: min(32rem, calc(100vw - 2rem));
+  padding: 0;
+  border: 2px solid var(--site-line-strong);
+  border-radius: var(--radius);
+  background: var(--site-surface);
+  color: var(--site-ink);
+  box-shadow: 8px 8px 0 0 var(--site-line);
+}
+
+.confirm-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.68);
+}
+
+.confirm-dialog__content {
+  display: grid;
+  gap: 0.9rem;
+  padding: 1.1rem;
+}
+
+.confirm-dialog__actions {
+  justify-content: flex-end;
 }
 
 .article-title {
