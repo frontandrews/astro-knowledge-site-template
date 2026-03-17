@@ -4,6 +4,7 @@ description: How to talk about delivery pressure without hiding risk or pretendi
 summary: Make the tradeoff explicit early and cut scope before you quietly cut quality.
 guideId: scope-risk-and-quality
 locale: en
+status: archived
 pubDate: 2026-03-17
 category: Execution & Communication
 topic: Delivery

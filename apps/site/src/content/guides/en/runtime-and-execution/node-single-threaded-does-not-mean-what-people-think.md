@@ -4,6 +4,7 @@ description: How to explain the difference between the JavaScript thread, the ev
 summary: The interview answer that separates the main thread from the whole runtime.
 guideId: node-single-thread
 locale: en
+status: archived
 pubDate: 2026-03-17
 category: Runtime & Execution
 topic: Node

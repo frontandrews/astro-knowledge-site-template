@@ -19,6 +19,8 @@ const pageTitle = `${title} | Prepdeck`
 const pathname = Astro.url.pathname
 const guideLocale = getGuideLocaleFromPathname(pathname)
 const guideIndexHref = getGuideIndexHref(guideLocale)
+const englishGuideIndexHref = getGuideIndexHref('en')
+const portugueseGuideIndexHref = getGuideIndexHref('pt-br')
 
 function getNavClass(href: string) {
   const isActive =
@@ -65,6 +67,24 @@ function getNavClass(href: string) {
             <a class={getNavClass(guideIndexHref)} href={guideIndexHref}>Path</a>
             <a class={getNavClass('/map')} href="/map">Map</a>
             <a class="site-nav__link" href={getAppHref('/')}>Practice</a>
+            <div aria-label="Language switcher" class="site-lang-switcher">
+              <a
+                class={guideLocale === 'en' ? 'site-nav__link site-nav__link--active' : 'site-nav__link'}
+                href={englishGuideIndexHref}
+                hreflang="en"
+                lang="en"
+              >
+                EN
+              </a>
+              <a
+                class={guideLocale === 'pt-br' ? 'site-nav__link site-nav__link--active' : 'site-nav__link'}
+                href={portugueseGuideIndexHref}
+                hreflang="pt-BR"
+                lang="pt-BR"
+              >
+                PT
+              </a>
+            </div>
             <button aria-label="Toggle theme" class="site-theme-toggle" data-theme-toggle type="button">
               <Icon aria-hidden="true" class="site-theme-toggle__icon site-theme-toggle__icon--sun" name="lucide:sun" />
               <Icon aria-hidden="true" class="site-theme-toggle__icon site-theme-toggle__icon--moon" name="lucide:moon" />

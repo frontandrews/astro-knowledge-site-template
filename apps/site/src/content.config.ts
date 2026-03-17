@@ -19,6 +19,7 @@ const guides = defineCollection({
     relationships: z.array(z.string().min(1)).default([]),
     relatedDeckIds: z.array(z.string()).default([]),
     summary: z.string().min(1),
+    status: z.enum(['active', 'archived']).default('active'),
     takeaways: z.array(z.string()).default([]),
     tags: z.array(z.string()).default([]),
     title: z.string().min(1),

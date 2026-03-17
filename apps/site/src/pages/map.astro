@@ -1,11 +1,12 @@
 ---
 import { getCollection } from 'astro:content'
+import { PATH_TO_SENIOR_PILLARS } from '@prepdeck/content'
 
 import GuideMapCard from '../components/GuideMapCard.astro'
 import BaseLayout from '../layouts/BaseLayout.astro'
 import { buildGuideMap } from '../lib/guide-map'
 
-const posts = await getCollection('guides')
+const posts = (await getCollection('guides')).filter((post) => post.data.status !== 'archived')
 const sections = buildGuideMap(posts)
 ---
 
@@ -22,7 +23,7 @@ const sections = buildGuideMap(posts)
     </div>
   </section>
 
-  {sections.map((section) => (
+  {sections.length > 0 ? sections.map((section) => (
     <section class="section section--compact">
       <div class="section-header">
         <div>
@@ -36,5 +37,20 @@ const sections = buildGuideMap(posts)
         ))}
       </div>
     </section>
-  ))}
+  )) : (
+    <section class="section section--compact">
+      <div class="panel empty-state-panel">
+        <h2 class="section-heading section-heading--compact">No active map yet.</h2>
+        <p class="section-copy">The guide graph will come back as the new Path to Senior content goes live.</p>
+        <ul class="planned-pillar-list">
+          {PATH_TO_SENIOR_PILLARS.map((pillar) => (
+            <li>
+              <strong>{pillar.order}. {pillar.title}</strong>
+              <span>{pillar.summary}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )}
 </BaseLayout>

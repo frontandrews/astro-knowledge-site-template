@@ -31,7 +31,9 @@ type Props = {
 const { post } = Astro.props
 const { Content } = await render(post)
 const allPosts = sortGuides(
-  (await getCollection('guides')).filter((entry) => entry.data.locale === post.data.locale),
+  (await getCollection('guides')).filter(
+    (entry) => entry.data.locale === post.data.locale && entry.data.status !== 'archived',
+  ),
 )
 const parentPathKey = post.data.path.slice(0, -1).join('>')
 const relatedDecks = post.data.relatedDeckIds

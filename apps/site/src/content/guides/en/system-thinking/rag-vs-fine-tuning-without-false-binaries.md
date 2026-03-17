@@ -4,6 +4,7 @@ description: A practical way to explain retrieval and fine-tuning based on the p
 summary: Separate knowledge access from behavior change before you pick the system shape.
 guideId: rag-vs-fine-tuning
 locale: en
+status: archived
 pubDate: 2026-03-17
 category: System Thinking
 topic: AI Engineering

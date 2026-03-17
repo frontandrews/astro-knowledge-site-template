@@ -4,6 +4,7 @@ description: Why copying props into state often creates more problems than it so
 summary: A cleaner mental model for derived state questions in React interviews.
 guideId: react-derived-state
 locale: en
+status: archived
 pubDate: 2026-03-17
 category: State & UI Thinking
 topic: React

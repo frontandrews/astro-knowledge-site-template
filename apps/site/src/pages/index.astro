@@ -1,11 +1,12 @@
 ---
 import { getCollection } from 'astro:content'
+import { PATH_TO_SENIOR_PILLARS } from '@prepdeck/content'
 
 import GuideTreeNode from '../components/GuideTreeNode.astro'
 import BaseLayout from '../layouts/BaseLayout.astro'
 import { buildGuideTree } from '../lib/guide-tree'
 
-const posts = await getCollection('guides')
+const posts = (await getCollection('guides')).filter((post) => post.data.status !== 'archived')
 const guideTree = buildGuideTree(posts)
 ---
 
@@ -21,22 +22,39 @@ const guideTree = buildGuideTree(posts)
       </div>
     </div>
 
-    <div class="tree-controls tree-controls--compact">
-      <p class="section-eyebrow">Filter by category</p>
-      <div class="meta-list">
-        {guideTree.map((node) => (
-          <button class="guide-filter-chip" data-tree-filter={node.label} type="button">
-            {node.label}
-          </button>
-        ))}
-      </div>
-    </div>
+    {guideTree.length > 0 ? (
+      <>
+        <div class="tree-controls tree-controls--compact">
+          <p class="section-eyebrow">Filter by category</p>
+          <div class="meta-list">
+            {guideTree.map((node) => (
+              <button class="guide-filter-chip" data-tree-filter={node.label} type="button">
+                {node.label}
+              </button>
+            ))}
+          </div>
+        </div>
 
-    <ul class="guide-tree guide-tree--root">
-      {guideTree.map((node) => (
-        <GuideTreeNode node={node} />
-      ))}
-    </ul>
+        <ul class="guide-tree guide-tree--root">
+          {guideTree.map((node) => (
+            <GuideTreeNode node={node} />
+          ))}
+        </ul>
+      </>
+    ) : (
+      <div class="panel empty-state-panel">
+        <h2 class="section-heading section-heading--compact">The new path is being rebuilt.</h2>
+        <p class="section-copy">The old seed guides are archived. New active guides will land under these pillars.</p>
+        <ul class="planned-pillar-list">
+          {PATH_TO_SENIOR_PILLARS.map((pillar) => (
+            <li>
+              <strong>{pillar.order}. {pillar.title}</strong>
+              <span>{pillar.summary}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
   </section>
 </BaseLayout>
 

@@ -1,16 +1,13 @@
 ---
 import { getCollection } from 'astro:content'
-import { getGuideSectionSegment } from '@prepdeck/content'
+import { getGuideSectionSegment, PATH_TO_SENIOR_PILLARS, SUPPORTED_GUIDE_LOCALES } from '@prepdeck/content'
 
 import ArticleCard from '../../../components/ArticleCard.astro'
 import BaseLayout from '../../../layouts/BaseLayout.astro'
 import { sortGuides } from '../../../lib/guide-tree'
 
 export async function getStaticPaths() {
-  const posts = await getCollection('guides')
-  const locales = [...new Set(posts.map((post) => post.data.locale))]
-
-  return locales.map((locale) => ({
+  return SUPPORTED_GUIDE_LOCALES.map((locale) => ({
     params: {
       locale,
       section: getGuideSectionSegment(locale),
@@ -19,7 +16,11 @@ export async function getStaticPaths() {
 }
 
 const { locale = 'en' } = Astro.params
-const posts = sortGuides((await getCollection('guides')).filter((post) => post.data.locale === locale))
+const posts = sortGuides(
+  (await getCollection('guides')).filter(
+    (post) => post.data.locale === locale && post.data.status !== 'archived',
+  ),
+)
 const categories = [...new Set(posts.map((post) => post.data.category))]
 const topics = [...new Set(posts.map((post) => post.data.topic).filter(Boolean))]
 ---
@@ -36,62 +37,64 @@ const topics = [...new Set(posts.map((post) => post.data.topic).filter(Boolean))
       </div>
     </div>
 
-    <div class="panel guide-directory-controls">
-      <div class="guide-directory-controls__grid">
-        <label class="guide-directory-search">
-          <input
-            class="guide-directory-search__input"
-            data-guide-search
-            name="search"
-            placeholder="React, RAG, standups, scope..."
-            type="search"
-          />
-        </label>
+    {posts.length > 0 ? (
+      <div class="panel guide-directory-controls">
+        <div class="guide-directory-controls__grid">
+          <label class="guide-directory-search">
+            <input
+              class="guide-directory-search__input"
+              data-guide-search
+              name="search"
+              placeholder="React, RAG, standups, scope..."
+              type="search"
+            />
+          </label>
 
-        <div>
-          <div class="meta-list" data-guide-filter-group="category">
-            <button class="guide-filter-chip guide-filter-chip--active" data-filter-value="all" type="button">
-              All
-            </button>
-            {categories.map((category) => (
-              <button class="guide-filter-chip" data-filter-value={category} type="button">
-                {category}
+          <div>
+            <div class="meta-list" data-guide-filter-group="category">
+              <button class="guide-filter-chip guide-filter-chip--active" data-filter-value="all" type="button">
+                All
               </button>
-            ))}
+              {categories.map((category) => (
+                <button class="guide-filter-chip" data-filter-value={category} type="button">
+                  {category}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
 
-        <div>
-          <div class="meta-list" data-guide-filter-group="topic">
-            <button class="guide-filter-chip guide-filter-chip--active" data-filter-value="all" type="button">
-              All
-            </button>
-            {topics.map((topic) => (
-              <button class="guide-filter-chip" data-filter-value={topic} type="button">
-                {topic}
+          <div>
+            <div class="meta-list" data-guide-filter-group="topic">
+              <button class="guide-filter-chip guide-filter-chip--active" data-filter-value="all" type="button">
+                All
               </button>
-            ))}
+              {topics.map((topic) => (
+                <button class="guide-filter-chip" data-filter-value={topic} type="button">
+                  {topic}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
 
-        <div>
-          <div class="meta-list" data-guide-filter-group="practice">
-            <button class="guide-filter-chip guide-filter-chip--active" data-filter-value="all" type="button">
-              All
-            </button>
-            <button class="guide-filter-chip" data-filter-value="with-practice" type="button">
-              Has practice deck
-            </button>
-            <button class="guide-filter-chip" data-filter-value="reading-only" type="button">
-              Reading only
-            </button>
+          <div>
+            <div class="meta-list" data-guide-filter-group="practice">
+              <button class="guide-filter-chip guide-filter-chip--active" data-filter-value="all" type="button">
+                All
+              </button>
+              <button class="guide-filter-chip" data-filter-value="with-practice" type="button">
+                Has practice deck
+              </button>
+              <button class="guide-filter-chip" data-filter-value="reading-only" type="button">
+                Reading only
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    ) : null}
   </section>
 
-  {categories.map((category) => (
+  {posts.length > 0 ? categories.map((category) => (
     <section class="section section--compact" data-guide-section={category}>
       <h2 class="section-heading section-heading--compact">{category}</h2>
       <div class="panel-grid panel-grid--articles">
@@ -110,16 +113,33 @@ const topics = [...new Set(posts.map((post) => post.data.topic).filter(Boolean))
           ))}
       </div>
     </section>
-  ))}
+  )) : (
+    <section class="section section--compact">
+      <div class="panel empty-state-panel">
+        <h2 class="section-heading section-heading--compact">No active guides yet for this language.</h2>
+        <p class="section-copy">The new path is being rebuilt. These are the pillars the next guides will follow.</p>
+        <ul class="planned-pillar-list">
+          {PATH_TO_SENIOR_PILLARS.map((pillar) => (
+            <li>
+              <strong>{pillar.order}. {pillar.title}</strong>
+              <span>{pillar.summary}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )}
 
-  <section class="section guide-directory-empty" data-guide-empty hidden>
-    <div class="panel">
-      <h2 class="section-heading section-heading--compact">No guides match the current filters.</h2>
-      <p class="section-copy">
-        Clear one filter or widen the search to reopen the full directory.
-      </p>
-    </div>
-  </section>
+  {posts.length > 0 ? (
+    <section class="section guide-directory-empty" data-guide-empty hidden>
+      <div class="panel">
+        <h2 class="section-heading section-heading--compact">No guides match the current filters.</h2>
+        <p class="section-copy">
+          Clear one filter or widen the search to reopen the full directory.
+        </p>
+      </div>
+    </section>
+  ) : null}
 </BaseLayout>
 
 <script is:inline>

@@ -4,6 +4,7 @@ description: A practical way to explain stack, microtasks, and macrotasks in int
 summary: A cleaner explanation of why promises often resolve before timeouts.
 guideId: javascript-event-loop
 locale: en
+status: archived
 pubDate: 2026-03-17
 category: Runtime & Execution
 topic: JavaScript

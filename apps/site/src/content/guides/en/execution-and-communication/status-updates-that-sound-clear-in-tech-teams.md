@@ -4,6 +4,7 @@ description: A repeatable structure for status updates in standups, scrums, and 
 summary: Good status updates are simple, structured, and explicit about what changed and what is at risk.
 guideId: status-updates
 locale: en
+status: archived
 pubDate: 2026-03-17
 category: Execution & Communication
 topic: English for Tech
