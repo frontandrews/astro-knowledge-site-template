@@ -448,8 +448,8 @@ function getSecondaryAction(weakestRecord: DeckRecord | null, starterRecord: Dec
     return {
       detail: `${weakestRecord.counts.partial + weakestRecord.counts.notLearned} cards still need work in ${weakestRecord.deck.title}.`,
       eyebrow: 'Weak spots',
-      href: `/decks/${weakestRecord.deck.id}/review`,
-      label: 'Review weak spots',
+      href: `/study/${weakestRecord.deck.id}?mode=start&scope=weak`,
+      label: 'Fix weak cards',
       title: weakestRecord.deck.title,
     }
   }

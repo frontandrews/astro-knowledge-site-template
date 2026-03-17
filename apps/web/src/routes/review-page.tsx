@@ -77,6 +77,11 @@ export function ReviewPage() {
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
+            {counts.partial + counts.notLearned > 0 ? (
+              <LinkButton to={`/study/${deck.id}?mode=start&scope=weak`} variant="secondary">
+                Study weak cards
+              </LinkButton>
+            ) : null}
             <LinkButton to={`/decks/${deck.id}`} variant="ghost">
               Back to deck
             </LinkButton>
