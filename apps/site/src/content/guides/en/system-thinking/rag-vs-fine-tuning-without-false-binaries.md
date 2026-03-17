@@ -5,12 +5,11 @@ summary: Separate knowledge access from behavior change before you pick the syst
 guideId: rag-vs-fine-tuning
 locale: en
 pubDate: 2026-03-17
-category: AI Engineering
+category: System Thinking
 topic: AI Engineering
 path:
-  - AI Engineering
-  - Knowledge and Context
-  - RAG vs Fine-Tuning
+  - System Thinking
+  - AI Systems and Retrieval
 order: 10
 relationships:
   - scope-risk-and-quality

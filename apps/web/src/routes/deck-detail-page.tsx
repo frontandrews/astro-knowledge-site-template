@@ -127,7 +127,7 @@ export function DeckDetailPage() {
               {articleLinks.map((article) => (
                 <div
                   className="flex flex-col gap-3 border-b border-[var(--retro-line)] pb-3 last:border-b-0 last:pb-0 sm:flex-row sm:items-center sm:justify-between"
-                  key={article.slug}
+                  key={article.routePath}
                 >
                   <p className="text-sm font-black text-[var(--retro-ink)]">
                     {article.question}
@@ -135,7 +135,7 @@ export function DeckDetailPage() {
                   <div className="flex flex-wrap gap-2">
                     <a
                       className="inline-flex min-h-10 items-center justify-center rounded-[0.95rem] border-2 border-[var(--retro-line-strong)] bg-[var(--retro-surface)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--retro-ink)] shadow-[4px_4px_0_var(--retro-shadow)] transition hover:bg-[var(--retro-surface-strong)]"
-                      data-testid={testIds.deckDetail.learnMoreLink(article.slug)}
+                      data-testid={testIds.deckDetail.learnMoreLink(article.routePath)}
                       href={getArticleHref(article.guideId) ?? undefined}
                       rel="noreferrer"
                       target="_blank"

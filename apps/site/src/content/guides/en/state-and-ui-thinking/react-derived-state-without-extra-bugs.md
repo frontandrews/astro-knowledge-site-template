@@ -5,12 +5,11 @@ summary: A cleaner mental model for derived state questions in React interviews.
 guideId: react-derived-state
 locale: en
 pubDate: 2026-03-17
-category: Programming
+category: State & UI Thinking
 topic: React
 path:
-  - Programming
-  - React
-  - State
+  - State & UI Thinking
+  - State Ownership
 order: 10
 relationships:
   - javascript-event-loop

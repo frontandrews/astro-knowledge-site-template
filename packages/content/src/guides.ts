@@ -1,39 +1,39 @@
 export type GuideRegistryEntry = {
   guideId: string
   locale: string
-  slug: string
+  routePath: string
 }
 
 const GUIDE_REGISTRY: GuideRegistryEntry[] = [
   {
     guideId: 'javascript-event-loop',
     locale: 'en',
-    slug: 'javascript-event-loop-without-hand-waving',
+    routePath: 'en/runtime-and-execution/javascript-event-loop-without-hand-waving',
   },
   {
     guideId: 'node-single-thread',
     locale: 'en',
-    slug: 'node-single-threaded-does-not-mean-what-people-think',
+    routePath: 'en/runtime-and-execution/node-single-threaded-does-not-mean-what-people-think',
   },
   {
     guideId: 'rag-vs-fine-tuning',
     locale: 'en',
-    slug: 'rag-vs-fine-tuning-without-false-binaries',
+    routePath: 'en/system-thinking/rag-vs-fine-tuning-without-false-binaries',
   },
   {
     guideId: 'react-derived-state',
     locale: 'en',
-    slug: 'react-derived-state-without-extra-bugs',
+    routePath: 'en/state-and-ui-thinking/react-derived-state-without-extra-bugs',
   },
   {
     guideId: 'scope-risk-and-quality',
     locale: 'en',
-    slug: 'scope-risk-and-quality-without-fake-certainty',
+    routePath: 'en/execution-and-communication/scope-risk-and-quality-without-fake-certainty',
   },
   {
     guideId: 'status-updates',
     locale: 'en',
-    slug: 'status-updates-that-sound-clear-in-tech-teams',
+    routePath: 'en/execution-and-communication/status-updates-that-sound-clear-in-tech-teams',
   },
 ]
 
@@ -48,6 +48,6 @@ export function getGuideEntry(guideId: string, locale = 'en') {
   )
 }
 
-export function getGuideSlug(guideId: string, locale = 'en') {
-  return getGuideEntry(guideId, locale)?.slug
+export function getGuideRoutePath(guideId: string, locale = 'en') {
+  return getGuideEntry(guideId, locale)?.routePath
 }

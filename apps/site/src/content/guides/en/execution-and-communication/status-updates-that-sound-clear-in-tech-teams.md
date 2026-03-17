@@ -5,12 +5,11 @@ summary: Good status updates are simple, structured, and explicit about what cha
 guideId: status-updates
 locale: en
 pubDate: 2026-03-17
-category: English for Tech
+category: Execution & Communication
 topic: English for Tech
 path:
-  - English for Tech
-  - Meetings
-  - Status Updates
+  - Execution & Communication
+  - Communication in Work and Interviews
 order: 10
 relationships:
   - scope-risk-and-quality

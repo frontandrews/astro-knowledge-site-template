@@ -1,36 +1,38 @@
-import { getGuideSlug } from '@prepdeck/content'
+import { getGuideRoutePath } from '@prepdeck/content'
 import type { Deck } from '@prepdeck/schemas'
 
-const BLOG_PATH = '/blog'
+const GUIDES_PATH = '/guides'
 
-function getBlogBase(siteBaseUrl?: string): string {
+function getGuidesBase(siteBaseUrl?: string): string {
   const normalizedBase = siteBaseUrl?.trim().replace(/\/+$/, '') ?? ''
 
   if (!normalizedBase) {
-    return BLOG_PATH
+    return GUIDES_PATH
   }
 
-  return normalizedBase.endsWith(BLOG_PATH) ? normalizedBase : `${normalizedBase}${BLOG_PATH}`
+  return normalizedBase.endsWith(GUIDES_PATH)
+    ? normalizedBase
+    : `${normalizedBase}${GUIDES_PATH}`
 }
 
-export function resolveArticleHref(slug: string, siteBaseUrl?: string): string {
-  return `${getBlogBase(siteBaseUrl)}/${slug}`
+export function resolveArticleHref(routePath: string, siteBaseUrl?: string): string {
+  return `${getGuidesBase(siteBaseUrl)}/${routePath}`
 }
 
 export function getArticleHref(guideId: string): string | null {
-  const slug = getGuideSlug(guideId)
+  const routePath = getGuideRoutePath(guideId)
 
-  if (!slug) {
+  if (!routePath) {
     return null
   }
 
-  return resolveArticleHref(slug, import.meta.env.VITE_PUBLIC_SITE_URL)
+  return resolveArticleHref(routePath, import.meta.env.VITE_PUBLIC_SITE_URL)
 }
 
 export type DeckArticleLink = {
   guideId: string
   question: string
-  slug: string
+  routePath: string
 }
 
 export function getDeckArticleLinks(deck: Deck): DeckArticleLink[] {
@@ -41,9 +43,9 @@ export function getDeckArticleLinks(deck: Deck): DeckArticleLink[] {
       return []
     }
 
-    const slug = getGuideSlug(card.learnMoreGuideId)
+    const routePath = getGuideRoutePath(card.learnMoreGuideId)
 
-    if (!slug) {
+    if (!routePath) {
       return []
     }
 
@@ -53,7 +55,7 @@ export function getDeckArticleLinks(deck: Deck): DeckArticleLink[] {
       {
         guideId: card.learnMoreGuideId,
         question: card.question,
-        slug,
+        routePath,
       },
     ]
   })

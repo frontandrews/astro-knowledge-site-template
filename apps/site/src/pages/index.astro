@@ -5,7 +5,7 @@ import GuideTreeNode from '../components/GuideTreeNode.astro'
 import BaseLayout from '../layouts/BaseLayout.astro'
 import { buildGuideTree } from '../lib/guide-tree'
 
-const posts = await getCollection('blog')
+const posts = await getCollection('guides')
 const guideTree = buildGuideTree(posts)
 ---
 

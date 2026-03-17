@@ -5,7 +5,7 @@ import { sortGuides } from './guide-tree'
 export type GuideMapConnection = {
   category: string
   id: string
-  slug: string
+  routePath: string
   relation: 'connects_to' | 'referenced_by'
   title: string
 }
@@ -16,7 +16,7 @@ export type GuideMapItem = {
   id: string
   path: string[]
   relatedDeckIds: string[]
-  slug: string
+  routePath: string
   summary: string
   tags: string[]
   title: string
@@ -28,7 +28,7 @@ export type GuideMapSection = {
   label: string
 }
 
-export function buildGuideMap(posts: CollectionEntry<'blog'>[]): GuideMapSection[] {
+export function buildGuideMap(posts: CollectionEntry<'guides'>[]): GuideMapSection[] {
   const sortedPosts = sortGuides(posts)
   const byGuideId = new Map(sortedPosts.map((post) => [post.data.guideId, post]))
   const incoming = new Map<string, string[]>()
@@ -56,7 +56,7 @@ export function buildGuideMap(posts: CollectionEntry<'blog'>[]): GuideMapSection
         {
           category: relatedPost.data.path[0] ?? relatedPost.data.category,
           id: relatedPost.data.guideId,
-          slug: relatedPost.id,
+          routePath: relatedPost.id,
           relation: 'connects_to' as const,
           title: relatedPost.data.title,
         },
@@ -73,7 +73,7 @@ export function buildGuideMap(posts: CollectionEntry<'blog'>[]): GuideMapSection
         {
           category: relatedPost.data.path[0] ?? relatedPost.data.category,
           id: relatedPost.data.guideId,
-          slug: relatedPost.id,
+          routePath: relatedPost.id,
           relation: 'referenced_by' as const,
           title: relatedPost.data.title,
         },
@@ -88,7 +88,7 @@ export function buildGuideMap(posts: CollectionEntry<'blog'>[]): GuideMapSection
       id: post.data.guideId,
       path: post.data.path,
       relatedDeckIds: post.data.relatedDeckIds,
-      slug: post.id,
+      routePath: post.id,
       summary: post.data.summary,
       tags: post.data.tags,
       title: post.data.title,

@@ -7,14 +7,14 @@ export type GuideTreeNode = {
   key: string
   label: string
   postIds: string[]
-  posts: CollectionEntry<'blog'>[]
+  posts: CollectionEntry<'guides'>[]
 }
 
 type MutableGuideTreeNode = GuideTreeNode & {
   childrenMap: Map<string, MutableGuideTreeNode>
 }
 
-export function buildGuideTree(posts: CollectionEntry<'blog'>[]): GuideTreeNode[] {
+export function buildGuideTree(posts: CollectionEntry<'guides'>[]): GuideTreeNode[] {
   const root = new Map<string, MutableGuideTreeNode>()
 
   for (const post of sortGuides(posts)) {
@@ -72,7 +72,7 @@ function materialize(nodes: Map<string, MutableGuideTreeNode>): GuideTreeNode[] 
     })
 }
 
-export function sortGuides(posts: CollectionEntry<'blog'>[]) {
+export function sortGuides(posts: CollectionEntry<'guides'>[]) {
   return [...posts].sort((left, right) => {
     const leftPath = left.data.path.join('>')
     const rightPath = right.data.path.join('>')

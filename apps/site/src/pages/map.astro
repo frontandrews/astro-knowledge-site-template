@@ -5,7 +5,7 @@ import GuideMapCard from '../components/GuideMapCard.astro'
 import BaseLayout from '../layouts/BaseLayout.astro'
 import { buildGuideMap } from '../lib/guide-map'
 
-const posts = await getCollection('blog')
+const posts = await getCollection('guides')
 const sections = buildGuideMap(posts)
 ---
 

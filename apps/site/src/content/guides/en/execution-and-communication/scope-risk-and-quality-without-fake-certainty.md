@@ -5,12 +5,11 @@ summary: Make the tradeoff explicit early and cut scope before you quietly cut q
 guideId: scope-risk-and-quality
 locale: en
 pubDate: 2026-03-17
-category: Leadership and Delivery
+category: Execution & Communication
 topic: Delivery
 path:
-  - Leadership and Delivery
-  - Delivery
-  - Scope and Risk
+  - Execution & Communication
+  - Estimation and Risk
 order: 10
 relationships:
   - status-updates

@@ -5,12 +5,11 @@ summary: A cleaner explanation of why promises often resolve before timeouts.
 guideId: javascript-event-loop
 locale: en
 pubDate: 2026-03-17
-category: Programming
+category: Runtime & Execution
 topic: JavaScript
 path:
-  - Programming
-  - JavaScript
-  - Runtime
+  - Runtime & Execution
+  - Event Loop and Execution Order
 order: 20
 relationships:
   - node-single-thread

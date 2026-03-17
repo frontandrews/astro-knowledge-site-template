@@ -9,7 +9,7 @@ import { getAppHref } from '../../lib/app-links'
 import { sortGuides } from '../../lib/guide-tree'
 
 export async function getStaticPaths() {
-  const posts = await getCollection('blog')
+  const posts = await getCollection('guides')
 
   return posts.map((post) => ({
     params: {
@@ -22,12 +22,12 @@ export async function getStaticPaths() {
 }
 
 type Props = {
-  post: CollectionEntry<'blog'>
+  post: CollectionEntry<'guides'>
 }
 
 const { post } = Astro.props
 const { Content } = await render(post)
-const allPosts = sortGuides(await getCollection('blog'))
+const allPosts = sortGuides(await getCollection('guides'))
 const parentPathKey = post.data.path.slice(0, -1).join('>')
 const relatedDecks = post.data.relatedDeckIds
   .map((deckId) => getDeckSummaryById(deckId))
@@ -204,7 +204,7 @@ const articlePath = post.data.path[0] === post.data.category
         </div>
         <div class="panel-grid panel-grid--summary">
           {nextReads.map((entry) => (
-            <a class="panel next-read-card" href={`/blog/${entry.id}`}>
+            <a class="panel next-read-card" href={`/guides/${entry.id}`}>
               <h3>{entry.data.title}</h3>
               <p class="article-excerpt">{entry.data.summary}</p>
             </a>

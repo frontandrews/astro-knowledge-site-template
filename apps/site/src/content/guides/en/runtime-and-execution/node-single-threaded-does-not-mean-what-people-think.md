@@ -5,12 +5,11 @@ summary: The interview answer that separates the main thread from the whole runt
 guideId: node-single-thread
 locale: en
 pubDate: 2026-03-17
-category: Programming
+category: Runtime & Execution
 topic: Node
 path:
-  - Programming
-  - Node
-  - Runtime
+  - Runtime & Execution
+  - Concurrency and Parallelism
 order: 30
 relationships:
   - javascript-event-loop

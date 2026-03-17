@@ -14,4 +14,4 @@ export {
   LEGACY_TRACK_TO_PATH_PILLAR,
   PATH_TO_SENIOR_PILLARS,
 } from './path-to-senior'
-export { getGuideEntry, getGuideRegistry, getGuideSlug } from './guides'
+export { getGuideEntry, getGuideRegistry, getGuideRoutePath } from './guides'

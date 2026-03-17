@@ -5,7 +5,7 @@ import ArticleCard from '../../components/ArticleCard.astro'
 import BaseLayout from '../../layouts/BaseLayout.astro'
 import { sortGuides } from '../../lib/guide-tree'
 
-const posts = sortGuides(await getCollection('blog'))
+const posts = sortGuides(await getCollection('guides'))
 const categories = [...new Set(posts.map((post) => post.data.category))]
 const topics = [...new Set(posts.map((post) => post.data.topic).filter(Boolean))]
 ---
