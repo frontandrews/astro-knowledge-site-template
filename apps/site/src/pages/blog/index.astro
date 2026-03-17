@@ -14,39 +14,17 @@ const topics = [...new Set(posts.map((post) => post.data.topic).filter(Boolean))
   description="Browse Prepdeck guides and checklists for programming, AI engineering, communication, and leadership."
   title="Guides"
 >
-  <section class="hero">
-    <div>
-      <div class="hero__badges">
-        <span class="badge badge--accent">Guides</span>
-        <span class="badge">{posts.length} reading paths</span>
-      </div>
-      <h1>Read first. Practice right after.</h1>
-      <p>
-        These guides are meant to be usable, not decorative. Read the summary, steal the
-        checklist, then open the related deck when you want to rehearse the answer or the
-        operating habit behind it.
-      </p>
-      <div class="meta-list">
-        <a class="button-link" href="/map">Open connection map</a>
+  <section class="section section--compact">
+    <div class="panel page-toolbar">
+      <div class="page-toolbar__intro">
+        <h1 class="section-heading section-heading--compact">Guides</h1>
+        <p class="page-toolbar__copy">Read first. Test when you want to validate it.</p>
       </div>
     </div>
-  </section>
 
-  <section class="section">
     <div class="panel guide-directory-controls">
-      <div class="guide-directory-controls__header">
-        <div>
-          <p class="section-eyebrow">Guide directory</p>
-          <h2 class="section-heading section-heading--compact">Search and filter</h2>
-        </div>
-        <p class="guide-directory-controls__count" data-guide-count>
-          Showing {posts.length} guides
-        </p>
-      </div>
-
       <div class="guide-directory-controls__grid">
         <label class="guide-directory-search">
-          <span class="section-eyebrow">Search</span>
           <input
             class="guide-directory-search__input"
             data-guide-search
@@ -57,7 +35,6 @@ const topics = [...new Set(posts.map((post) => post.data.topic).filter(Boolean))
         </label>
 
         <div>
-          <p class="section-eyebrow">Category</p>
           <div class="meta-list" data-guide-filter-group="category">
             <button class="guide-filter-chip guide-filter-chip--active" data-filter-value="all" type="button">
               All
@@ -71,7 +48,6 @@ const topics = [...new Set(posts.map((post) => post.data.topic).filter(Boolean))
         </div>
 
         <div>
-          <p class="section-eyebrow">Topic</p>
           <div class="meta-list" data-guide-filter-group="topic">
             <button class="guide-filter-chip guide-filter-chip--active" data-filter-value="all" type="button">
               All
@@ -85,7 +61,6 @@ const topics = [...new Set(posts.map((post) => post.data.topic).filter(Boolean))
         </div>
 
         <div>
-          <p class="section-eyebrow">Practice link</p>
           <div class="meta-list" data-guide-filter-group="practice">
             <button class="guide-filter-chip guide-filter-chip--active" data-filter-value="all" type="button">
               All
@@ -103,11 +78,8 @@ const topics = [...new Set(posts.map((post) => post.data.topic).filter(Boolean))
   </section>
 
   {categories.map((category) => (
-    <section class="section" data-guide-section={category}>
-      <h2 class="section-heading">{category}</h2>
-      <p class="section-copy">
-        Short guides you can read quickly, then turn into deliberate practice.
-      </p>
+    <section class="section section--compact" data-guide-section={category}>
+      <h2 class="section-heading section-heading--compact">{category}</h2>
       <div class="panel-grid panel-grid--articles">
         {posts
           .filter((post) => post.data.category === category)
@@ -128,7 +100,6 @@ const topics = [...new Set(posts.map((post) => post.data.topic).filter(Boolean))
 
   <section class="section guide-directory-empty" data-guide-empty hidden>
     <div class="panel">
-      <p class="section-eyebrow">No match</p>
       <h2 class="section-heading section-heading--compact">No guides match the current filters.</h2>
       <p class="section-copy">
         Clear one filter or widen the search to reopen the full directory.
@@ -141,7 +112,6 @@ const topics = [...new Set(posts.map((post) => post.data.topic).filter(Boolean))
   const searchInput = document.querySelector('[data-guide-search]')
   const guideCards = [...document.querySelectorAll('[data-guide-card]')]
   const guideSections = [...document.querySelectorAll('[data-guide-section]')]
-  const countLabel = document.querySelector('[data-guide-count]')
   const emptyState = document.querySelector('[data-guide-empty]')
   const url = new URL(window.location.href)
   const filters = {
@@ -184,10 +154,6 @@ const topics = [...new Set(posts.map((post) => post.data.topic).filter(Boolean))
       const visibleChildren = section.querySelectorAll('[data-guide-card]:not([hidden])').length
       section.toggleAttribute('hidden', visibleChildren === 0)
     })
-
-    if (countLabel) {
-      countLabel.textContent = `Showing ${visibleCards} guide${visibleCards === 1 ? '' : 's'}`
-    }
 
     if (emptyState) {
       emptyState.toggleAttribute('hidden', visibleCards !== 0)

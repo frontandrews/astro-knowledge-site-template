@@ -11,17 +11,7 @@ const { post } = Astro.props
 
 <article class="panel article-card">
   <p class="section-eyebrow">{post.data.path.join(' / ')}</p>
-  <div>
-    <h3>{post.data.title}</h3>
-    <p class="article-excerpt">{post.data.summary}</p>
-  </div>
-  {post.data.takeaways.length > 0 ? (
-    <ul class="article-card__list">
-      {post.data.takeaways.slice(0, 2).map((point) => (
-        <li>{point}</li>
-      ))}
-    </ul>
-  ) : null}
+  <h3>{post.data.title}</h3>
   <div class="meta-list">
     <a class="button-link button-link--primary" href={`/blog/${post.id}`}>Read</a>
     {post.data.relatedDeckIds.length > 0 ? (
