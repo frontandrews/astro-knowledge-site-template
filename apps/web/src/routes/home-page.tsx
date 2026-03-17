@@ -32,6 +32,7 @@ import {
   getSessionKindLabel,
 } from '@/lib/session-history'
 import { getSessionPresets, type SessionPreset } from '@/lib/session-presets'
+import { getStudyGoalsSnapshot } from '@/lib/study-goals'
 import { getTopicLabel } from '@/lib/topic-labels'
 import { useProgress } from '@/state/progress-context'
 
@@ -85,6 +86,7 @@ export function HomePage() {
   const sessionPresets = getSessionPresets(deckRecords)
   const masterySnapshot = getMasterySnapshot(deckRecords, progressStore)
   const sessionHistorySnapshot = getSessionHistorySnapshot(sessionHistoryStore)
+  const goalsSnapshot = getStudyGoalsSnapshot(sessionHistorySnapshot)
   const topicCards = topicEntries.map(([topic, summaries]) => {
     const topicDecks = deckRecords.filter((record) => record.summary.topic === topic)
 
@@ -288,6 +290,68 @@ export function HomePage() {
           {sessionPresets.map((preset) => (
             <SessionPresetCard key={preset.id} preset={preset} />
           ))}
+        </div>
+      </section>
+
+      <section aria-labelledby="goal-tracker-heading" className="mb-6">
+        <div className="mb-4 flex items-center justify-between gap-4">
+          <div>
+            <h2 className="text-2xl font-black text-[var(--retro-ink)]" id="goal-tracker-heading">
+              Goal tracker
+            </h2>
+            <p className="mt-1 text-sm leading-6 text-white/75">
+              Simple local targets that make the home screen feel like a habit app instead
+              of a static deck shelf.
+            </p>
+          </div>
+        </div>
+        <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.15fr)]">
+          <GoalCard
+            description={
+              goalsSnapshot.daily.isComplete
+                ? 'Today is already covered. Anything else now is bonus practice.'
+                : `${goalsSnapshot.daily.remaining} short ${pluralize('session', goalsSnapshot.daily.remaining)} left to close today.`
+            }
+            goal={goalsSnapshot.daily}
+          />
+          <GoalCard
+            description={
+              goalsSnapshot.weekly.isComplete
+                ? 'Weekly pace is clear. Keep going only if you want extra reps.'
+                : `${goalsSnapshot.weekly.remaining} more ${pluralize('session', goalsSnapshot.weekly.remaining)} to hit this week’s pace.`
+            }
+            goal={goalsSnapshot.weekly}
+          />
+          <m.div
+            className="[transform-style:preserve-3d]"
+            initial="initial"
+            variants={cardRevealVariants}
+            viewport={{ amount: 0.2, once: true }}
+            whileInView="animate"
+            {...hoverLiftMotionProps}
+          >
+            <Panel className="flex h-full flex-col justify-between gap-4 p-5">
+              <div>
+                <p className="text-[0.68rem] font-bold uppercase tracking-[0.22em] text-[var(--retro-line)]">
+                  Next move
+                </p>
+                <h3 className="mt-3 text-2xl font-black text-[var(--retro-ink)]">
+                  Keep the pace deliberate.
+                </h3>
+                <p className="mt-3 text-sm leading-6 text-white/80">
+                  {goalsSnapshot.nextAction.detail}
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                <LinkButton to={goalsSnapshot.nextAction.href} variant="secondary">
+                  {goalsSnapshot.nextAction.label}
+                </LinkButton>
+                <Button onClick={() => setSelectedTopic('all')} type="button" variant="ghost">
+                  Browse all decks
+                </Button>
+              </div>
+            </Panel>
+          </m.div>
         </div>
       </section>
 
@@ -657,6 +721,51 @@ function MomentumStatCard({
         </p>
         <p className="mt-3 text-2xl font-black text-[var(--retro-ink)]">{value}</p>
         <p className="mt-3 text-sm leading-6 text-white/80">{detail}</p>
+      </Panel>
+    </m.div>
+  )
+}
+
+function GoalCard({
+  description,
+  goal,
+}: {
+  description: string
+  goal: {
+    current: number
+    isComplete: boolean
+    label: string
+    remaining: number
+    target: number
+  }
+}) {
+  return (
+    <m.div
+      className="[transform-style:preserve-3d]"
+      initial="initial"
+      variants={cardRevealVariants}
+      viewport={{ amount: 0.2, once: true }}
+      whileInView="animate"
+      {...hoverLiftMotionProps}
+    >
+      <Panel className="h-full p-5">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="text-[0.68rem] font-bold uppercase tracking-[0.22em] text-[var(--retro-line)]">
+              {goal.label}
+            </p>
+            <h3 className="mt-3 text-2xl font-black text-[var(--retro-ink)]">
+              {goal.current} / {goal.target}
+            </h3>
+          </div>
+          <Badge tone={goal.isComplete ? 'success' : 'accent'}>
+            {goal.isComplete ? 'On track' : `${goal.remaining} left`}
+          </Badge>
+        </div>
+        <div className="mt-4">
+          <ProgressMeter current={Math.min(goal.current, goal.target)} total={goal.target} />
+        </div>
+        <p className="mt-4 text-sm leading-6 text-white/80">{description}</p>
       </Panel>
     </m.div>
   )

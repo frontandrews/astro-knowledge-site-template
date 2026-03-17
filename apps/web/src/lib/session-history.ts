@@ -23,6 +23,7 @@ export type SessionHistorySnapshot = {
   currentStreak: number
   lastCompletedAt: string | null
   recentSessions: SessionHistoryEntry[]
+  sessionsToday: number
   sessionsThisWeek: number
   totalSessions: number
 }
@@ -102,6 +103,7 @@ export function getSessionHistorySnapshot(
     currentStreak: getCurrentSessionStreak(store, now),
     lastCompletedAt: store.sessions[0]?.completedAt ?? null,
     recentSessions: store.sessions.slice(0, 4),
+    sessionsToday: getSessionsCompletedToday(store, now),
     sessionsThisWeek: getSessionsCompletedThisWeek(store, now),
     totalSessions: store.sessions.length,
   }
@@ -146,6 +148,16 @@ export function getSessionsCompletedThisWeek(
     const completedAt = Date.parse(entry.completedAt)
     return !Number.isNaN(completedAt) && completedAt >= weekStart
   }).length
+}
+
+export function getSessionsCompletedToday(
+  store: SessionHistoryStore,
+  now: Date = new Date(),
+): number {
+  const todayKey = toLocalDayKey(now)
+
+  return store.sessions.filter((entry) => toLocalDayKey(new Date(entry.completedAt)) === todayKey)
+    .length
 }
 
 export function getSessionKindLabel(kind: SessionHistoryKind): string {

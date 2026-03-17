@@ -92,6 +92,7 @@ describe('session history', () => {
     const snapshot = getSessionHistorySnapshot(store, new Date('2026-03-17T20:00:00.000Z'))
 
     expect(getCurrentSessionStreak(store, new Date('2026-03-17T20:00:00.000Z'))).toBe(3)
+    expect(snapshot.sessionsToday).toBe(1)
     expect(snapshot.sessionsThisWeek).toBe(3)
     expect(snapshot.totalSessions).toBe(3)
     expect(snapshot.recentSessions).toHaveLength(3)
