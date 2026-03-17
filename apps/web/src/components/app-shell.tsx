@@ -23,7 +23,7 @@ export function AppShell({ children }: PropsWithChildren) {
 
   return (
     <div className="min-h-screen bg-transparent text-[var(--retro-ink)]">
-      <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-4 pb-24 pt-5 sm:px-6">
+      <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-4 pb-[calc(6.5rem+env(safe-area-inset-bottom))] pt-[calc(1.25rem+env(safe-area-inset-top))] sm:px-6 sm:pb-24 sm:pt-5">
         {shell.mode === 'home' ? (
           <Panel className="mb-6 bg-[var(--retro-surface)] px-4 py-3">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -58,7 +58,7 @@ export function AppShell({ children }: PropsWithChildren) {
             </div>
           </Panel>
         ) : (
-          <Panel className="sticky top-3 z-20 mb-4 bg-[var(--retro-surface)] px-4 py-3">
+          <Panel className="sticky top-[calc(0.75rem+env(safe-area-inset-top))] z-20 mb-4 bg-[var(--retro-surface)] px-4 py-3 sm:top-3">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap gap-2">
@@ -250,7 +250,7 @@ function BottomNavigation({ pathname }: { pathname: string }) {
   ] as const
 
   return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-0 z-30 px-3 pb-3 sm:hidden">
+    <div className="pointer-events-none fixed inset-x-0 bottom-0 z-30 px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:hidden">
       <Panel className="pointer-events-auto border-[var(--retro-line-strong)] bg-[color:rgba(8,14,24,0.96)] px-2 py-2 shadow-[0_-8px_32px_rgba(0,0,0,0.28)]">
         <nav aria-label="Primary" className="grid grid-cols-4 gap-2">
           {items.map((item) => {
