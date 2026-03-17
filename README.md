@@ -2,7 +2,7 @@
 
 Prepdeck is a small open-source project I’m building to make technical interview prep less messy.
 
-The goal is simple: pick a topic, study on a phone-sized screen, mark what you actually know, and come back later without losing your place.
+The goal is simple: open the app, get one clear next step, study on a phone-sized screen, and come back later without losing your place.
 
 ## Why This Repo Exists
 
@@ -22,34 +22,53 @@ The goal is simple: pick a topic, study on a phone-sized screen, mark what you a
 - Zod
 - Vitest
 - vite-plugin-pwa
-- localStorage for v1 persistence
+- Motion for interface polish
+- localStorage for local-first persistence
 
 ## What It Does
 
-- `apps/web`: flashcards PWA
+- `apps/web`: local-first flashcards PWA
 - `packages/content`: deck manifest, deck JSON, and loaders
 - `packages/schemas`: shared Zod schemas and types
 - `docs/coding-interview-foundations/`: notes for coding challenge prep
 - `docs/system-design-interview/`: notes for system design and tricky interview topics
 - `docs/flashcards-app/`: product and implementation notes for the app
 
-## MVP Scope
+## Current Product Surface
 
-1. Browse decks by category
-2. Study cards with `learned`, `partial`, and `not_learned`
-3. Resume from the first unseen card
-4. Review cards by status
-5. Reset deck or global progress
+1. Browse decks by topic, difficulty, status, and search
+2. Study in flashcard mode or timed interview mode
+3. Save local notes on any card
+4. Run focused weak-card sessions, daily queues, and mixed mock interviews
+5. Track local streaks, recent activity, and study goals
+6. Export and import local backups
+7. Generate a shareable progress snapshot card
+8. Preview monetization surfaces without needing a backend
 
-## What I Want To Add Next
+## Principles
 
-1. Interview mode with timer and deeper prompts
-2. Better review loops for weak cards
-3. Portfolio embed once the standalone app is stable
+- Local-first before sync
+- Good mobile navigation before more surface area
+- Small, composable features over one giant rewrite
+- Keep the free product genuinely usable
+
+## Next Up
+
+1. Better history filters and session recap depth
+2. More polished study goals and review loops
+3. Portfolio embed once the standalone app feels fully mature
 
 ## Run It
 
 ```bash
 pnpm install
 pnpm dev
+```
+
+## Test It
+
+```bash
+pnpm test
+pnpm lint
+pnpm build
 ```
