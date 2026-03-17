@@ -11,6 +11,7 @@ import { buttonVariants } from '@/components/ui/button-styles'
 import { Panel } from '@/components/ui/panel'
 import { getArticleHref } from '@/lib/article-links'
 import { ProgressMeter } from '@/components/ui/progress-meter'
+import { useScreenWakeLock } from '@/hooks/use-screen-wake-lock'
 import { cardRevealVariants, springTransition } from '@/lib/motion'
 import {
   getInterviewDurationSeconds,
@@ -47,6 +48,7 @@ export function StudySessionPlayer({
   scopeLabel,
 }: StudySessionPlayerProps) {
   const { preferences } = usePreferences()
+  const wakeLockStatus = useScreenWakeLock(preferences.keepScreenAwake)
   const {
     clearCardNote,
     getCardNote,
@@ -216,6 +218,9 @@ export function StudySessionPlayer({
                 <Badge>{currentCard.difficulty}</Badge>
                 {isInterviewMode ? (
                   <Badge tone="warning">{formatDuration(interviewDurationSeconds)}</Badge>
+                ) : null}
+                {preferences.keepScreenAwake && wakeLockStatus === 'active' ? (
+                  <Badge tone="success">Awake</Badge>
                 ) : null}
               </div>
               <h2 className="mt-2 text-2xl font-black text-[var(--retro-ink)]">

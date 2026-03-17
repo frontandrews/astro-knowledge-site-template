@@ -33,6 +33,7 @@ export function SettingsPage() {
     resetPreferences,
     setDailyGoalTarget,
     setInterviewTimerPreset,
+    setKeepScreenAwake,
     setWeeklyGoalTarget,
   } = usePreferences()
 
@@ -126,6 +127,28 @@ export function SettingsPage() {
               </div>
             </Panel>
           ))}
+        </div>
+      </SettingCard>
+
+      <SettingCard
+        description="When the browser supports it, Prepdeck can keep the screen awake during focused study sessions."
+        title="Screen wake lock"
+      >
+        <div className="flex flex-wrap gap-3">
+          <Button
+            onClick={() => setKeepScreenAwake(true)}
+            type="button"
+            variant={preferences.keepScreenAwake ? 'primary' : 'ghost'}
+          >
+            Keep awake
+          </Button>
+          <Button
+            onClick={() => setKeepScreenAwake(false)}
+            type="button"
+            variant={!preferences.keepScreenAwake ? 'secondary' : 'ghost'}
+          >
+            Let it sleep
+          </Button>
         </div>
       </SettingCard>
 

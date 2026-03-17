@@ -7,6 +7,7 @@ export type InterviewTimerPreset = 'deep' | 'short' | 'standard'
 export type PreferencesState = {
   dailyGoalTarget: number
   interviewTimerPreset: InterviewTimerPreset
+  keepScreenAwake: boolean
   version: 1
   weeklyGoalTarget: number
 }
@@ -14,6 +15,7 @@ export type PreferencesState = {
 const DEFAULT_PREFERENCES_STATE: PreferencesState = {
   dailyGoalTarget: 1,
   interviewTimerPreset: 'standard',
+  keepScreenAwake: true,
   version: 1,
   weeklyGoalTarget: 5,
 }
@@ -66,9 +68,13 @@ export function normalizePreferencesState(value: unknown): PreferencesState {
     parsed.version === 1 &&
     isValidGoalTarget(parsed.dailyGoalTarget) &&
     isValidGoalTarget(parsed.weeklyGoalTarget) &&
-    isValidInterviewTimerPreset(parsed.interviewTimerPreset)
+    isValidInterviewTimerPreset(parsed.interviewTimerPreset) &&
+    isValidKeepScreenAwake(parsed.keepScreenAwake)
   ) {
-    return parsed as PreferencesState
+    return {
+      ...createDefaultPreferencesState(),
+      ...parsed,
+    }
   }
 
   return createDefaultPreferencesState()
@@ -80,4 +86,8 @@ function isValidGoalTarget(value: unknown): value is number {
 
 function isValidInterviewTimerPreset(value: unknown): value is InterviewTimerPreset {
   return value === 'short' || value === 'standard' || value === 'deep'
+}
+
+function isValidKeepScreenAwake(value: unknown): value is boolean | undefined {
+  return typeof value === 'boolean' || typeof value === 'undefined'
 }

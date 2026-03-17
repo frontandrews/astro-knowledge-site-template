@@ -22,6 +22,7 @@ type PreferencesContextValue = {
   resetPreferences: () => void
   setDailyGoalTarget: (target: number) => void
   setInterviewTimerPreset: (preset: InterviewTimerPreset) => void
+  setKeepScreenAwake: (enabled: boolean) => void
   setWeeklyGoalTarget: (target: number) => void
 }
 
@@ -55,6 +56,13 @@ export function PreferencesProvider({ children }: PropsWithChildren) {
     }))
   }, [])
 
+  const setKeepScreenAwake = useCallback((enabled: boolean) => {
+    setPreferences((current) => ({
+      ...current,
+      keepScreenAwake: enabled,
+    }))
+  }, [])
+
   const replacePreferences = useCallback((state: PreferencesState) => {
     setPreferences(state)
   }, [])
@@ -70,6 +78,7 @@ export function PreferencesProvider({ children }: PropsWithChildren) {
       resetPreferences,
       setDailyGoalTarget,
       setInterviewTimerPreset,
+      setKeepScreenAwake,
       setWeeklyGoalTarget,
     }),
     [
@@ -78,6 +87,7 @@ export function PreferencesProvider({ children }: PropsWithChildren) {
       resetPreferences,
       setDailyGoalTarget,
       setInterviewTimerPreset,
+      setKeepScreenAwake,
       setWeeklyGoalTarget,
     ],
   )

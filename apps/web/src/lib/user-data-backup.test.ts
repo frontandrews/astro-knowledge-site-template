@@ -46,6 +46,7 @@ describe('user data backup helpers', () => {
         preferencesState: {
           dailyGoalTarget: 2,
           interviewTimerPreset: 'deep',
+          keepScreenAwake: false,
           version: 1,
           weeklyGoalTarget: 7,
         },
@@ -60,6 +61,7 @@ describe('user data backup helpers', () => {
       preferencesState: {
         dailyGoalTarget: 2,
         interviewTimerPreset: 'deep',
+        keepScreenAwake: false,
         version: 1,
         weeklyGoalTarget: 7,
       },

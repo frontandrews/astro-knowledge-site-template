@@ -224,6 +224,7 @@ describe('app routes', () => {
     await user.click(screen.getByRole('button', { name: '2 sessions' }))
     await user.click(screen.getByRole('button', { name: '7 sessions' }))
     await user.click(screen.getByRole('button', { name: 'Use Deep' }))
+    await user.click(screen.getByRole('button', { name: 'Let it sleep' }))
 
     const primaryNav = screen.getByRole('navigation', { name: 'Primary' })
     await user.click(within(primaryNav).getByRole('link', { name: 'Progress' }))
@@ -675,6 +676,7 @@ describe('app routes', () => {
     seedPreferences({
       dailyGoalTarget: 2,
       interviewTimerPreset: 'standard',
+      keepScreenAwake: true,
       version: 1,
       weeklyGoalTarget: 7,
     })
