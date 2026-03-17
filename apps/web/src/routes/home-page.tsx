@@ -29,10 +29,12 @@ import { getSessionHistorySnapshot } from '@/lib/session-history'
 import { getSessionPresets, type SessionPreset } from '@/lib/session-presets'
 import { getStudyGoalsSnapshot } from '@/lib/study-goals'
 import { getTopicLabel } from '@/lib/topic-labels'
+import { usePreferences } from '@/state/preferences-context'
 import { useProgress } from '@/state/progress-context'
 
 export function HomePage() {
   const { progressStore, sessionHistoryStore } = useProgress()
+  const { preferences } = usePreferences()
   const [libraryDifficulty, setLibraryDifficulty] =
     useState<DeckLibraryFilters['difficulty']>('all')
   const [libraryQuery, setLibraryQuery] = useState('')
@@ -80,7 +82,10 @@ export function HomePage() {
   const sessionPresets = getSessionPresets(deckRecords)
   const masterySnapshot = getMasterySnapshot(deckRecords, progressStore)
   const sessionHistorySnapshot = getSessionHistorySnapshot(sessionHistoryStore)
-  const goalsSnapshot = getStudyGoalsSnapshot(sessionHistorySnapshot)
+  const goalsSnapshot = getStudyGoalsSnapshot(sessionHistorySnapshot, {
+    daily: preferences.dailyGoalTarget,
+    weekly: preferences.weeklyGoalTarget,
+  })
   const isFirstRun =
     overallCounts.seen === 0 &&
     sessionHistorySnapshot.totalSessions === 0 &&

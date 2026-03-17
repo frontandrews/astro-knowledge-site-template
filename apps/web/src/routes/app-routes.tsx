@@ -10,6 +10,7 @@ import { MockInterviewPage } from '@/routes/mock-interview-page'
 import { PremiumPage } from '@/routes/premium-page'
 import { ProgressPage } from '@/routes/progress-page'
 import { ReviewPage } from '@/routes/review-page'
+import { SettingsPage } from '@/routes/settings-page'
 import { StudyPage } from '@/routes/study-page'
 
 export function AppRoutes() {
@@ -34,6 +35,7 @@ export function AppRoutes() {
             <Route element={<PremiumPage />} path="/premium" />
             <Route element={<ProgressPage />} path="/progress" />
             <Route element={<ReviewPage />} path="/decks/:deckId/review" />
+            <Route element={<SettingsPage />} path="/settings" />
             <Route element={<StudyPage />} path="/study/:deckId" />
             <Route element={<Navigate replace to="/" />} path="*" />
           </Routes>

@@ -5,10 +5,12 @@ import { render } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 
 import { MEMBERSHIP_STORAGE_KEY, type MembershipTier } from '@/lib/monetization'
+import { PREFERENCES_STORAGE_KEY, type PreferencesState } from '@/lib/preferences'
 import { STORAGE_KEY } from '@/lib/progress'
 import { SESSION_HISTORY_STORAGE_KEY } from '@/lib/session-history'
 import { AppRoutes } from '@/routes/app-routes'
 import { MonetizationProvider } from '@/state/monetization-context'
+import { PreferencesProvider } from '@/state/preferences-context'
 import { ProgressProvider } from '@/state/progress-context'
 
 function Providers({
@@ -17,13 +19,15 @@ function Providers({
 }: PropsWithChildren<{ initialEntries?: string[] }>) {
   return (
     <MonetizationProvider>
-      <ProgressProvider>
-        <MotionConfig reducedMotion="never">
-          <LazyMotion features={domMax}>
-            <MemoryRouter initialEntries={initialEntries}>{children}</MemoryRouter>
-          </LazyMotion>
-        </MotionConfig>
-      </ProgressProvider>
+      <PreferencesProvider>
+        <ProgressProvider>
+          <MotionConfig reducedMotion="never">
+            <LazyMotion features={domMax}>
+              <MemoryRouter initialEntries={initialEntries}>{children}</MemoryRouter>
+            </LazyMotion>
+          </MotionConfig>
+        </ProgressProvider>
+      </PreferencesProvider>
     </MonetizationProvider>
   )
 }
@@ -44,6 +48,10 @@ export function seedMembership(tier: MembershipTier) {
       version: 1,
     }),
   )
+}
+
+export function seedPreferences(preferences: PreferencesState) {
+  window.localStorage.setItem(PREFERENCES_STORAGE_KEY, JSON.stringify(preferences))
 }
 
 export function renderApp(initialEntries: string[] = ['/']) {

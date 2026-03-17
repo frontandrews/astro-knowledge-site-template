@@ -1,6 +1,8 @@
+import type { InterviewTimerPreset } from '@/lib/preferences'
 import type { Deck, Flashcard, ProgressStore } from '@prepdeck/schemas'
 
 import { getCardStatus, getFirstUnseenCardIndex } from '@/lib/progress'
+import { getInterviewTimerMultiplier } from '@/lib/preferences'
 
 export type StudyFormat = 'flashcards' | 'interview'
 export type StudyScope = 'all' | 'weak'
@@ -72,8 +74,14 @@ export function createDailyQueueHref(state?: 'success'): string {
   return query ? `/daily-queue?${query}` : '/daily-queue'
 }
 
-export function getInterviewDurationSeconds(card: Flashcard): number {
-  return INTERVIEW_SECONDS_BY_DIFFICULTY[card.difficulty]
+export function getInterviewDurationSeconds(
+  card: Flashcard,
+  preset: InterviewTimerPreset = 'standard',
+): number {
+  return Math.round(
+    INTERVIEW_SECONDS_BY_DIFFICULTY[card.difficulty] *
+      getInterviewTimerMultiplier(preset),
+  )
 }
 
 export function getStudyFormat(value: string | null): StudyFormat {

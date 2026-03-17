@@ -1,9 +1,6 @@
 import type { SessionHistorySnapshot } from '@/lib/session-history'
 import { createDailyQueueHref, createMockInterviewHref } from '@/lib/study-session'
 
-export const DAILY_SESSION_TARGET = 1
-export const WEEKLY_SESSION_TARGET = 5
-
 export type GoalProgress = {
   current: number
   isComplete: boolean
@@ -24,12 +21,19 @@ export type StudyGoalsSnapshot = {
 
 export function getStudyGoalsSnapshot(
   sessionHistory: SessionHistorySnapshot,
+  targets: {
+    daily: number
+    weekly: number
+  } = {
+    daily: 1,
+    weekly: 5,
+  },
 ): StudyGoalsSnapshot {
-  const daily = createGoalProgress('Daily goal', sessionHistory.sessionsToday, DAILY_SESSION_TARGET)
+  const daily = createGoalProgress('Daily goal', sessionHistory.sessionsToday, targets.daily)
   const weekly = createGoalProgress(
     'Weekly goal',
     sessionHistory.sessionsThisWeek,
-    WEEKLY_SESSION_TARGET,
+    targets.weekly,
   )
 
   return {

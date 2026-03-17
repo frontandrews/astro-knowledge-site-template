@@ -47,4 +47,27 @@ describe('study goals', () => {
     expect(goals.weekly.isComplete).toBe(true)
     expect(goals.nextAction.label).toBe('Add a bonus rep')
   })
+
+  it('uses custom local targets when preferences change the pace', () => {
+    const goals = getStudyGoalsSnapshot(
+      {
+        currentStreak: 1,
+        lastCompletedAt: '2026-03-17T12:00:00.000Z',
+        recentSessions: [],
+        sessionsToday: 1,
+        sessionsThisWeek: 4,
+        totalSessions: 10,
+      },
+      {
+        daily: 2,
+        weekly: 7,
+      },
+    )
+
+    expect(goals.daily.isComplete).toBe(false)
+    expect(goals.daily.remaining).toBe(1)
+    expect(goals.weekly.isComplete).toBe(false)
+    expect(goals.weekly.remaining).toBe(3)
+    expect(goals.nextAction.label).toBe('Start daily queue')
+  })
 })

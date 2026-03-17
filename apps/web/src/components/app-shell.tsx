@@ -15,8 +15,11 @@ export function AppShell({ children }: PropsWithChildren) {
   const showHomeShortcut = shell.mode === 'compact' && shell.backTo !== '/'
   const showProgressShortcut =
     shell.mode === 'compact' && !location.pathname.startsWith('/progress')
+  const showSettingsShortcut =
+    shell.mode === 'compact' && !location.pathname.startsWith('/settings')
   const showPremiumShortcut =
     shell.mode === 'compact' && !location.pathname.startsWith('/premium')
+  const showBottomNavigation = !isFocusRoute(location.pathname)
 
   return (
     <div className="min-h-screen bg-transparent text-[var(--retro-ink)]">
@@ -45,6 +48,9 @@ export function AppShell({ children }: PropsWithChildren) {
                 <LinkButton size="sm" to="/progress" variant="ghost">
                   Progress
                 </LinkButton>
+                <LinkButton size="sm" to="/settings" variant="ghost">
+                  Settings
+                </LinkButton>
                 <LinkButton size="sm" to="/premium" variant="ghost">
                   Premium
                 </LinkButton>
@@ -69,6 +75,11 @@ export function AppShell({ children }: PropsWithChildren) {
                   {showProgressShortcut ? (
                     <LinkButton size="sm" to="/progress" variant="ghost">
                       Progress
+                    </LinkButton>
+                  ) : null}
+                  {showSettingsShortcut ? (
+                    <LinkButton size="sm" to="/settings" variant="ghost">
+                      Settings
                     </LinkButton>
                   ) : null}
                   {showPremiumShortcut ? (
@@ -96,6 +107,8 @@ export function AppShell({ children }: PropsWithChildren) {
 
         <main className="flex-1">{children}</main>
       </div>
+
+      {showBottomNavigation ? <BottomNavigation pathname={location.pathname} /> : null}
     </div>
   )
 }
@@ -177,6 +190,16 @@ function getShellConfig(pathname: string): ShellConfig {
     }
   }
 
+  if (segments[0] === 'settings') {
+    return {
+      backLabel: 'Back home',
+      backTo: '/',
+      eyebrow: 'Preferences',
+      mode: 'compact',
+      title: 'Goals, timers, and local defaults',
+    }
+  }
+
   if (segments[0] === 'mock-interview') {
     return {
       backLabel: 'Back home',
@@ -204,4 +227,61 @@ function getShellConfig(pathname: string): ShellConfig {
     mode: 'compact',
     title: 'Deck library',
   }
+}
+
+function BottomNavigation({ pathname }: { pathname: string }) {
+  const items = [
+    { href: '/', label: 'Home', match: (value: string) => value === '/' },
+    {
+      href: '/progress',
+      label: 'Progress',
+      match: (value: string) => value.startsWith('/progress'),
+    },
+    {
+      href: '/settings',
+      label: 'Settings',
+      match: (value: string) => value.startsWith('/settings'),
+    },
+    {
+      href: '/premium',
+      label: 'Premium',
+      match: (value: string) => value.startsWith('/premium'),
+    },
+  ] as const
+
+  return (
+    <div className="pointer-events-none fixed inset-x-0 bottom-0 z-30 px-3 pb-3 sm:hidden">
+      <Panel className="pointer-events-auto border-[var(--retro-line-strong)] bg-[color:rgba(8,14,24,0.96)] px-2 py-2 shadow-[0_-8px_32px_rgba(0,0,0,0.28)]">
+        <nav aria-label="Primary" className="grid grid-cols-4 gap-2">
+          {items.map((item) => {
+            const isActive = item.match(pathname)
+
+            return (
+              <Link
+                aria-current={isActive ? 'page' : undefined}
+                className={[
+                  'flex min-h-12 items-center justify-center rounded-[0.95rem] border-2 px-2 text-[0.68rem] font-bold uppercase tracking-[0.18em] transition',
+                  isActive
+                    ? 'border-[var(--retro-line-strong)] bg-[var(--retro-accent)] text-white shadow-[4px_4px_0_var(--retro-shadow)]'
+                    : 'border-[var(--retro-line)] bg-[color:rgba(255,255,255,0.04)] text-[var(--retro-ink)] shadow-[4px_4px_0_var(--retro-line)]',
+                ].join(' ')}
+                key={item.href}
+                to={item.href}
+              >
+                {item.label}
+              </Link>
+            )
+          })}
+        </nav>
+      </Panel>
+    </div>
+  )
+}
+
+function isFocusRoute(pathname: string) {
+  return (
+    pathname.startsWith('/study/') ||
+    pathname.startsWith('/mock-interview') ||
+    pathname.startsWith('/daily-queue')
+  )
 }

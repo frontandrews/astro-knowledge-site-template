@@ -24,6 +24,7 @@ import {
 } from '@/lib/session-history'
 import { getStudyGoalsSnapshot } from '@/lib/study-goals'
 import { getTopicLabel } from '@/lib/topic-labels'
+import { usePreferences } from '@/state/preferences-context'
 import { useProgress } from '@/state/progress-context'
 
 type DeckRecordLike = {
@@ -44,6 +45,7 @@ type DeckRecordLike = {
 
 export function ProgressPage() {
   const { progressStore, resetAllProgress, sessionHistoryStore } = useProgress()
+  const { preferences } = usePreferences()
   const [isResetAllOpen, setIsResetAllOpen] = useState(false)
   const decksByTopic = getDecksByTopic()
   const topicEntries = Object.entries(decksByTopic)
@@ -68,7 +70,10 @@ export function ProgressPage() {
   const overallCounts = combineDeckCounts(deckRecords.map((record) => record.counts))
   const masterySnapshot = getMasterySnapshot(deckRecords, progressStore)
   const sessionHistorySnapshot = getSessionHistorySnapshot(sessionHistoryStore)
-  const goalsSnapshot = getStudyGoalsSnapshot(sessionHistorySnapshot)
+  const goalsSnapshot = getStudyGoalsSnapshot(sessionHistorySnapshot, {
+    daily: preferences.dailyGoalTarget,
+    weekly: preferences.weeklyGoalTarget,
+  })
 
   return (
     <>

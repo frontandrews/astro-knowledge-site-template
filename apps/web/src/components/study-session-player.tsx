@@ -20,6 +20,7 @@ import {
 } from '@/lib/study-session'
 import { getTopicLabel } from '@/lib/topic-labels'
 import { cn } from '@/lib/utils'
+import { usePreferences } from '@/state/preferences-context'
 import { useProgress } from '@/state/progress-context'
 
 type StudySessionPlayerProps = {
@@ -45,6 +46,7 @@ export function StudySessionPlayer({
   showEntrySource = false,
   scopeLabel,
 }: StudySessionPlayerProps) {
+  const { preferences } = usePreferences()
   const {
     clearCardNote,
     getCardNote,
@@ -68,7 +70,7 @@ export function StudySessionPlayer({
   const singleDeckEntry = getSingleDeckEntry(entries)
   const currentNote = currentEntry ? getCardNote(currentEntry.deckId, currentCard.id) : ''
   const [interviewSecondsLeft, setInterviewSecondsLeft] = useState(() =>
-    currentCard ? getInterviewDurationSeconds(currentCard) : 0,
+    currentCard ? getInterviewDurationSeconds(currentCard, preferences.interviewTimerPreset) : 0,
   )
 
   useEffect(() => {
@@ -125,11 +127,18 @@ export function StudySessionPlayer({
     setCurrentIndex((previousIndex) => previousIndex + 1)
     setIsAnswerVisible(false)
     setIsLearnMoreOpen(false)
-    setInterviewSecondsLeft(nextEntry ? getInterviewDurationSeconds(nextEntry.card) : 0)
+    setInterviewSecondsLeft(
+      nextEntry
+        ? getInterviewDurationSeconds(nextEntry.card, preferences.interviewTimerPreset)
+        : 0,
+    )
     rememberDeckPosition(nextEntry?.deckId ?? currentEntry.deckId, nextEntry?.card.id ?? null)
   }
 
-  const interviewDurationSeconds = getInterviewDurationSeconds(currentCard)
+  const interviewDurationSeconds = getInterviewDurationSeconds(
+    currentCard,
+    preferences.interviewTimerPreset,
+  )
   const elapsedInterviewSeconds = interviewDurationSeconds - interviewSecondsLeft
   const isInterviewMode = format === 'interview'
   const isRevealLocked = isInterviewMode && interviewSecondsLeft > 0 && !isAnswerVisible

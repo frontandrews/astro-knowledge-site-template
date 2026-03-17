@@ -16,6 +16,7 @@ import {
 import {
   renderApp,
   seedMembership,
+  seedPreferences,
   seedProgress,
   seedSessionHistory,
 } from '@/test/test-utils'
@@ -202,14 +203,34 @@ describe('app routes', () => {
     renderApp(['/decks/react-rendering-core'])
 
     expect(screen.getByRole('link', { name: 'Back to library' })).toBeInTheDocument()
-    expect(screen.queryByRole('link', { name: 'Home' })).not.toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Progress' })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Premium' })).toBeInTheDocument()
+    expect(screen.getByRole('navigation', { name: 'Primary' })).toBeInTheDocument()
+    expect(screen.getAllByRole('link', { name: 'Progress' }).length).toBeGreaterThan(0)
+    expect(screen.getAllByRole('link', { name: 'Settings' }).length).toBeGreaterThan(0)
+    expect(screen.getAllByRole('link', { name: 'Premium' }).length).toBeGreaterThan(0)
     expect(
       screen.queryByRole('heading', {
         name: 'Technical interview prep that feels manageable.',
       }),
     ).not.toBeInTheDocument()
+  })
+
+  it('lets the user tune local goals and timer pace from settings', async () => {
+    const user = userEvent.setup()
+
+    renderApp(['/settings'])
+
+    expect(screen.getByRole('heading', { name: 'Tune the app to your study rhythm.' })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: '2 sessions' }))
+    await user.click(screen.getByRole('button', { name: '7 sessions' }))
+    await user.click(screen.getByRole('button', { name: 'Use Deep' }))
+
+    const primaryNav = screen.getByRole('navigation', { name: 'Primary' })
+    await user.click(within(primaryNav).getByRole('link', { name: 'Progress' }))
+
+    expect(await screen.findByRole('heading', { name: 'Goal tracker' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: '0 / 2' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: '0 / 7' })).toBeInTheDocument()
   })
 
   it('shows X of Y and reaches the strong success state after rating every card as learned', async () => {
@@ -232,6 +253,12 @@ describe('app routes', () => {
         name: 'Everything in this deck is marked learned.',
       }),
     ).toBeInTheDocument()
+  })
+
+  it('keeps the bottom navigation hidden during focused study routes', () => {
+    renderApp(['/study/react-rendering-core?mode=start'])
+
+    expect(screen.queryByRole('navigation', { name: 'Primary' })).not.toBeInTheDocument()
   })
 
   it('records a completed session and surfaces it on the home page after the run', async () => {
@@ -609,9 +636,21 @@ describe('app routes', () => {
     ).toBeInTheDocument()
     expect(screen.getByText('Premium checkout is not live yet.')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Back home' })).toBeInTheDocument()
-    expect(screen.queryByRole('link', { name: 'Home' })).not.toBeInTheDocument()
-    expect(screen.queryByRole('link', { name: 'Premium' })).not.toBeInTheDocument()
+    expect(screen.getByRole('navigation', { name: 'Primary' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Preview premium locally' })).toBeInTheDocument()
+  })
+
+  it('applies saved goal targets to the home and progress summaries', () => {
+    seedPreferences({
+      dailyGoalTarget: 2,
+      interviewTimerPreset: 'standard',
+      version: 1,
+      weeklyGoalTarget: 7,
+    })
+
+    renderApp(['/'])
+
+    expect(screen.getByText('0/2 today')).toBeInTheDocument()
   })
 
   it('hides ad slots when premium is active on the device', () => {
