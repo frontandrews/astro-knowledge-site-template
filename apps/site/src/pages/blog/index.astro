@@ -143,21 +143,26 @@ const topics = [...new Set(posts.map((post) => post.data.topic).filter(Boolean))
   const guideSections = [...document.querySelectorAll('[data-guide-section]')]
   const countLabel = document.querySelector('[data-guide-count]')
   const emptyState = document.querySelector('[data-guide-empty]')
+  const url = new URL(window.location.href)
   const filters = {
-    category: 'all',
-    topic: 'all',
-    practice: 'all',
+    category: url.searchParams.get('category') || 'all',
+    topic: url.searchParams.get('topic') || 'all',
+    practice: url.searchParams.get('practice') || 'all',
+  }
+
+  if (searchInput instanceof HTMLInputElement) {
+    searchInput.value = url.searchParams.get('q') || ''
   }
 
   const applyFilters = () => {
     let visibleCards = 0
+    const query = (searchInput instanceof HTMLInputElement ? searchInput.value : '').trim().toLowerCase()
 
     guideCards.forEach((card) => {
       const category = card.getAttribute('data-guide-category') ?? ''
       const topic = card.getAttribute('data-guide-topic') ?? ''
       const hasPractice = card.getAttribute('data-guide-has-practice') === 'true'
       const searchText = card.getAttribute('data-guide-search') ?? ''
-      const query = (searchInput instanceof HTMLInputElement ? searchInput.value : '').trim().toLowerCase()
 
       const matchesCategory = filters.category === 'all' || category === filters.category
       const matchesTopic = filters.topic === 'all' || topic === filters.topic
@@ -187,7 +192,37 @@ const topics = [...new Set(posts.map((post) => post.data.topic).filter(Boolean))
     if (emptyState) {
       emptyState.toggleAttribute('hidden', visibleCards !== 0)
     }
+
+    const nextUrl = new URL(window.location.href)
+
+    if (query) {
+      nextUrl.searchParams.set('q', query)
+    } else {
+      nextUrl.searchParams.delete('q')
+    }
+
+    ;(['category', 'topic', 'practice']).forEach((key) => {
+      const value = filters[key]
+
+      if (value && value !== 'all') {
+        nextUrl.searchParams.set(key, value)
+      } else {
+        nextUrl.searchParams.delete(key)
+      }
+    })
+
+    window.history.replaceState({}, '', `${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`)
   }
+
+  document.querySelectorAll('[data-guide-filter-group]').forEach((group) => {
+    const filterGroup = group.getAttribute('data-guide-filter-group')
+    const currentValue = filterGroup ? filters[filterGroup] : 'all'
+
+    group.querySelectorAll('.guide-filter-chip').forEach((button) => {
+      const isActive = button.getAttribute('data-filter-value') === currentValue
+      button.classList.toggle('guide-filter-chip--active', isActive)
+    })
+  })
 
   document.querySelectorAll('[data-guide-filter-group]').forEach((group) => {
     group.addEventListener('click', (event) => {
@@ -217,4 +252,6 @@ const topics = [...new Set(posts.map((post) => post.data.topic).filter(Boolean))
   if (searchInput instanceof HTMLInputElement) {
     searchInput.addEventListener('input', applyFilters)
   }
+
+  applyFilters()
 </script>
