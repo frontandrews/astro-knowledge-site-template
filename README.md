@@ -32,9 +32,8 @@ The goal is simple: open the app, get one clear next step, study on a phone-size
 - `apps/site`: Astro guide site for summary-first reading and practice checklists
 - `packages/content`: deck manifest, deck JSON, and loaders
 - `packages/schemas`: shared Zod schemas and types
-- `docs/coding-interview-foundations/`: notes for coding challenge prep
-- `docs/system-design-interview/`: notes for system design and tricky technical topics
-- `docs/flashcards-app/`: product and implementation notes for the app
+- `docs/path-to-senior/`: the canonical roadmap, taxonomy, and localization model
+- `docs/flashcards-app/`: implementation notes for the app surface
 
 ## Current Product Surface
 
@@ -56,6 +55,7 @@ The goal is simple: open the app, get one clear next step, study on a phone-size
 - Keep the free product genuinely usable
 - Keep the app and the content layer separate when that separation improves product clarity
 - Grow from interview prep into a broader practice app for engineering, communication, and leadership
+- Remove outdated structure fast instead of keeping parallel systems alive
 
 ## Next Up
 

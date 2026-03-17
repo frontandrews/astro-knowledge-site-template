@@ -181,10 +181,10 @@ Good fit for:
 - failure handling
 - AI feature rollout
 
-## How current content maps into this structure
+## How active content maps into this structure
 
-Current content does not need to be deleted first.
-It should be remapped.
+Legacy notes should not stay as parallel source material forever.
+Active guides and decks should map into this structure directly.
 
 ### Current topic to final pillar
 
