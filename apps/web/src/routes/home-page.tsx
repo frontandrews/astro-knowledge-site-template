@@ -17,6 +17,7 @@ import {
   getMostRecentlyStudiedDeckId,
   type DeckCounts,
 } from '@/lib/progress'
+import { getSessionPresets, type SessionPreset } from '@/lib/session-presets'
 import { getTopicLabel } from '@/lib/topic-labels'
 import { useProgress } from '@/state/progress-context'
 
@@ -67,6 +68,7 @@ export function HomePage() {
     starterRecord?.deck.id ?? null,
   )
   const visibleDeckRecords = getVisibleDeckRecords(deckRecords, selectedTopic)
+  const sessionPresets = getSessionPresets(deckRecords)
   const topicCards = topicEntries.map(([topic, summaries]) => {
     const topicDecks = deckRecords.filter((record) => record.summary.topic === topic)
 
@@ -167,6 +169,24 @@ export function HomePage() {
           eyebrow={secondaryAction.eyebrow}
           title={secondaryAction.title}
         />
+      </section>
+
+      <section aria-labelledby="session-presets-heading" className="mb-6">
+        <div className="mb-4 flex items-center justify-between gap-4">
+          <div>
+            <h2 className="text-2xl font-black text-[var(--retro-ink)]" id="session-presets-heading">
+              Session presets
+            </h2>
+            <p className="mt-1 text-sm leading-6 text-white/75">
+              Quick entry points for the next useful session instead of deciding from scratch.
+            </p>
+          </div>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {sessionPresets.map((preset) => (
+            <SessionPresetCard key={preset.id} preset={preset} />
+          ))}
+        </div>
       </section>
 
       <section aria-labelledby="topic-paths-heading" className="mb-6">
@@ -288,6 +308,30 @@ function FocusCard({
       <div className="mt-5">
         <LinkButton to={actionHref} variant="primary">
           {actionLabel}
+        </LinkButton>
+      </div>
+    </Panel>
+  )
+}
+
+function SessionPresetCard({ preset }: { preset: SessionPreset }) {
+  return (
+    <Panel className="flex h-full flex-col justify-between gap-5 p-5">
+      <div>
+        <p className="text-[0.68rem] font-bold uppercase tracking-[0.22em] text-[var(--retro-line)]">
+          Session preset
+        </p>
+        <h3 className="mt-3 text-2xl font-black text-[var(--retro-ink)]">{preset.title}</h3>
+        <div className="mt-3 flex flex-wrap gap-2 text-sm">
+          {preset.meta.map((item) => (
+            <Badge key={item}>{item}</Badge>
+          ))}
+        </div>
+        <p className="mt-4 text-sm leading-6 text-white/80">{preset.detail}</p>
+      </div>
+      <div className="mt-auto">
+        <LinkButton to={preset.href} variant="secondary">
+          {preset.label}
         </LinkButton>
       </div>
     </Panel>

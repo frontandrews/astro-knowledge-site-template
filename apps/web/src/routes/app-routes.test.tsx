@@ -33,6 +33,10 @@ describe('app routes', () => {
     expect(screen.getAllByText('React Rendering Core').length).toBeGreaterThan(0)
     expect(screen.getByText('1 / 2 learned')).toBeInTheDocument()
     expect(screen.getByText('Ad-supported free plan')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Session presets' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Continue latest' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Run interview rep' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Take a quick warm-up' })).toBeInTheDocument()
   })
 
   it('filters the home deck list by selected topic', async () => {
