@@ -35,6 +35,7 @@ describe('app routes', () => {
     expect(screen.getByText('Ad-supported free plan')).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Session presets' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Continue latest' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Start daily queue' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Start mock interview' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Run interview rep' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Take a quick warm-up' })).toBeInTheDocument()
@@ -202,6 +203,27 @@ describe('app routes', () => {
 
     expect(screen.getByText('Strong answer')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /follow-up drill/i })).toBeInTheDocument()
+  })
+
+  it('runs a daily smart queue with mixed flashcards', async () => {
+    const user = userEvent.setup()
+    const deck = getReactDeck()
+    let store = createEmptyProgressStore()
+    store = setCardStatus(store, deck.id, deck.cards[1].id, 'partial')
+    store = setCardNote(store, deck.id, deck.cards[1].id, 'Lead with rerender blast radius')
+    seedProgress(store)
+
+    renderApp(['/daily-queue'])
+
+    expect(screen.getByRole('heading', { name: '1 of 7' })).toBeInTheDocument()
+    expect(screen.getAllByText('Daily smart queue').length).toBeGreaterThan(0)
+    expect(screen.getByText('React Rendering Core')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Show answer' })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Show answer' }))
+
+    expect(screen.getByText('Because broad context updates can rerender large subtrees.')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /your note/i })).toBeInTheDocument()
   })
 
   it('walks interview follow-ups one prompt at a time', async () => {

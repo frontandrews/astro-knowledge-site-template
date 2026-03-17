@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 
 import { AppShell } from '@/components/app-shell'
+import { DailyQueuePage } from '@/routes/daily-queue-page'
 import { DeckDetailPage } from '@/routes/deck-detail-page'
 import { HomePage } from '@/routes/home-page'
 import { MockInterviewPage } from '@/routes/mock-interview-page'
@@ -13,6 +14,7 @@ export function AppRoutes() {
     <AppShell>
       <Routes>
         <Route element={<HomePage />} path="/" />
+        <Route element={<DailyQueuePage />} path="/daily-queue" />
         <Route element={<DeckDetailPage />} path="/decks/:deckId" />
         <Route element={<MockInterviewPage />} path="/mock-interview" />
         <Route element={<PremiumPage />} path="/premium" />

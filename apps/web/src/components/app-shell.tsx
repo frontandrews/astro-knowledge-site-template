@@ -167,6 +167,16 @@ function getShellConfig(pathname: string): ShellConfig {
     }
   }
 
+  if (segments[0] === 'daily-queue') {
+    return {
+      backLabel: 'Back home',
+      backTo: '/',
+      eyebrow: 'Daily queue',
+      mode: 'compact',
+      title: 'Daily smart queue',
+    }
+  }
+
   return {
     backLabel: 'Back home',
     backTo: '/',

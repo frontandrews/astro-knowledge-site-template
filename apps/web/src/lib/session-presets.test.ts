@@ -17,8 +17,9 @@ describe('session presets', () => {
   it('builds a useful starter set for a clean library', () => {
     const presets = getSessionPresets(buildRecords())
 
-    expect(presets).toHaveLength(4)
+    expect(presets).toHaveLength(5)
     expect(presets[0]?.label).toBe('Start warm-up')
+    expect(presets.some((preset) => preset.label === 'Start daily queue')).toBe(true)
     expect(presets.some((preset) => preset.label === 'Start mock interview')).toBe(true)
     expect(presets.some((preset) => preset.label === 'Run interview rep')).toBe(true)
     expect(presets.some((preset) => preset.label === 'Take a quick warm-up')).toBe(true)

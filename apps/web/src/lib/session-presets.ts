@@ -1,6 +1,6 @@
 import type { Deck, DeckManifestEntry } from '@prepdeck/schemas'
 
-import { createMockInterviewHref, createStudyHref } from '@/lib/study-session'
+import { createDailyQueueHref, createMockInterviewHref, createStudyHref } from '@/lib/study-session'
 import { getTopicLabel } from '@/lib/topic-labels'
 
 type DeckCountsLike = {
@@ -21,7 +21,7 @@ type DeckRecordLike = {
 export type SessionPreset = {
   detail: string
   href: string
-  id: 'continue' | 'interview' | 'mock' | 'weak' | 'warmup'
+  id: 'continue' | 'daily' | 'interview' | 'mock' | 'weak' | 'warmup'
   label: string
   meta: string[]
   title: string
@@ -37,6 +37,7 @@ export function getSessionPresets(records: DeckRecordLike[]): SessionPreset[] {
     usedDeckIds.add(continueRecord.deck.id)
   }
 
+  presets.push(createDailyPreset())
   presets.push(createMockPreset())
 
   const interviewRecord = getInterviewRecord(records, usedDeckIds)
@@ -57,6 +58,18 @@ export function getSessionPresets(records: DeckRecordLike[]): SessionPreset[] {
   }
 
   return presets
+}
+
+function createDailyPreset(): SessionPreset {
+  return {
+    detail:
+      'Run a small mixed queue that pulls weak cards, noted cards, and a few fresh prompts into one daily pass.',
+    href: createDailyQueueHref(),
+    id: 'daily',
+    label: 'Start daily queue',
+    meta: ['Mixed topics', 'Flashcards', '7 cards'],
+    title: 'Daily smart queue',
+  }
 }
 
 function createMockPreset(): SessionPreset {
