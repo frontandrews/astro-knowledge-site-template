@@ -177,10 +177,33 @@ describe('app routes', () => {
 
     expect(screen.getByText('Strong answer')).toBeInTheDocument()
     expect(screen.getByText('Common traps')).toBeInTheDocument()
-    expect(screen.getByText('Follow-up prompts')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /follow-up drill/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Strong' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Decent' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Needs work' })).toBeInTheDocument()
+  })
+
+  it('walks interview follow-ups one prompt at a time', async () => {
+    const user = userEvent.setup()
+
+    renderApp(['/study/react-rendering-core?mode=start&format=interview'])
+
+    await user.click(screen.getByRole('button', { name: 'End early' }))
+    await user.click(screen.getByRole('button', { name: 'Reveal answer' }))
+    await user.click(screen.getByRole('button', { name: /follow-up drill/i }))
+
+    expect(screen.getByText('Prompt 1 of 2')).toBeInTheDocument()
+    expect(screen.getByText('When is memoization enough instead of extra state?')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Next prompt' }))
+
+    expect(screen.getByText('Prompt 2 of 2')).toBeInTheDocument()
+    expect(screen.getByText('What is an example of bad derived state?')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Finish follow-ups' }))
+
+    expect(screen.getByText('Follow-ups complete')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Run again' })).toBeInTheDocument()
   })
 
   it('keeps personal notes collapsed until the user opens them in study mode', async () => {

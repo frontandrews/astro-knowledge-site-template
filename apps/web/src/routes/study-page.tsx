@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import { Link, Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 
 import { CardNoteEditor } from '@/components/card-note-editor'
+import { FollowUpDrill } from '@/components/follow-up-drill'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { LinkButton } from '@/components/ui/link-button'
@@ -279,15 +280,11 @@ function StudySession({
                   </ul>
                 </div>
               ) : null}
-              {isInterviewMode && currentCard.followUps.length > 0 ? (
-                <div>
-                  <p className="text-sm font-black text-[var(--retro-ink)]">Follow-up prompts</p>
-                  <ul className="mt-3 space-y-2 text-sm leading-6 text-white/80">
-                    {currentCard.followUps.map((followUp) => (
-                      <li key={followUp}>- {followUp}</li>
-                    ))}
-                  </ul>
-                </div>
+              {isInterviewMode ? (
+                <FollowUpDrill
+                  key={`follow-up-${currentCard.id}`}
+                  prompts={currentCard.followUps}
+                />
               ) : null}
               {currentCard.learnMore || currentCard.exampleCode ? (
                 <div className="rounded-[1rem] border border-[var(--retro-line)] bg-[var(--retro-bg-strong)]">
@@ -331,7 +328,7 @@ function StudySession({
                 </div>
               ) : null}
               <CardNoteEditor
-                key={currentCard.id}
+                key={`note-${currentCard.id}`}
                 note={currentNote}
                 onClearNote={() => clearCardNote(deck.id, currentCard.id)}
                 onSaveNote={(note) => setCardNote(deck.id, currentCard.id, note)}
