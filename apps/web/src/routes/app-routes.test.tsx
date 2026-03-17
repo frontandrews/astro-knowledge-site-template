@@ -63,19 +63,15 @@ describe('app routes', () => {
     expect(screen.getByText('1 / 2 learned')).toBeInTheDocument()
     expect(screen.getByText('Ad-supported free plan')).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Session presets' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Momentum' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Goal tracker' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Download a portfolio-ready progress card.' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Download share card' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Progress hub' })).toBeInTheDocument()
+    expect(screen.getAllByRole('link', { name: 'Open progress hub' }).length).toBeGreaterThan(0)
     expect(screen.getByRole('link', { name: 'Continue latest' })).toBeInTheDocument()
     expect(screen.getAllByRole('link', { name: 'Start daily queue' }).length).toBeGreaterThan(0)
     expect(screen.getByRole('link', { name: 'Start mock interview' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Run interview rep' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Take a quick warm-up' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Mastery snapshot' })).toBeInTheDocument()
-    expect(screen.getAllByText('Strongest topic').length).toBeGreaterThan(0)
-    expect(screen.getAllByText('Weakest topic').length).toBeGreaterThan(0)
-    expect(screen.getByText('No weak topic yet')).toBeInTheDocument()
+    expect(screen.getByText('Current streak')).toBeInTheDocument()
+    expect(screen.getByText('Review debt')).toBeInTheDocument()
   })
 
   it('surfaces an install panel when the browser exposes the PWA prompt', async () => {
@@ -108,7 +104,7 @@ describe('app routes', () => {
     expect(prompt).toHaveBeenCalledTimes(1)
   })
 
-  it('renders local momentum and recent session activity on the home page', () => {
+  it('summarizes local progress on the home page without the full tracking sections', () => {
     let sessionHistory = createEmptySessionHistoryStore()
     sessionHistory = recordCompletedSession(
       sessionHistory,
@@ -132,11 +128,9 @@ describe('app routes', () => {
 
     expect(screen.getByText('Current streak')).toBeInTheDocument()
     expect(screen.getByText('This week')).toBeInTheDocument()
-    expect(screen.getByText('Latest completed reps')).toBeInTheDocument()
-    expect(screen.getByText('Daily goal')).toBeInTheDocument()
-    expect(screen.getByText('Weekly goal')).toBeInTheDocument()
-    expect(screen.getAllByText('Daily smart queue').length).toBeGreaterThan(0)
-    expect(screen.getAllByText(/4 learned/i).length).toBeGreaterThan(0)
+    expect(screen.getByRole('heading', { name: 'Progress hub' })).toBeInTheDocument()
+    expect(screen.getAllByRole('link', { name: 'Open progress hub' }).length).toBeGreaterThan(0)
+    expect(screen.queryByText('Latest completed reps')).not.toBeInTheDocument()
   })
 
   it('filters the home deck list by selected topic', async () => {
@@ -209,6 +203,7 @@ describe('app routes', () => {
 
     expect(screen.getByRole('link', { name: 'Back to library' })).toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'Home' })).not.toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Progress' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Premium' })).toBeInTheDocument()
     expect(
       screen.queryByRole('heading', {
@@ -258,10 +253,48 @@ describe('app routes', () => {
 
     renderApp(['/'])
 
+    expect(screen.getByRole('heading', { name: 'Progress hub' })).toBeInTheDocument()
+    expect(screen.getByText('Current streak')).toBeInTheDocument()
+    expect(screen.getAllByRole('link', { name: 'Open progress hub' }).length).toBeGreaterThan(0)
+  })
+
+  it('renders the dedicated progress page with momentum, mastery, and local tools', () => {
+    const deck = getReactDeck()
+    let store = createEmptyProgressStore()
+    store = setCardStatus(store, deck.id, deck.cards[0].id, 'learned')
+    store = setCardNote(store, deck.id, deck.cards[0].id, 'Lead with duplicated state risk')
+    seedProgress(store)
+
+    let sessionHistory = createEmptySessionHistoryStore()
+    sessionHistory = recordCompletedSession(
+      sessionHistory,
+      {
+        cardCount: 2,
+        deckId: deck.id,
+        deckTitle: deck.title,
+        format: 'flashcards',
+        kind: 'deck',
+        learnedCount: 2,
+        notLearnedCount: 0,
+        partialCount: 0,
+        scopeLabel: 'Full deck',
+        sessionLabel: deck.title,
+      },
+      '2026-03-17T12:00:00.000Z',
+    )
+    seedSessionHistory(sessionHistory)
+
+    renderApp(['/progress'])
+
     expect(screen.getByRole('heading', { name: 'Momentum' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Latest completed reps' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Goal tracker' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Mastery snapshot' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Local tools' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Download a portfolio-ready progress card.' })).toBeInTheDocument()
+    expect(screen.getByText('Latest completed reps')).toBeInTheDocument()
     expect(screen.getAllByText('React Rendering Core').length).toBeGreaterThan(0)
-    expect(screen.getAllByText(/2 learned/i).length).toBeGreaterThan(0)
+    expect(screen.getByRole('button', { name: 'Download share card' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Export backup' })).toBeInTheDocument()
   })
 
   it('keeps learn-more content collapsed until the user opens it', async () => {
@@ -590,8 +623,8 @@ describe('app routes', () => {
     expect(screen.getByText('Premium active')).toBeInTheDocument()
   })
 
-  it('shows local backup controls on the home page', () => {
-    renderApp(['/'])
+  it('shows local backup controls on the progress page', () => {
+    renderApp(['/progress'])
 
     expect(screen.getByRole('heading', { name: 'Own your progress on this device.' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Export backup' })).toBeInTheDocument()

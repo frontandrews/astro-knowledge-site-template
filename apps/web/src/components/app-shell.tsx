@@ -13,6 +13,8 @@ export function AppShell({ children }: PropsWithChildren) {
   const shell = getShellConfig(location.pathname)
   const { isPremium } = useMonetization()
   const showHomeShortcut = shell.mode === 'compact' && shell.backTo !== '/'
+  const showProgressShortcut =
+    shell.mode === 'compact' && !location.pathname.startsWith('/progress')
   const showPremiumShortcut =
     shell.mode === 'compact' && !location.pathname.startsWith('/premium')
 
@@ -40,6 +42,9 @@ export function AppShell({ children }: PropsWithChildren) {
                 <Badge tone={isPremium ? 'success' : 'warning'}>
                   {isPremium ? 'Premium active' : 'Ad-supported'}
                 </Badge>
+                <LinkButton size="sm" to="/progress" variant="ghost">
+                  Progress
+                </LinkButton>
                 <LinkButton size="sm" to="/premium" variant="ghost">
                   Premium
                 </LinkButton>
@@ -59,6 +64,11 @@ export function AppShell({ children }: PropsWithChildren) {
                   {showHomeShortcut ? (
                     <LinkButton size="sm" to="/" variant="secondary">
                       Home
+                    </LinkButton>
+                  ) : null}
+                  {showProgressShortcut ? (
+                    <LinkButton size="sm" to="/progress" variant="ghost">
+                      Progress
                     </LinkButton>
                   ) : null}
                   {showPremiumShortcut ? (
@@ -154,6 +164,16 @@ function getShellConfig(pathname: string): ShellConfig {
       eyebrow: 'Monetization',
       mode: 'compact',
       title: 'Premium',
+    }
+  }
+
+  if (segments[0] === 'progress') {
+    return {
+      backLabel: 'Back home',
+      backTo: '/',
+      eyebrow: 'Progress',
+      mode: 'compact',
+      title: 'History, goals, and local data',
     }
   }
 

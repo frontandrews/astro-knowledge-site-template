@@ -8,6 +8,7 @@ import { DeckDetailPage } from '@/routes/deck-detail-page'
 import { HomePage } from '@/routes/home-page'
 import { MockInterviewPage } from '@/routes/mock-interview-page'
 import { PremiumPage } from '@/routes/premium-page'
+import { ProgressPage } from '@/routes/progress-page'
 import { ReviewPage } from '@/routes/review-page'
 import { StudyPage } from '@/routes/study-page'
 
@@ -31,6 +32,7 @@ export function AppRoutes() {
             <Route element={<DeckDetailPage />} path="/decks/:deckId" />
             <Route element={<MockInterviewPage />} path="/mock-interview" />
             <Route element={<PremiumPage />} path="/premium" />
+            <Route element={<ProgressPage />} path="/progress" />
             <Route element={<ReviewPage />} path="/decks/:deckId/review" />
             <Route element={<StudyPage />} path="/study/:deckId" />
             <Route element={<Navigate replace to="/" />} path="*" />

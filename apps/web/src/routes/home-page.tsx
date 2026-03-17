@@ -1,15 +1,12 @@
-import type { DeckManifestEntry, SessionHistoryEntry } from '@prepdeck/schemas'
+import type { DeckManifestEntry } from '@prepdeck/schemas'
 import { getDecksByTopic } from '@prepdeck/content/manifest'
 import { m } from 'motion/react'
 import { useMemo, useState } from 'react'
 
-import { ConfirmDialog } from '@/components/confirm-dialog'
 import { AdSlot } from '@/components/ad-slot'
-import { DataControlsPanel } from '@/components/data-controls-panel'
 import { DeckCard } from '@/components/deck-card'
 import { FirstRunPanel } from '@/components/first-run-panel'
 import { InstallAppPanel } from '@/components/install-app-panel'
-import { ProgressSharePanel } from '@/components/progress-share-panel'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { LinkButton } from '@/components/ui/link-button'
@@ -21,26 +18,21 @@ import {
   type DeckLibraryRecord,
 } from '@/lib/deck-library'
 import { cardRevealVariants, hoverLiftMotionProps } from '@/lib/motion'
-import { getMasteryPercent, getMasterySnapshot } from '@/lib/mastery'
+import { getMasterySnapshot } from '@/lib/mastery'
 import {
   combineDeckCounts,
   getDeckCountsFromSummary,
   getMostRecentlyStudiedDeckId,
   type DeckCounts,
 } from '@/lib/progress'
-import {
-  getSessionFormatLabel,
-  getSessionHistorySnapshot,
-  getSessionKindLabel,
-} from '@/lib/session-history'
+import { getSessionHistorySnapshot } from '@/lib/session-history'
 import { getSessionPresets, type SessionPreset } from '@/lib/session-presets'
 import { getStudyGoalsSnapshot } from '@/lib/study-goals'
 import { getTopicLabel } from '@/lib/topic-labels'
 import { useProgress } from '@/state/progress-context'
 
 export function HomePage() {
-  const { progressStore, resetAllProgress, sessionHistoryStore } = useProgress()
-  const [isResetAllOpen, setIsResetAllOpen] = useState(false)
+  const { progressStore, sessionHistoryStore } = useProgress()
   const [libraryDifficulty, setLibraryDifficulty] =
     useState<DeckLibraryFilters['difficulty']>('all')
   const [libraryQuery, setLibraryQuery] = useState('')
@@ -198,92 +190,6 @@ export function HomePage() {
         />
       </section>
 
-      <section aria-labelledby="momentum-heading" className="mb-6">
-        <div className="mb-4 flex items-center justify-between gap-4">
-          <div>
-            <h2 className="text-2xl font-black text-[var(--retro-ink)]" id="momentum-heading">
-              Momentum
-            </h2>
-            <p className="mt-1 text-sm leading-6 text-white/75">
-              Local session history that shows whether the habit is alive, how often you
-              are actually practicing, and what the latest reps looked like.
-            </p>
-          </div>
-        </div>
-        <div className="grid gap-4 xl:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
-          <div className="grid gap-4 sm:grid-cols-3">
-            <MomentumStatCard
-              detail={
-                sessionHistorySnapshot.currentStreak > 0
-                  ? `${sessionHistorySnapshot.currentStreak} consecutive ${pluralize('day', sessionHistorySnapshot.currentStreak)} with at least one completed session.`
-                  : 'No live streak yet. One short session starts the chain again.'
-              }
-              label="Current streak"
-              value={
-                sessionHistorySnapshot.currentStreak > 0
-                  ? `${sessionHistorySnapshot.currentStreak} ${sessionHistorySnapshot.currentStreak === 1 ? 'day' : 'days'}`
-                  : 'Start one'
-              }
-            />
-            <MomentumStatCard
-              detail={`${sessionHistorySnapshot.sessionsThisWeek} ${pluralize('session', sessionHistorySnapshot.sessionsThisWeek)} completed in the last 7 days.`}
-              label="This week"
-              value={`${sessionHistorySnapshot.sessionsThisWeek}`}
-            />
-            <MomentumStatCard
-              detail={`${sessionHistorySnapshot.totalSessions} total ${pluralize('session', sessionHistorySnapshot.totalSessions)} stored on this device.`}
-              label="Total sessions"
-              value={`${sessionHistorySnapshot.totalSessions}`}
-            />
-          </div>
-
-          <m.div
-            className="[transform-style:preserve-3d]"
-            initial="initial"
-            variants={cardRevealVariants}
-            viewport={{ amount: 0.2, once: true }}
-            whileInView="animate"
-            {...hoverLiftMotionProps}
-          >
-            <Panel className="h-full p-5">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="text-[0.68rem] font-bold uppercase tracking-[0.22em] text-[var(--retro-line)]">
-                    Recent activity
-                  </p>
-                  <h3 className="mt-3 text-2xl font-black text-[var(--retro-ink)]">
-                    {sessionHistorySnapshot.recentSessions.length > 0
-                      ? 'Latest completed reps'
-                      : 'Your session recap will land here.'}
-                  </h3>
-                </div>
-                {sessionHistorySnapshot.lastCompletedAt ? (
-                  <Badge tone="accent">
-                    Last rep {formatSessionRelativeTime(sessionHistorySnapshot.lastCompletedAt)}
-                  </Badge>
-                ) : null}
-              </div>
-
-              {sessionHistorySnapshot.recentSessions.length > 0 ? (
-                <div className="mt-5 space-y-3">
-                  {sessionHistorySnapshot.recentSessions.map((session) => (
-                    <RecentSessionCard key={session.id} session={session} />
-                  ))}
-                </div>
-              ) : (
-                <Panel className="mt-5 bg-[var(--retro-surface-muted)] p-4" inset>
-                  <p className="text-sm leading-6 text-white/80">
-                    Finish any deck, daily queue, or mock interview and Prepdeck will keep a
-                    local recap here so the home screen feels like a living study app, not
-                    just a deck browser.
-                  </p>
-                </Panel>
-              )}
-            </Panel>
-          </m.div>
-        </div>
-      </section>
-
       <section aria-labelledby="session-presets-heading" className="mb-6">
         <div className="mb-4 flex items-center justify-between gap-4">
           <div>
@@ -302,35 +208,48 @@ export function HomePage() {
         </div>
       </section>
 
-      <section aria-labelledby="goal-tracker-heading" className="mb-6">
+      <section aria-labelledby="progress-hub-heading" className="mb-6">
         <div className="mb-4 flex items-center justify-between gap-4">
           <div>
-            <h2 className="text-2xl font-black text-[var(--retro-ink)]" id="goal-tracker-heading">
-              Goal tracker
+            <h2 className="text-2xl font-black text-[var(--retro-ink)]" id="progress-hub-heading">
+              Progress hub
             </h2>
             <p className="mt-1 text-sm leading-6 text-white/75">
-              Simple local targets that make the home screen feel like a habit app instead
-              of a static deck shelf.
+              History, goals, local backup, and shareable progress now live in one place so
+              the home screen can stay focused on starting the next useful rep.
             </p>
           </div>
+          <LinkButton to="/progress" variant="secondary">
+            Open progress hub
+          </LinkButton>
         </div>
-        <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.15fr)]">
-          <GoalCard
-            description={
-              goalsSnapshot.daily.isComplete
-                ? 'Today is already covered. Anything else now is bonus practice.'
-                : `${goalsSnapshot.daily.remaining} short ${pluralize('session', goalsSnapshot.daily.remaining)} left to close today.`
-            }
-            goal={goalsSnapshot.daily}
-          />
-          <GoalCard
-            description={
-              goalsSnapshot.weekly.isComplete
-                ? 'Weekly pace is clear. Keep going only if you want extra reps.'
-                : `${goalsSnapshot.weekly.remaining} more ${pluralize('session', goalsSnapshot.weekly.remaining)} to hit this week’s pace.`
-            }
-            goal={goalsSnapshot.weekly}
-          />
+        <div className="grid gap-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
+          <div className="grid gap-4 sm:grid-cols-3">
+            <HubSignalCard
+              detail={
+                sessionHistorySnapshot.currentStreak > 0
+                  ? `${sessionHistorySnapshot.currentStreak} consecutive ${pluralize('day', sessionHistorySnapshot.currentStreak)} with at least one completed session.`
+                  : 'No live streak yet. One short session starts the chain again.'
+              }
+              label="Current streak"
+              value={
+                sessionHistorySnapshot.currentStreak > 0
+                  ? `${sessionHistorySnapshot.currentStreak} ${sessionHistorySnapshot.currentStreak === 1 ? 'day' : 'days'}`
+                  : 'Start one'
+              }
+            />
+            <HubSignalCard
+              detail={`${sessionHistorySnapshot.sessionsThisWeek} ${pluralize('session', sessionHistorySnapshot.sessionsThisWeek)} completed in the last 7 days.`}
+              label="This week"
+              value={`${sessionHistorySnapshot.sessionsThisWeek}`}
+            />
+            <HubSignalCard
+              detail={`${masterySnapshot.reviewDebt} ${pluralize('card', masterySnapshot.reviewDebt)} currently need another pass.`}
+              label="Review debt"
+              value={`${masterySnapshot.reviewDebt}`}
+            />
+          </div>
+
           <m.div
             className="[transform-style:preserve-3d]"
             initial="initial"
@@ -339,77 +258,29 @@ export function HomePage() {
             whileInView="animate"
             {...hoverLiftMotionProps}
           >
-            <Panel className="flex h-full flex-col justify-between gap-4 p-5">
-              <div>
-                <p className="text-[0.68rem] font-bold uppercase tracking-[0.22em] text-[var(--retro-line)]">
-                  Next move
-                </p>
-                <h3 className="mt-3 text-2xl font-black text-[var(--retro-ink)]">
-                  Keep the pace deliberate.
-                </h3>
-                <p className="mt-3 text-sm leading-6 text-white/80">
-                  {goalsSnapshot.nextAction.detail}
-                </p>
+            <Panel className="h-full p-5">
+              <div className="flex flex-wrap gap-2">
+                <Badge tone="accent">Goals</Badge>
+                <Badge>{goalsSnapshot.daily.current}/{goalsSnapshot.daily.target} today</Badge>
+                <Badge>{masterySnapshot.savedNotes} notes</Badge>
               </div>
-              <div className="flex flex-wrap gap-3">
-                <LinkButton to={goalsSnapshot.nextAction.href} variant="secondary">
+              <h3 className="mt-3 text-2xl font-black text-[var(--retro-ink)]">
+                Keep the tracking layer out of the way.
+              </h3>
+              <p className="mt-3 text-sm leading-6 text-white/80">
+                Open the progress hub for recent reps, goal tracking, mastery signals, shareable
+                snapshots, and backup controls. The home screen stays lighter and faster.
+              </p>
+              <div className="mt-5 flex flex-wrap gap-3">
+                <LinkButton to="/progress" variant="primary">
+                  Open progress hub
+                </LinkButton>
+                <LinkButton to={goalsSnapshot.nextAction.href} variant="ghost">
                   {goalsSnapshot.nextAction.label}
                 </LinkButton>
-                <Button onClick={() => setSelectedTopic('all')} type="button" variant="ghost">
-                  Browse all decks
-                </Button>
               </div>
             </Panel>
           </m.div>
-        </div>
-      </section>
-
-      <section aria-labelledby="mastery-snapshot-heading" className="mb-6">
-        <div className="mb-4">
-          <h2 className="text-2xl font-black text-[var(--retro-ink)]" id="mastery-snapshot-heading">
-            Mastery snapshot
-          </h2>
-          <p className="mt-1 text-sm leading-6 text-white/75">
-            Local signals that show where you are strongest, where the review debt lives, and how much groundwork is already done.
-          </p>
-        </div>
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          <MasterySignalCard
-            detail={
-              masterySnapshot.strongestTopic
-                ? `${getMasteryPercent(masterySnapshot.strongestTopic)}% learned across ${masterySnapshot.strongestTopic.deckCount} deck${masterySnapshot.strongestTopic.deckCount === 1 ? '' : 's'}.`
-                : 'No topic has enough progress yet to rank as strongest.'
-            }
-            label="Strongest topic"
-            value={
-              masterySnapshot.strongestTopic
-                ? getTopicLabel(masterySnapshot.strongestTopic.topic)
-                : 'Not enough reps yet'
-            }
-          />
-          <MasterySignalCard
-            detail={
-              masterySnapshot.weakestTopic
-                ? `${masterySnapshot.weakestTopic.reviewDebt} ${pluralize('card', masterySnapshot.weakestTopic.reviewDebt)} still ${masterySnapshot.weakestTopic.reviewDebt === 1 ? 'needs' : 'need'} work here.`
-                : 'No weak topic is standing out right now.'
-            }
-            label="Weakest topic"
-            value={
-              masterySnapshot.weakestTopic
-                ? getTopicLabel(masterySnapshot.weakestTopic.topic)
-                : 'No weak topic yet'
-            }
-          />
-          <MasterySignalCard
-            detail={`${masterySnapshot.startedDecks} started ${pluralize('deck', masterySnapshot.startedDecks)} across the library.`}
-            label="Decks completed"
-            value={`${masterySnapshot.decksCompleted}`}
-          />
-          <MasterySignalCard
-            detail={`${masterySnapshot.reviewDebt} ${pluralize('card', masterySnapshot.reviewDebt)} currently ${masterySnapshot.reviewDebt === 1 ? 'sits' : 'sit'} in the review debt queue.`}
-            label="Saved notes"
-            value={`${masterySnapshot.savedNotes}`}
-          />
         </div>
       </section>
 
@@ -584,25 +455,6 @@ export function HomePage() {
         )}
       </section>
 
-      <section className="mt-6">
-        <ProgressSharePanel />
-      </section>
-
-      <section className="mt-6">
-        <DataControlsPanel onResetAll={() => setIsResetAllOpen(true)} />
-      </section>
-
-      <ConfirmDialog
-        confirmLabel="Reset all"
-        description="This clears every saved status, personal note, and session recap across all decks."
-        isOpen={isResetAllOpen}
-        onCancel={() => setIsResetAllOpen(false)}
-        onConfirm={() => {
-          resetAllProgress()
-          setIsResetAllOpen(false)
-        }}
-        title="Reset all progress?"
-      />
     </>
   )
 }
@@ -678,35 +530,7 @@ function SessionPresetCard({ preset }: { preset: SessionPreset }) {
   )
 }
 
-function MasterySignalCard({
-  detail,
-  label,
-  value,
-}: {
-  detail: string
-  label: string
-  value: string
-}) {
-  return (
-    <m.div
-      initial="initial"
-      variants={cardRevealVariants}
-      viewport={{ amount: 0.3, once: true }}
-      whileInView="animate"
-      {...hoverLiftMotionProps}
-    >
-      <Panel className="p-5">
-        <p className="text-[0.68rem] font-bold uppercase tracking-[0.22em] text-[var(--retro-line)]">
-          {label}
-        </p>
-        <p className="mt-3 text-2xl font-black text-[var(--retro-ink)]">{value}</p>
-        <p className="mt-3 text-sm leading-6 text-white/80">{detail}</p>
-      </Panel>
-    </m.div>
-  )
-}
-
-function MomentumStatCard({
+function HubSignalCard({
   detail,
   label,
   value,
@@ -735,83 +559,6 @@ function MomentumStatCard({
   )
 }
 
-function GoalCard({
-  description,
-  goal,
-}: {
-  description: string
-  goal: {
-    current: number
-    isComplete: boolean
-    label: string
-    remaining: number
-    target: number
-  }
-}) {
-  return (
-    <m.div
-      className="[transform-style:preserve-3d]"
-      initial="initial"
-      variants={cardRevealVariants}
-      viewport={{ amount: 0.2, once: true }}
-      whileInView="animate"
-      {...hoverLiftMotionProps}
-    >
-      <Panel className="h-full p-5">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <p className="text-[0.68rem] font-bold uppercase tracking-[0.22em] text-[var(--retro-line)]">
-              {goal.label}
-            </p>
-            <h3 className="mt-3 text-2xl font-black text-[var(--retro-ink)]">
-              {goal.current} / {goal.target}
-            </h3>
-          </div>
-          <Badge tone={goal.isComplete ? 'success' : 'accent'}>
-            {goal.isComplete ? 'On track' : `${goal.remaining} left`}
-          </Badge>
-        </div>
-        <div className="mt-4">
-          <ProgressMeter current={Math.min(goal.current, goal.target)} total={goal.target} />
-        </div>
-        <p className="mt-4 text-sm leading-6 text-white/80">{description}</p>
-      </Panel>
-    </m.div>
-  )
-}
-
-function RecentSessionCard({ session }: { session: SessionHistoryEntry }) {
-  const reviewDebt = session.partialCount + session.notLearnedCount
-
-  return (
-    <Panel className="bg-[var(--retro-surface-muted)] p-4" inset>
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <div className="flex flex-wrap gap-2">
-            <Badge tone="accent">{getSessionKindLabel(session.kind)}</Badge>
-            <Badge>{getSessionFormatLabel(session.format)}</Badge>
-            {session.deckTitle ? <Badge>{session.deckTitle}</Badge> : null}
-          </div>
-          <h4 className="mt-3 text-lg font-black text-[var(--retro-ink)]">
-            {session.sessionLabel}
-          </h4>
-          <p className="mt-1 text-sm leading-6 text-white/75">
-            {session.scopeLabel} · {session.cardCount} {pluralize('card', session.cardCount)} ·{' '}
-            {formatSessionRelativeTime(session.completedAt)}
-          </p>
-        </div>
-        <Badge>{session.learnedCount} learned</Badge>
-      </div>
-      <p className="mt-3 text-sm leading-6 text-white/80">
-        {session.learnedCount} learned · {session.partialCount} partial ·{' '}
-        {session.notLearnedCount} needs work
-        {reviewDebt > 0
-          ? '. Keep this lane in the queue before the weak pile grows.'
-          : '. Clean rep.'}
-      </p>
-    </Panel>
-  )
-}
 
 function TopicPathCard({
   counts,
@@ -1014,30 +761,4 @@ function getDifficultyRank(difficulty: DeckManifestEntry['difficulty']) {
 
 function pluralize(word: string, count: number) {
   return count === 1 ? word : `${word}s`
-}
-
-function formatSessionRelativeTime(value: string, now: Date = new Date()) {
-  const date = new Date(value)
-  const today = new Date(now)
-  today.setHours(0, 0, 0, 0)
-  const targetDay = new Date(date)
-  targetDay.setHours(0, 0, 0, 0)
-  const dayDelta = Math.round((today.getTime() - targetDay.getTime()) / 86_400_000)
-  const timeLabel = new Intl.DateTimeFormat('en-US', {
-    hour: 'numeric',
-    minute: '2-digit',
-  }).format(date)
-
-  if (dayDelta === 0) {
-    return `today at ${timeLabel}`
-  }
-
-  if (dayDelta === 1) {
-    return `yesterday at ${timeLabel}`
-  }
-
-  return new Intl.DateTimeFormat('en-US', {
-    day: 'numeric',
-    month: 'short',
-  }).format(date)
 }
