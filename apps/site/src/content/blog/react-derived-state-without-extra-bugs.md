@@ -5,6 +5,13 @@ summary: A cleaner mental model for derived state questions in React interviews.
 pubDate: 2026-03-17
 category: Programming
 topic: React
+path:
+  - Programming
+  - React
+  - State
+order: 10
+relationships:
+  - javascript-event-loop-without-hand-waving
 takeaways:
   - "Treat duplicated state as a synchronization risk, not as a convenience."
   - "Derive cheap values during render instead of copying props into state."

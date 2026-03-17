@@ -83,7 +83,7 @@ export function createProgressShareCardSvg(snapshot: ProgressShareSnapshot): str
   <g transform="translate(80 84)">
     <text fill="#7aa2ff" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" font-weight="700" letter-spacing="5">PREPDECK</text>
     <text y="54" fill="#f5f8ff" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="44" font-weight="800">Progress snapshot</text>
-    <text y="94" fill="rgba(245,248,255,0.75)" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="22">Local-first interview prep with short sessions, saved notes, and no signup wall.</text>
+    <text y="94" fill="rgba(245,248,255,0.75)" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="22">Local-first career practice with short sessions, saved notes, and no signup wall.</text>
   </g>
 
   <g transform="translate(80 190)">

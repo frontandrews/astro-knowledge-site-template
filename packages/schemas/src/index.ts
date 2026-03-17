@@ -31,6 +31,7 @@ export const deckSchema = z.object({
   id: z.string().min(1),
   title: z.string().min(1),
   topic: z.string().min(1),
+  track: z.string().min(1),
   description: z.string().min(1),
   difficulty: difficultySchema,
   estimatedMinutes: z.number().int().positive(),
@@ -41,6 +42,7 @@ export const deckSchema = z.object({
 export const deckManifestEntrySchema = z.object({
   id: z.string().min(1),
   topic: z.string().min(1),
+  track: z.string().min(1),
   title: z.string().min(1),
   description: z.string().min(1),
   difficulty: difficultySchema,

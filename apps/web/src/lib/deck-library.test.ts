@@ -36,6 +36,7 @@ describe('deck library filters', () => {
         path: '',
         searchTerms: ['react', 'hooks', 'state'],
         tags: ['react', 'hooks'],
+        track: 'programming',
         title: 'React Core',
         topic: 'react',
       },
@@ -53,6 +54,7 @@ describe('deck library filters', () => {
         path: '',
         searchTerms: ['node', 'runtime', 'event loop'],
         tags: ['node', 'runtime'],
+        track: 'programming',
         title: 'Node Core',
         topic: 'node',
       },
@@ -63,7 +65,7 @@ describe('deck library filters', () => {
     const result = filterDeckLibraryRecords(records, {
       difficulty: 'all',
       query: 'runtime',
-      selectedTopic: 'all',
+      selectedTrack: 'all',
       status: 'all',
     })
 
@@ -74,14 +76,14 @@ describe('deck library filters', () => {
     const needsReview = filterDeckLibraryRecords(records, {
       difficulty: 'all',
       query: '',
-      selectedTopic: 'all',
+      selectedTrack: 'all',
       status: 'needs_review',
     })
 
     const hasNotes = filterDeckLibraryRecords(records, {
       difficulty: 'all',
       query: '',
-      selectedTopic: 'all',
+      selectedTrack: 'all',
       status: 'has_notes',
     })
 

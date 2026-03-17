@@ -1,5 +1,6 @@
 import type { DeckManifestEntry } from '@prepdeck/schemas'
 
+import { getTrackLabel } from '@/lib/track-labels'
 import { getTopicLabel } from '@/lib/topic-labels'
 
 type DeckCountsLike = {
@@ -23,7 +24,7 @@ export type DeckLibraryRecord = {
 export type DeckLibraryFilters = {
   difficulty: DeckManifestEntry['difficulty'] | 'all'
   query: string
-  selectedTopic: string
+  selectedTrack: string
   status: 'all' | 'has_notes' | 'needs_review' | 'started'
 }
 
@@ -34,7 +35,7 @@ export function filterDeckLibraryRecords(
   const normalizedQuery = normalize(filters.query)
 
   const nextRecords = records.filter((record) => {
-    if (filters.selectedTopic !== 'all' && record.summary.topic !== filters.selectedTopic) {
+    if (filters.selectedTrack !== 'all' && record.summary.track !== filters.selectedTrack) {
       return false
     }
 
@@ -82,6 +83,7 @@ function buildSearchText(record: DeckLibraryRecord): string {
     [
       record.summary.title,
       record.summary.description,
+      getTrackLabel(record.summary.track),
       getTopicLabel(record.summary.topic),
       ...record.summary.tags,
       ...record.summary.searchTerms,

@@ -2,6 +2,7 @@
   "id": "coding-two-pointers-sliding-window",
   "title": "Two Pointers and Sliding Window",
   "topic": "coding-interview",
+  "track": "programming",
   "description": "Core pattern deck for problems that need left-right movement instead of nested loops.",
   "difficulty": "medium",
   "estimatedMinutes": 10,

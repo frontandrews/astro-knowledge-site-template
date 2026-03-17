@@ -2,6 +2,7 @@
   "id": "node-runtime-core",
   "title": "Node Runtime Core",
   "topic": "node",
+  "track": "programming",
   "description": "Node runtime and architecture questions focused on event loop, workers, and I/O.",
   "difficulty": "medium",
   "estimatedMinutes": 8,

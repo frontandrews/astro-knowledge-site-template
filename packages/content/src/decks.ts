@@ -4,6 +4,9 @@ import { getDeckSummaries } from './manifest'
 import codingArraysHashmapsBasicsRaw from './data/decks/coding-interview/coding-arrays-hashmaps-basics.json'
 import codingStacksQueuesBinarySearchRaw from './data/decks/coding-interview/coding-stacks-queues-binary-search.json'
 import codingTwoPointersSlidingWindowRaw from './data/decks/coding-interview/coding-two-pointers-sliding-window.json'
+import aiEngineeringRagEvalsCoreRaw from './data/decks/ai-engineering/ai-engineering-rag-evals-core.json'
+import deliveryScopeRiskCoreRaw from './data/decks/delivery/delivery-scope-risk-core.json'
+import englishTechCommunicationCoreRaw from './data/decks/english/english-tech-communication-core.json'
 import javascriptRuntimeCoreRaw from './data/decks/javascript/javascript-runtime-core.json'
 import leadershipOwnershipCoreRaw from './data/decks/leadership/leadership-ownership-core.json'
 import nodeRuntimeCoreRaw from './data/decks/node/node-runtime-core.json'
@@ -11,9 +14,12 @@ import reactRenderingCoreRaw from './data/decks/react/react-rendering-core.json'
 import systemDesignCoreTradeoffsRaw from './data/decks/system-design/system-design-core-tradeoffs.json'
 
 const rawDecks = {
+  'ai-engineering-rag-evals-core': aiEngineeringRagEvalsCoreRaw,
   'coding-arrays-hashmaps-basics': codingArraysHashmapsBasicsRaw,
   'coding-stacks-queues-binary-search': codingStacksQueuesBinarySearchRaw,
   'coding-two-pointers-sliding-window': codingTwoPointersSlidingWindowRaw,
+  'delivery-scope-risk-core': deliveryScopeRiskCoreRaw,
+  'english-tech-communication-core': englishTechCommunicationCoreRaw,
   'javascript-runtime-core': javascriptRuntimeCoreRaw,
   'leadership-ownership-core': leadershipOwnershipCoreRaw,
   'node-runtime-core': nodeRuntimeCoreRaw,
@@ -46,6 +52,7 @@ for (const [deckId, deck] of Object.entries(decksById)) {
   if (
     summary.cardCount !== deck.cards.length ||
     summary.title !== deck.title ||
+    summary.track !== deck.track ||
     summary.topic !== deck.topic ||
     summary.estimatedMinutes !== deck.estimatedMinutes
   ) {

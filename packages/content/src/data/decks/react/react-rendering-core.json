@@ -2,6 +2,7 @@
   "id": "react-rendering-core",
   "title": "React Rendering Core",
   "topic": "react",
+  "track": "programming",
   "description": "Core React rendering and state questions that commonly appear in interviews.",
   "difficulty": "medium",
   "estimatedMinutes": 8,

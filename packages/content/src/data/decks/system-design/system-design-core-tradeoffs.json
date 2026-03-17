@@ -2,6 +2,7 @@
   "id": "system-design-core-tradeoffs",
   "title": "System Design Core Tradeoffs",
   "topic": "system-design",
+  "track": "systems",
   "description": "High-frequency system-design tradeoffs with concise interview-ready framing.",
   "difficulty": "medium",
   "estimatedMinutes": 10,

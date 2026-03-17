@@ -3,6 +3,7 @@ import type { DeckManifestEntry } from '@prepdeck/schemas'
 import { Badge } from '@/components/ui/badge'
 import { LinkButton } from '@/components/ui/link-button'
 import { Panel } from '@/components/ui/panel'
+import { getTrackLabel } from '@/lib/track-labels'
 import { createStudyHref } from '@/lib/study-session'
 import { getTopicLabel } from '@/lib/topic-labels'
 
@@ -25,16 +26,16 @@ export function FirstRunPanel({ starterDecks }: FirstRunPanelProps) {
             Start in under 10 minutes.
           </h2>
           <p className="mt-4 max-w-2xl text-sm leading-7 text-white/80 sm:text-base">
-            The app already has a lot of surface area. On a first run, the only thing that
-            matters is getting into one short deck, rating your answers honestly, and leaving
-            with a clearer next move.
+            On a first run, the only thing that matters is getting into one short deck,
+            rating your answer honestly, and leaving with a clearer next move for your
+            technical growth.
           </p>
 
           <div className="mt-5 grid gap-3 sm:grid-cols-3">
             <QuickStartStep
-              detail="Choose one short lane that matches the interview you care about next."
+              detail="Choose one focus area that matches the skill you want to tighten next."
               step="1"
-              title="Pick one lane"
+              title="Pick one area"
             />
             <QuickStartStep
               detail="Flip only after you answer it yourself, then rate the answer without cheating."
@@ -53,7 +54,8 @@ export function FirstRunPanel({ starterDecks }: FirstRunPanelProps) {
           {starterDecks.map((deck) => (
             <Panel className="bg-[color:rgba(8,14,25,0.42)] p-4" inset key={deck.id}>
               <div className="flex flex-wrap gap-2">
-                <Badge tone="accent">{getTopicLabel(deck.topic)}</Badge>
+                <Badge tone="accent">{getTrackLabel(deck.track)}</Badge>
+                <Badge>{getTopicLabel(deck.topic)}</Badge>
                 <Badge>{deck.difficulty}</Badge>
                 <Badge>{deck.estimatedMinutes} min</Badge>
               </div>
@@ -61,7 +63,7 @@ export function FirstRunPanel({ starterDecks }: FirstRunPanelProps) {
               <p className="mt-2 text-sm leading-6 text-white/75">{deck.description}</p>
               <div className="mt-4">
                 <LinkButton to={createStudyHref(deck.id, { mode: 'start' })} variant="primary">
-                  Start {getTopicLabel(deck.topic)}
+                  Start {getTrackLabel(deck.track)}
                 </LinkButton>
               </div>
             </Panel>

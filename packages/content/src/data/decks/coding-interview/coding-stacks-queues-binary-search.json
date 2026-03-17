@@ -2,6 +2,7 @@
   "id": "coding-stacks-queues-binary-search",
   "title": "Stacks, Queues, and Binary Search",
   "topic": "coding-interview",
+  "track": "programming",
   "description": "Practical mental models for classic interview tools that look harder than they really are.",
   "difficulty": "medium",
   "estimatedMinutes": 10,

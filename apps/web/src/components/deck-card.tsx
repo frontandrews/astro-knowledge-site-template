@@ -6,6 +6,7 @@ import { LinkButton } from '@/components/ui/link-button'
 import { Panel } from '@/components/ui/panel'
 import { ProgressMeter } from '@/components/ui/progress-meter'
 import { cardRevealVariants, hoverLiftMotionProps } from '@/lib/motion'
+import { getTrackLabel } from '@/lib/track-labels'
 import { getTopicLabel } from '@/lib/topic-labels'
 
 type DeckCardProps = {
@@ -36,9 +37,10 @@ export function DeckCard({
       {...hoverLiftMotionProps}
     >
       <Panel className="flex h-full flex-col justify-between gap-5 p-5">
-        <p className="text-xs font-bold uppercase tracking-[0.25em] text-[var(--retro-line)]">
-          {getTopicLabel(summary.topic)}
-        </p>
+        <div className="flex flex-wrap gap-2">
+          <Badge tone="accent">{getTrackLabel(summary.track)}</Badge>
+          <Badge>{getTopicLabel(summary.topic)}</Badge>
+        </div>
         <h2 className="text-xl font-black text-[var(--retro-ink)]">{summary.title}</h2>
         <div className="flex flex-wrap gap-2 text-sm">
           <Badge>{summary.estimatedMinutes} min</Badge>

@@ -5,6 +5,13 @@ summary: A cleaner explanation of why promises often resolve before timeouts.
 pubDate: 2026-03-17
 category: Programming
 topic: JavaScript
+path:
+  - Programming
+  - JavaScript
+  - Runtime
+order: 20
+relationships:
+  - node-single-threaded-does-not-mean-what-people-think
 takeaways:
   - "Finish the current stack first, then drain microtasks, then run the next macrotask."
   - "Promise handlers usually beat zero-delay timeouts because they are microtasks."

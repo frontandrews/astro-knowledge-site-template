@@ -1,5 +1,5 @@
 import type { DeckManifestEntry } from '@prepdeck/schemas'
-import { getDecksByTopic } from '@prepdeck/content/manifest'
+import { getDecksByTrack } from '@prepdeck/content/manifest'
 import { m } from 'motion/react'
 import { useMemo, useState } from 'react'
 
@@ -28,7 +28,7 @@ import {
 import { getSessionHistorySnapshot } from '@/lib/session-history'
 import { getSessionPresets, type SessionPreset } from '@/lib/session-presets'
 import { getStudyGoalsSnapshot } from '@/lib/study-goals'
-import { getTopicLabel } from '@/lib/topic-labels'
+import { getTrackLabel } from '@/lib/track-labels'
 import { usePreferences } from '@/state/preferences-context'
 import { useProgress } from '@/state/progress-context'
 
@@ -39,13 +39,13 @@ export function HomePage() {
     useState<DeckLibraryFilters['difficulty']>('all')
   const [libraryQuery, setLibraryQuery] = useState('')
   const [libraryStatus, setLibraryStatus] = useState<DeckLibraryFilters['status']>('all')
-  const [selectedTopic, setSelectedTopic] = useState<'all' | string>('all')
-  const decksByTopic = getDecksByTopic()
-  const topicEntries = Object.entries(decksByTopic)
+  const [selectedTrack, setSelectedTrack] = useState<'all' | string>('all')
+  const decksByTrack = getDecksByTrack()
+  const trackEntries = Object.entries(decksByTrack)
 
   const deckRecords = useMemo(
     () =>
-      topicEntries
+      trackEntries
         .flatMap(([, summaries]) =>
           summaries.map((summary) => {
             const counts = getDeckCountsFromSummary(progressStore, summary)
@@ -59,7 +59,7 @@ export function HomePage() {
           }),
         )
         .filter((record): record is DeckLibraryRecord => record !== null),
-    [progressStore, topicEntries],
+    [progressStore, trackEntries],
   )
 
   const overallCounts = combineDeckCounts(deckRecords.map((record) => record.counts))
@@ -76,7 +76,7 @@ export function HomePage() {
   const visibleDeckRecords = filterDeckLibraryRecords(deckRecords, {
     difficulty: libraryDifficulty,
     query: libraryQuery,
-    selectedTopic,
+    selectedTrack,
     status: libraryStatus,
   })
   const sessionPresets = getSessionPresets(deckRecords)
@@ -91,13 +91,13 @@ export function HomePage() {
     sessionHistorySnapshot.totalSessions === 0 &&
     masterySnapshot.savedNotes === 0
   const starterDecks = getStarterDeckRecords(deckRecords, 3).map((record) => record.summary)
-  const topicCards = topicEntries.map(([topic, summaries]) => {
-    const topicDecks = deckRecords.filter((record) => record.summary.topic === topic)
+  const focusAreaCards = trackEntries.map(([track, summaries]) => {
+    const trackDecks = deckRecords.filter((record) => record.summary.track === track)
 
     return {
-      counts: combineDeckCounts(topicDecks.map((record) => record.counts)),
+      counts: combineDeckCounts(trackDecks.map((record) => record.counts)),
       deckCount: summaries.length,
-      topic,
+      track,
     }
   })
 
@@ -119,12 +119,12 @@ export function HomePage() {
                 className="mt-4 text-3xl font-black tracking-tight text-[var(--retro-ink)] sm:text-4xl"
                 id="home-hero-heading"
               >
-                Study the next right deck.
+                Train the next right skill.
               </h1>
               <p className="mt-4 max-w-2xl text-sm leading-7 text-white/80 sm:text-base">
-                Prepdeck keeps your interview practice short, local, and easy to
-                resume. Pick up where you left off, tighten weak spots, and keep your
-                own notes attached to the cards that matter.
+                Prepdeck keeps practice short, local, and easy to resume. Use it to
+                sharpen technical depth, AI judgment, delivery communication, and the
+                English you actually need in tech teams.
               </p>
               <div className="mt-5 flex flex-wrap gap-3">
                 <LinkButton to={primaryAction.href} variant="primary">
@@ -134,7 +134,7 @@ export function HomePage() {
                   {secondaryAction.label}
                 </LinkButton>
                 <Button
-                  onClick={() => setSelectedTopic('all')}
+                  onClick={() => setSelectedTrack('all')}
                   type="button"
                   variant="ghost"
                 >
@@ -289,30 +289,30 @@ export function HomePage() {
         </div>
       </section>
 
-      <section aria-labelledby="topic-paths-heading" className="mb-6">
+      <section aria-labelledby="focus-areas-heading" className="mb-6">
         <div className="mb-4 flex items-center justify-between gap-4">
           <div>
-            <h2 className="text-2xl font-black text-[var(--retro-ink)]" id="topic-paths-heading">
-              Topic paths
+            <h2 className="text-2xl font-black text-[var(--retro-ink)]" id="focus-areas-heading">
+              Focus areas
             </h2>
             <p className="mt-1 text-sm leading-6 text-white/75">
-              Jump into a lane fast and keep the deck library filtered around that
-              topic.
+              Bigger lanes for programming, systems, AI engineering, communication,
+              and leadership growth.
             </p>
           </div>
-          <Button onClick={() => setSelectedTopic('all')} size="sm" type="button" variant="ghost">
+          <Button onClick={() => setSelectedTrack('all')} size="sm" type="button" variant="ghost">
             Show all
           </Button>
         </div>
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {topicCards.map((topicCard) => (
-            <TopicPathCard
-              counts={topicCard.counts}
-              deckCount={topicCard.deckCount}
-              isActive={selectedTopic === topicCard.topic}
-              key={topicCard.topic}
-              onSelect={() => setSelectedTopic(topicCard.topic)}
-              topic={topicCard.topic}
+          {focusAreaCards.map((focusArea) => (
+            <FocusAreaCard
+              counts={focusArea.counts}
+              deckCount={focusArea.deckCount}
+              isActive={selectedTrack === focusArea.track}
+              key={focusArea.track}
+              onSelect={() => setSelectedTrack(focusArea.track)}
+              track={focusArea.track}
             />
           ))}
         </div>
@@ -325,29 +325,29 @@ export function HomePage() {
               Deck library
             </h2>
             <p className="mt-1 text-sm leading-6 text-white/75">
-              {selectedTopic === 'all'
+              {selectedTrack === 'all'
                 ? `Showing all ${visibleDeckRecords.length} decks.`
-                : `Showing ${visibleDeckRecords.length} deck${visibleDeckRecords.length === 1 ? '' : 's'} in ${getTopicLabel(selectedTopic)}.`}
+                : `Showing ${visibleDeckRecords.length} deck${visibleDeckRecords.length === 1 ? '' : 's'} in ${getTrackLabel(selectedTrack)}.`}
             </p>
           </div>
           <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
             <Button
-              onClick={() => setSelectedTopic('all')}
+              onClick={() => setSelectedTrack('all')}
               size="sm"
               type="button"
-              variant={selectedTopic === 'all' ? 'primary' : 'ghost'}
+              variant={selectedTrack === 'all' ? 'primary' : 'ghost'}
             >
-              All topics
+              All areas
             </Button>
-            {topicEntries.map(([topic, summaries]) => (
+            {trackEntries.map(([track, summaries]) => (
               <Button
-                key={topic}
-                onClick={() => setSelectedTopic(topic)}
+                key={track}
+                onClick={() => setSelectedTrack(track)}
                 size="sm"
                 type="button"
-                variant={selectedTopic === topic ? 'primary' : 'ghost'}
+                variant={selectedTrack === track ? 'primary' : 'ghost'}
               >
-                {getTopicLabel(topic)} ({summaries.length})
+                {getTrackLabel(track)} ({summaries.length})
               </Button>
             ))}
           </div>
@@ -366,7 +366,7 @@ export function HomePage() {
                 className="mt-3 min-h-12 w-full rounded-[0.95rem] border-2 border-[var(--retro-line)] bg-[color:rgba(255,255,255,0.04)] px-4 text-sm text-[var(--retro-ink)] outline-none transition placeholder:text-white/40 focus:border-[var(--retro-line-strong)]"
                 id="deck-library-search"
                 onChange={(event) => setLibraryQuery(event.target.value)}
-                placeholder="React, queues, ownership, context..."
+                placeholder="React, RAG, standups, delivery, ownership..."
                 type="text"
                 value={libraryQuery}
               />
@@ -448,7 +448,7 @@ export function HomePage() {
                   setLibraryDifficulty('all')
                   setLibraryQuery('')
                   setLibraryStatus('all')
-                  setSelectedTopic('all')
+                  setSelectedTrack('all')
                 }}
                 type="button"
                 variant="secondary"
@@ -565,18 +565,18 @@ function HubSignalCard({
 }
 
 
-function TopicPathCard({
+function FocusAreaCard({
   counts,
   deckCount,
   isActive,
   onSelect,
-  topic,
+  track,
 }: {
   counts: DeckCounts
   deckCount: number
   isActive: boolean
   onSelect: () => void
-  topic: string
+  track: string
 }) {
   return (
     <m.div
@@ -598,10 +598,10 @@ function TopicPathCard({
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-[0.68rem] font-bold uppercase tracking-[0.22em] text-[var(--retro-line)]">
-              Topic
+              Focus area
             </p>
             <h3 className="mt-2 text-xl font-black text-[var(--retro-ink)]">
-              {getTopicLabel(topic)}
+              {getTrackLabel(track)}
             </h3>
           </div>
           <Badge>{deckCount} decks</Badge>
@@ -614,7 +614,7 @@ function TopicPathCard({
         </div>
         <div className="mt-4">
           <Button onClick={onSelect} size="sm" type="button" variant={isActive ? 'primary' : 'ghost'}>
-            {isActive ? 'Showing topic' : 'Show topic decks'}
+            {isActive ? 'Showing area' : 'Show area decks'}
           </Button>
         </div>
       </Panel>
@@ -664,7 +664,7 @@ function getStarterDeckRecords(
   limit: number,
   excludeDeckId?: string | null,
 ) {
-  return [...records]
+  const sortedRecords = [...records]
     .filter((record) => record.counts.seen === 0 && record.summary.id !== excludeDeckId)
     .sort((a, b) => {
       const difficultyRank = getDifficultyRank(a.summary.difficulty) - getDifficultyRank(b.summary.difficulty)
@@ -679,7 +679,38 @@ function getStarterDeckRecords(
 
       return a.summary.title.localeCompare(b.summary.title)
     })
-    .slice(0, limit)
+
+  const picked = new Set<string>()
+  const seenTracks = new Set<string>()
+  const results: DeckLibraryRecord[] = []
+
+  for (const record of sortedRecords) {
+    if (results.length >= limit) {
+      break
+    }
+
+    if (seenTracks.has(record.summary.track)) {
+      continue
+    }
+
+    results.push(record)
+    picked.add(record.summary.id)
+    seenTracks.add(record.summary.track)
+  }
+
+  for (const record of sortedRecords) {
+    if (results.length >= limit) {
+      break
+    }
+
+    if (picked.has(record.summary.id)) {
+      continue
+    }
+
+    results.push(record)
+  }
+
+  return results
 }
 
 function getPrimaryAction(
@@ -717,7 +748,7 @@ function getPrimaryAction(
   }
 
   return {
-    detail: 'Jump into the library and pick the topic that matters for the next interview.',
+    detail: 'Jump into the library and pick the area that matters for your next career rep.',
     eyebrow: 'Get started',
     href: '/decks/react-rendering-core',
     label: 'Open a deck',
@@ -744,7 +775,7 @@ function getSecondaryAction(
       detail: `No weak cards yet. Open another lane and build breadth before the review queue starts growing.`,
       eyebrow: 'Explore',
       href: `/decks/${starterRecord.summary.id}`,
-      label: 'Explore another lane',
+      label: 'Explore another area',
       title: starterRecord.summary.title,
     }
   }

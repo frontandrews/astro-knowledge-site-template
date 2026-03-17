@@ -5,6 +5,13 @@ summary: The interview answer that separates the main thread from the whole runt
 pubDate: 2026-03-17
 category: Programming
 topic: Node
+path:
+  - Programming
+  - Node
+  - Runtime
+order: 30
+relationships:
+  - javascript-event-loop-without-hand-waving
 takeaways:
   - "Node runs JavaScript on a main thread by default, but the runtime is not one-thread-only."
   - "Event loop coordination is different from CPU-bound parallelism."

@@ -36,7 +36,7 @@ export function AppShell({ children }: PropsWithChildren) {
                   Prepdeck
                 </Link>
                 <p className="mt-2 max-w-2xl text-sm leading-6 text-white/80">
-                  Local-first interview prep with phone-sized study flows, saved notes,
+                  Local-first career practice with phone-sized study flows, saved notes,
                   and no signup wall.
                 </p>
               </div>
@@ -132,7 +132,7 @@ function getShellConfig(pathname: string): ShellConfig {
       backTo: null,
       eyebrow: 'Deck library',
       mode: 'home',
-      title: 'Technical interview prep that feels manageable.',
+      title: 'Career practice that stays usable on a phone.',
     }
   }
 

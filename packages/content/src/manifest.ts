@@ -33,3 +33,14 @@ export function getDecksByTopic(): Record<string, DeckManifestEntry[]> {
     return acc
   }, {})
 }
+
+export function getDecksByTrack(): Record<string, DeckManifestEntry[]> {
+  return manifest.decks.reduce<Record<string, DeckManifestEntry[]>>((acc, summary) => {
+    if (!acc[summary.track]) {
+      acc[summary.track] = []
+    }
+
+    acc[summary.track].push(summary)
+    return acc
+  }, {})
+}

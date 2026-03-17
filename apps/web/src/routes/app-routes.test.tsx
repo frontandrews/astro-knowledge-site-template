@@ -38,17 +38,17 @@ describe('app routes', () => {
 
     expect(screen.getByRole('heading', { name: 'Start in under 10 minutes.' })).toBeInTheDocument()
     expect(screen.getByText('Step 1')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Start Coding Challenges' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Start Programming' })).toHaveAttribute(
       'href',
       '/study/coding-arrays-hashmaps-basics?mode=start',
     )
-    expect(screen.getByRole('link', { name: 'Start JavaScript' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Start AI Engineering' })).toHaveAttribute(
       'href',
-      '/study/javascript-runtime-core?mode=start',
+      '/study/ai-engineering-rag-evals-core?mode=start',
     )
-    expect(screen.getByRole('link', { name: 'Start Leadership' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Start Leadership and Delivery' })).toHaveAttribute(
       'href',
-      '/study/leadership-ownership-core?mode=start',
+      '/study/delivery-scope-risk-core?mode=start',
     )
   })
 
@@ -60,7 +60,7 @@ describe('app routes', () => {
 
     renderApp(['/'])
 
-    expect(screen.getByRole('heading', { name: 'React' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Programming' })).toBeInTheDocument()
     expect(screen.getAllByText('React Rendering Core').length).toBeGreaterThan(0)
     expect(screen.getByText('1 / 2 learned')).toBeInTheDocument()
     expect(screen.getByText('Ad-supported free plan')).toBeInTheDocument()
@@ -148,17 +148,17 @@ describe('app routes', () => {
     expect(screen.queryByText('Latest completed reps')).not.toBeInTheDocument()
   })
 
-  it('filters the home deck list by selected topic', async () => {
+  it('filters the home deck list by selected focus area', async () => {
     const user = userEvent.setup()
 
     renderApp(['/'])
 
-    await user.click(screen.getByRole('button', { name: 'JavaScript (1)' }))
+    await user.click(screen.getByRole('button', { name: 'AI Engineering (1)' }))
 
     const deckLibrary = screen.getByRole('region', { name: 'Deck library' })
 
-    expect(within(deckLibrary).getByText('Showing 1 deck in JavaScript.')).toBeInTheDocument()
-    expect(within(deckLibrary).getByText('JavaScript Runtime Core')).toBeInTheDocument()
+    expect(within(deckLibrary).getByText('Showing 1 deck in AI Engineering.')).toBeInTheDocument()
+    expect(within(deckLibrary).getByText('AI Engineering Core')).toBeInTheDocument()
     expect(within(deckLibrary).queryByText('React Rendering Core')).not.toBeInTheDocument()
   })
 
@@ -206,8 +206,8 @@ describe('app routes', () => {
     expect(screen.getByRole('button', { name: 'Study weak cards' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Review progress' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Reset deck' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'Full articles tied to this deck' })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Read article' })).toHaveAttribute(
+    expect(screen.getByRole('heading', { name: 'Full guides tied to this deck' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Read guide' })).toHaveAttribute(
       'href',
       '/blog/react-derived-state-without-extra-bugs',
     )
@@ -223,7 +223,7 @@ describe('app routes', () => {
     expect(screen.getAllByRole('link', { name: 'Premium' }).length).toBeGreaterThan(0)
     expect(
       screen.queryByRole('heading', {
-        name: 'Technical interview prep that feels manageable.',
+        name: 'Career practice that stays usable on a phone.',
       }),
     ).not.toBeInTheDocument()
   })

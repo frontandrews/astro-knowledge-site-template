@@ -12,6 +12,7 @@ import { Panel } from '@/components/ui/panel'
 import { getArticleHref, getDeckArticleLinks } from '@/lib/article-links'
 import { ProgressMeter } from '@/components/ui/progress-meter'
 import { getDeckCounts } from '@/lib/progress'
+import { getTrackLabel } from '@/lib/track-labels'
 import { createStudyHref } from '@/lib/study-session'
 import { getTopicLabel } from '@/lib/topic-labels'
 import { useProgress } from '@/state/progress-context'
@@ -40,9 +41,10 @@ export function DeckDetailPage() {
   return (
     <>
       <Panel className="bg-[var(--retro-surface)] p-5">
-        <p className="text-xs font-bold uppercase tracking-[0.25em] text-[var(--retro-line)]">
-          {getTopicLabel(deck.topic)}
-        </p>
+        <div className="flex flex-wrap gap-2">
+          <Badge tone="accent">{getTrackLabel(deck.track)}</Badge>
+          <Badge>{getTopicLabel(deck.topic)}</Badge>
+        </div>
         <h2 className="mt-3 text-3xl font-black text-[var(--retro-ink)]">{deck.title}</h2>
         <p className="mt-3 max-w-2xl text-sm leading-6 text-white/80">
           {deck.description}
@@ -119,11 +121,11 @@ export function DeckDetailPage() {
                   Deep-dive reading
                 </p>
                 <h3 className="mt-2 text-xl font-black text-[var(--retro-ink)]">
-                  Full articles tied to this deck
+                  Full guides tied to this deck
                 </h3>
                 <p className="mt-2 max-w-2xl text-sm leading-6 text-white/75">
-                  Use the cards for reps. Open the full article when you want the longer
-                  explanation, examples, and tradeoff framing behind a concept.
+                  Use the cards for reps. Open the full guide when you want the longer
+                  explanation, examples, and checklist behind a concept.
                 </p>
               </div>
               <Badge tone="accent">{articleLinks.length} article{articleLinks.length === 1 ? '' : 's'}</Badge>
@@ -138,7 +140,7 @@ export function DeckDetailPage() {
                         {article.question}
                       </p>
                       <p className="mt-2 text-sm leading-6 text-white/75">
-                        Open the paired long-form article from the journal.
+                        Open the paired guide for the fuller explanation and checklist.
                       </p>
                     </div>
                     <a
@@ -147,7 +149,7 @@ export function DeckDetailPage() {
                       rel="noreferrer"
                       target="_blank"
                     >
-                      Read article
+                      Read guide
                     </a>
                   </div>
                 </Panel>
