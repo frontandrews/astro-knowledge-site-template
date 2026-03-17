@@ -7,7 +7,7 @@
     "build": "pnpm --filter @prepdeck/web build",
     "build:all": "pnpm build && pnpm build:site",
     "build:site": "pnpm --filter @prepdeck/site build",
-    "dev:all": "pnpm -r --parallel --stream --filter @prepdeck/web --filter @prepdeck/site dev",
+    "dev:all": "node scripts/dev-all.mjs",
     "dev": "pnpm --filter @prepdeck/web dev",
     "dev:site": "pnpm --filter @prepdeck/site dev",
     "lint": "pnpm --filter @prepdeck/web lint",
