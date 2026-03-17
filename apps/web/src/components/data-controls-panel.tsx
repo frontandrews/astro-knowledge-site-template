@@ -11,6 +11,7 @@ import {
   parseUserDataBackup,
   serializeUserDataBackup,
 } from '@/lib/user-data-backup'
+import { usePreferences } from '@/state/preferences-context'
 import { useProgress } from '@/state/progress-context'
 
 type DataControlsPanelProps = {
@@ -24,6 +25,7 @@ type FeedbackState = {
 
 export function DataControlsPanel({ onResetAll }: DataControlsPanelProps) {
   const { progressStore, replaceLocalData, sessionHistoryStore } = useProgress()
+  const { preferences, replacePreferences } = usePreferences()
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const [feedback, setFeedback] = useState<FeedbackState | null>(null)
   const [pendingImport, setPendingImport] = useState<{
@@ -34,6 +36,7 @@ export function DataControlsPanel({ onResetAll }: DataControlsPanelProps) {
   const handleExport = () => {
     const blob = new Blob([
       serializeUserDataBackup({
+        preferencesState: preferences,
         progressStore,
         sessionHistoryStore,
       }),
@@ -89,6 +92,7 @@ export function DataControlsPanel({ onResetAll }: DataControlsPanelProps) {
     }
 
     replaceLocalData(pendingImport.snapshot)
+    replacePreferences(pendingImport.snapshot.preferencesState)
     setPendingImport(null)
     setFeedback({
       text: 'Backup restored on this device.',
@@ -143,8 +147,8 @@ export function DataControlsPanel({ onResetAll }: DataControlsPanelProps) {
           </p>
           <p className="mt-3 text-sm leading-6 text-white/80">
             Card status, weak-card progress, last studied position, personal notes, and
-            session momentum. Premium preview state stays local and is not included in
-            the backup.
+            session momentum. Goal and timer preferences move with the backup too. Premium
+            preview state stays local and is not included in the backup.
           </p>
         </Panel>
 
@@ -166,7 +170,7 @@ export function DataControlsPanel({ onResetAll }: DataControlsPanelProps) {
         confirmLabel="Restore backup"
         description={
           pendingImport
-            ? `${pendingImport.fileName} will replace the current local progress, notes, and session history on this device.`
+            ? `${pendingImport.fileName} will replace the current local progress, notes, session history, and preferences on this device.`
             : ''
         }
         isOpen={Boolean(pendingImport)}

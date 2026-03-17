@@ -1,12 +1,18 @@
 import type { ProgressStore, SessionHistoryStore } from '@prepdeck/schemas'
 import { sessionHistoryStoreSchema, userDataStoreSchema } from '@prepdeck/schemas'
 
+import {
+  createDefaultPreferencesState,
+  normalizePreferencesState,
+  type PreferencesState,
+} from '@/lib/preferences'
 import { normalizeSessionHistoryStore } from '@/lib/session-history'
 
 export const USER_DATA_BACKUP_APP = 'prepdeck'
-export const USER_DATA_BACKUP_VERSION = 2
+export const USER_DATA_BACKUP_VERSION = 3
 
 export type LocalDataSnapshot = {
+  preferencesState: PreferencesState
   progressStore: ProgressStore
   sessionHistoryStore: SessionHistoryStore
 }
@@ -14,6 +20,7 @@ export type LocalDataSnapshot = {
 export type UserDataBackup = {
   app: typeof USER_DATA_BACKUP_APP
   exportedAt: string
+  preferences: PreferencesState
   sessionHistory: SessionHistoryStore
   userData: ProgressStore
   version: typeof USER_DATA_BACKUP_VERSION
@@ -26,6 +33,7 @@ export function createUserDataBackup(
   return {
     app: USER_DATA_BACKUP_APP,
     exportedAt,
+    preferences: snapshot.preferencesState,
     sessionHistory: snapshot.sessionHistoryStore,
     userData: snapshot.progressStore,
     version: USER_DATA_BACKUP_VERSION,
@@ -50,6 +58,7 @@ export function serializeUserDataBackup(
 export function parseUserDataBackup(raw: string): LocalDataSnapshot {
   const parsed = JSON.parse(raw) as {
     app?: string
+    preferences?: unknown
     sessionHistory?: unknown
     userData?: unknown
     version?: number
@@ -57,6 +66,7 @@ export function parseUserDataBackup(raw: string): LocalDataSnapshot {
 
   if (parsed.app === USER_DATA_BACKUP_APP && parsed.version === USER_DATA_BACKUP_VERSION) {
     return {
+      preferencesState: normalizePreferencesState(parsed.preferences),
       progressStore: userDataStoreSchema.parse(parsed.userData),
       sessionHistoryStore: normalizeSessionHistoryStore(
         sessionHistoryStoreSchema.parse(parsed.sessionHistory),
@@ -66,10 +76,21 @@ export function parseUserDataBackup(raw: string): LocalDataSnapshot {
 
   if (parsed.app === USER_DATA_BACKUP_APP && parsed.version === 1) {
     return {
+      preferencesState: createDefaultPreferencesState(),
       progressStore: userDataStoreSchema.parse(parsed.userData),
       sessionHistoryStore: sessionHistoryStoreSchema.parse({
         version: 1,
       }),
+    }
+  }
+
+  if (parsed.app === USER_DATA_BACKUP_APP && parsed.version === 2) {
+    return {
+      preferencesState: createDefaultPreferencesState(),
+      progressStore: userDataStoreSchema.parse(parsed.userData),
+      sessionHistoryStore: normalizeSessionHistoryStore(
+        sessionHistoryStoreSchema.parse(parsed.sessionHistory),
+      ),
     }
   }
 
