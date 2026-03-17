@@ -138,6 +138,12 @@ pre {
   background: rgba(255, 255, 255, 0.08);
 }
 
+.site-nav__link--active {
+  border-color: var(--site-line-strong);
+  background: rgba(93, 144, 235, 0.18);
+  color: white;
+}
+
 .button-link--primary {
   border-color: var(--site-line-strong);
   background: var(--site-accent);
