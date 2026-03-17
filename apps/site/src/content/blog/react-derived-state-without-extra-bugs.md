@@ -3,7 +3,16 @@ title: React Derived State Without Extra Bugs
 description: Why copying props into state often creates more problems than it solves, and what to reach for instead.
 summary: A cleaner mental model for derived state questions in React interviews.
 pubDate: 2026-03-17
+category: Programming
 topic: React
+takeaways:
+  - "Treat duplicated state as a synchronization risk, not as a convenience."
+  - "Derive cheap values during render instead of copying props into state."
+  - "Reach for memoization before inventing extra state."
+practiceChecklist:
+  - "Explain why duplicated state creates two sources of truth."
+  - "Name the safer default: derive during render."
+  - "Mention when separate state is justified, such as drafts or optimistic UI."
 tags:
   - react
   - state

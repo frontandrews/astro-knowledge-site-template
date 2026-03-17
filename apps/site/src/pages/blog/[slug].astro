@@ -26,10 +26,13 @@ type Props = {
 
 const { post } = Astro.props
 const { Content } = await render(post)
+const allPosts = (await getCollection('blog')).sort(
+  (left, right) => right.data.pubDate.getTime() - left.data.pubDate.getTime(),
+)
 const relatedDecks = post.data.relatedDeckIds
   .map((deckId) => getDeckSummaryById(deckId))
   .filter((deck): deck is NonNullable<typeof deck> => Boolean(deck))
-const relatedPosts = (await getCollection('blog'))
+const relatedPosts = allPosts
   .filter((entry) => {
     if (entry.id === post.id) {
       return false
@@ -41,13 +44,17 @@ const relatedPosts = (await getCollection('blog'))
     return Boolean(sharesTopic || sharesTag)
   })
   .slice(0, 2)
+const currentIndex = allPosts.findIndex((entry) => entry.id === post.id)
+const previousPost = currentIndex >= 0 ? allPosts[currentIndex + 1] ?? null : null
+const nextPost = currentIndex > 0 ? allPosts[currentIndex - 1] ?? null : null
 ---
 
 <BaseLayout description={post.data.description} title={post.data.title}>
   <article class="article-shell">
     <header class="article-header">
       <div class="meta-list">
-        <span class="badge badge--accent">{post.data.topic ?? 'Article'}</span>
+        <span class="badge badge--accent">{post.data.category}</span>
+        {post.data.topic ? <span class="badge">{post.data.topic}</span> : null}
         {post.data.tags.map((tag) => (
           <span class="badge">{tag}</span>
         ))}
@@ -73,6 +80,40 @@ const relatedPosts = (await getCollection('blog'))
         ) : null}
       </div>
     </header>
+
+    {(post.data.takeaways.length > 0 || post.data.practiceChecklist.length > 0) ? (
+      <section class="article-section article-section--summary">
+        <div class="panel-grid panel-grid--summary">
+          {post.data.takeaways.length > 0 ? (
+            <div class="panel article-related-card">
+              <div>
+                <p class="section-eyebrow">Quick summary</p>
+                <h2 class="section-heading section-heading--compact">What to keep in your head</h2>
+              </div>
+              <ul class="article-prose compact-list">
+                {post.data.takeaways.map((point) => (
+                  <li>{point}</li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+
+          {post.data.practiceChecklist.length > 0 ? (
+            <div class="panel article-related-card">
+              <div>
+                <p class="section-eyebrow">Practice checklist</p>
+                <h2 class="section-heading section-heading--compact">Use this when you answer</h2>
+              </div>
+              <ul class="article-prose compact-list">
+                {post.data.practiceChecklist.map((step) => (
+                  <li>{step}</li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+        </div>
+      </section>
+    ) : null}
 
     <div class="article-prose">
       <Content />
@@ -119,6 +160,33 @@ const relatedPosts = (await getCollection('blog'))
           {relatedPosts.map((entry) => (
             <ArticleCard post={entry} />
           ))}
+        </div>
+      </section>
+    ) : null}
+
+    {(previousPost || nextPost) ? (
+      <section class="article-section">
+        <div class="section-header">
+          <div>
+            <p class="section-eyebrow">Keep reading</p>
+            <h2 class="section-heading section-heading--compact">Next guide</h2>
+          </div>
+        </div>
+        <div class="panel-grid panel-grid--summary">
+          {previousPost ? (
+            <a class="panel nav-card" href={`/blog/${previousPost.id}`}>
+              <p class="section-eyebrow">Previous</p>
+              <h3>{previousPost.data.title}</h3>
+              <p class="article-excerpt">{previousPost.data.summary}</p>
+            </a>
+          ) : null}
+          {nextPost ? (
+            <a class="panel nav-card" href={`/blog/${nextPost.id}`}>
+              <p class="section-eyebrow">Next</p>
+              <h3>{nextPost.data.title}</h3>
+              <p class="article-excerpt">{nextPost.data.summary}</p>
+            </a>
+          ) : null}
         </div>
       </section>
     ) : null}

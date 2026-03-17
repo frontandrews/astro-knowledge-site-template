@@ -3,7 +3,16 @@ title: The JavaScript Event Loop Without Hand-Waving
 description: A practical way to explain stack, microtasks, and macrotasks in interviews without sounding vague.
 summary: A cleaner explanation of why promises often resolve before timeouts.
 pubDate: 2026-03-17
+category: Programming
 topic: JavaScript
+takeaways:
+  - "Finish the current stack first, then drain microtasks, then run the next macrotask."
+  - "Promise handlers usually beat zero-delay timeouts because they are microtasks."
+  - "Too many microtasks can still hurt responsiveness."
+practiceChecklist:
+  - "State the execution order in one clean sentence."
+  - "Use Promise versus setTimeout as the concrete example."
+  - "Add the performance angle about microtasks starving other work."
 tags:
   - javascript
   - event loop

@@ -7,30 +7,48 @@ import BaseLayout from '../../layouts/BaseLayout.astro'
 const posts = (await getCollection('blog')).sort(
   (left, right) => right.data.pubDate.getTime() - left.data.pubDate.getTime(),
 )
+const categories = [...new Set(posts.map((post) => post.data.category))]
 ---
 
 <BaseLayout
-  description="Browse the technical interview articles behind Prepdeck's deeper learn-more content."
-  title="Blog"
+  description="Browse Prepdeck guides and checklists before you jump into practice."
+  title="Guides"
 >
   <section class="hero">
     <div>
       <div class="hero__badges">
-        <span class="badge badge--accent">Blog</span>
-        <span class="badge">{posts.length} articles</span>
+        <span class="badge badge--accent">Guides</span>
+        <span class="badge">{posts.length} reading paths</span>
       </div>
-      <h1>Prepdeck Journal</h1>
+      <h1>Read first. Practice right after.</h1>
       <p>
-        Deeper breakdowns for interview topics that deserve more than a flashcard answer.
+        These guides are meant to be usable, not decorative. Read the summary, steal the
+        checklist, then open the related deck when you want to rehearse the answer.
       </p>
     </div>
   </section>
 
   <section class="section">
-    <div class="panel-grid panel-grid--articles">
-      {posts.map((post) => (
-        <ArticleCard post={post} />
+    <div class="meta-list">
+      {categories.map((category) => (
+        <span class="badge">{category}</span>
       ))}
     </div>
   </section>
+
+  {categories.map((category) => (
+    <section class="section">
+      <h2 class="section-heading">{category}</h2>
+      <p class="section-copy">
+        Short guides you can read quickly, then turn into deliberate practice.
+      </p>
+      <div class="panel-grid panel-grid--articles">
+        {posts
+          .filter((post) => post.data.category === category)
+          .map((post) => (
+            <ArticleCard post={post} />
+          ))}
+      </div>
+    </section>
+  ))}
 </BaseLayout>

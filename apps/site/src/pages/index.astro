@@ -3,54 +3,66 @@ import { getCollection } from 'astro:content'
 
 import ArticleCard from '../components/ArticleCard.astro'
 import BaseLayout from '../layouts/BaseLayout.astro'
+import { getAppHref } from '../lib/app-links'
 
 const posts = (await getCollection('blog')).sort(
   (left, right) => right.data.pubDate.getTime() - left.data.pubDate.getTime(),
 )
 const featuredPosts = posts.slice(0, 3)
+const topics = [...new Set(posts.map((post) => post.data.topic).filter(Boolean))]
 ---
 
 <BaseLayout
-  description="Prepdeck Journal is the content layer behind deeper interview explanations, written as SEO-friendly static articles."
-  title="Prepdeck Journal"
+  description="Short guides and checklists that you can read first, then turn into focused practice inside Prepdeck."
+  title="Guides"
 >
   <section class="hero">
     <div class="hero__grid">
       <div>
         <div class="hero__badges">
-          <span class="badge badge--accent">Astro</span>
-          <span class="badge">Static blog</span>
-          <span class="badge">SEO-friendly</span>
+          <span class="badge badge--accent">Read first</span>
+          <span class="badge">Practice next</span>
+          <span class="badge">{posts.length} guides</span>
         </div>
-        <h1>Long-form explanations for the topics behind the cards.</h1>
+        <h1>Short guides that turn into practice fast.</h1>
         <p>
-          The flashcards are fast on purpose. The journal is where each concept can expand
-          into a real article with examples, tradeoffs, and code snippets. Keeping this in
-          Astro lets the content layer stay static, fast, and searchable without forcing the
-          study app to become a content site.
+          Prepdeck works best when reading and practice stay connected. Start with a clear
+          guide, grab the checklist, then open the matching deck when you want to rehearse
+          the concept instead of just reading about it.
         </p>
         <div class="meta-list">
-          <a class="button-link button-link--primary" href="/blog">Browse the blog</a>
+          <a class="button-link button-link--primary" href="/blog">Browse guides</a>
+          <a class="button-link" href={getAppHref('/')}>Open practice</a>
         </div>
       </div>
 
       <div class="panel">
-        <p class="section-copy">
-          This site is intentionally separate from the app:
-        </p>
-        <ul class="article-prose">
-          <li>The app can stay local-first and interaction-heavy.</li>
-          <li>The blog can focus on discoverability, reading, and search traffic.</li>
-          <li><code>learnMoreSlug</code> links can point cards to full articles here.</li>
+        <p class="section-eyebrow">How to use it</p>
+        <ul class="article-prose compact-list">
+          <li>Pick one guide and read the summary first.</li>
+          <li>Use the checklist to shape how you explain the topic.</li>
+          <li>Open the related deck and practice the answer while it is still fresh.</li>
         </ul>
       </div>
     </div>
   </section>
 
   <section class="section">
-    <h2 class="section-heading">Featured articles</h2>
+    <h2 class="section-heading">Browse by topic</h2>
     <p class="section-copy">
-      Seed content that already maps well to the current interview decks.
+      Start from the area you want to sharpen, then move straight into practice.
+    </p>
+    <div class="meta-list">
+      {topics.map((topic) => (
+        <span class="badge">{topic}</span>
+      ))}
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-heading">Start with these guides</h2>
+    <p class="section-copy">
+      Summary-first reading paths that already connect to the practice app.
     </p>
     <div class="panel-grid panel-grid--articles">
       {featuredPosts.map((post) => (

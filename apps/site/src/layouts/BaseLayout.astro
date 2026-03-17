@@ -13,7 +13,7 @@ const {
   title,
 } = Astro.props
 
-const pageTitle = `${title} | Prepdeck Journal`
+const pageTitle = `${title} | Prepdeck`
 ---
 
 <!doctype html>
@@ -35,23 +35,21 @@ const pageTitle = `${title} | Prepdeck Journal`
       <header class="site-header">
         <div class="site-header__inner">
           <div class="site-brand">
-            <a class="site-brand__eyebrow" href="/">Prepdeck Journal</a>
+            <a class="site-brand__eyebrow" href="/">Prepdeck</a>
             <div class="site-brand__summary">
-              SEO-friendly learning articles that back the flashcards, decks, and
-              learn-more paths in the Prepdeck app.
+              Read a guide, grab the checklist, then jump into practice when you are ready.
             </div>
           </div>
           <nav class="site-nav">
             <a class="site-nav__link" href="/">Home</a>
-            <a class="site-nav__link" href="/blog">Blog</a>
-            <a class="site-nav__link" href={getAppHref('/')}>Open app</a>
+            <a class="site-nav__link" href="/blog">Guides</a>
+            <a class="site-nav__link" href={getAppHref('/')}>Practice</a>
           </nav>
         </div>
       </header>
       <slot />
       <footer class="site-footer">
-        Prepdeck keeps the study app and the content site separate on purpose: the app
-        stays fast and local-first, while the journal stays static and SEO-friendly.
+        Read first. Practice right after.
       </footer>
     </div>
   </body>
