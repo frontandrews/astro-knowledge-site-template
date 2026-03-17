@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom'
 
 import { CardNoteEditor } from '@/components/card-note-editor'
 import { FollowUpDrill } from '@/components/follow-up-drill'
+import { Accordion } from '@/components/retroui/Accordion'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { buttonVariants } from '@/components/ui/button-styles'
@@ -324,23 +325,20 @@ export function StudySessionPlayer({
                     />
                   ) : null}
                   {currentCard.learnMore || currentCard.exampleCode || articleHref ? (
-                    <div className="rounded-[1rem] border border-[var(--retro-line)] bg-[var(--retro-bg-strong)]">
-                      <button
-                        aria-expanded={isLearnMoreOpen}
-                        className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm font-black text-[var(--retro-ink)]"
-                        onClick={() => setIsLearnMoreOpen((open) => !open)}
-                        type="button"
-                      >
-                        <span>Learn more</span>
-                        <span className="text-[var(--retro-line)]">
-                          {isLearnMoreOpen ? 'Hide' : 'Open'}
-                        </span>
-                      </button>
-                      {isLearnMoreOpen ? (
-                        <div className="border-t border-[var(--retro-line)] px-4 py-4">
+                    <Accordion
+                      collapsible
+                      onValueChange={(value) => setIsLearnMoreOpen(value === 'learn-more')}
+                      type="single"
+                      value={isLearnMoreOpen ? 'learn-more' : undefined}
+                    >
+                      <Accordion.Item className="bg-[var(--retro-bg-strong)]" value="learn-more">
+                        <Accordion.Header className="text-sm text-[var(--retro-ink)]">
+                          <span>Learn more</span>
+                        </Accordion.Header>
+                        <Accordion.Content className="border-t border-[var(--retro-line)] bg-transparent px-4 py-4">
                           {currentCard.learnMore ? (
                             <div>
-                              <p className="whitespace-pre-line text-sm leading-6 text-white/80">
+                              <p className="whitespace-pre-line text-sm leading-6 text-[var(--retro-ink-muted)]">
                                 {currentCard.learnMore}
                               </p>
                             </div>
@@ -355,7 +353,7 @@ export function StudySessionPlayer({
                                   <Badge>{currentCard.exampleLanguage}</Badge>
                                 ) : null}
                               </div>
-                              <pre className="mt-3 overflow-x-auto rounded-[1rem] border border-[var(--retro-line)] bg-[color:rgba(255,255,255,0.03)] p-4 text-xs leading-6 text-white/90">
+                              <pre className="mt-3 overflow-x-auto rounded-[1rem] border border-[var(--retro-line)] bg-[color:rgba(255,255,255,0.03)] p-4 text-xs leading-6 text-[var(--retro-ink)]">
                                 <code>{currentCard.exampleCode}</code>
                               </pre>
                             </div>
@@ -375,9 +373,9 @@ export function StudySessionPlayer({
                               </a>
                             </div>
                           ) : null}
-                        </div>
-                      ) : null}
-                    </div>
+                        </Accordion.Content>
+                      </Accordion.Item>
+                    </Accordion>
                   ) : null}
                   <CardNoteEditor
                     key={`note-${currentEntry.deckId}-${currentCard.id}`}

@@ -1,5 +1,6 @@
 import { useEffect, useId, useState } from 'react'
 
+import { Accordion } from '@/components/retroui/Accordion'
 import { Button } from '@/components/ui/button'
 
 const AUTOSAVE_DELAY_MS = 600
@@ -34,33 +35,22 @@ export function CardNoteEditor({
   }, [draft, note, onSaveNote])
 
   return (
-    <div className="rounded-[1rem] border border-[var(--retro-line)] bg-[var(--retro-bg-strong)]">
-      <button
-        aria-controls={textareaId}
-        aria-expanded={isOpen}
-        className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm font-black text-[var(--retro-ink)]"
-        onClick={() => setIsOpen((open) => !open)}
-        type="button"
-      >
-        <span>Your note</span>
-        <span className="text-[var(--retro-line)]">{isOpen ? 'Hide' : 'Open'}</span>
-      </button>
-
-      {!isOpen && showCollapsedPreview && note ? (
-        <div className="border-t border-[var(--retro-line)] px-4 py-3">
-          <p className="line-clamp-3 whitespace-pre-line text-sm leading-6 text-white/75">
-            {note}
-          </p>
-        </div>
-      ) : null}
-
-      {isOpen ? (
-        <div className="border-t border-[var(--retro-line)] px-4 py-4">
+    <Accordion
+      collapsible
+      onValueChange={(value) => setIsOpen(value === 'note')}
+      type="single"
+      value={isOpen ? 'note' : undefined}
+    >
+      <Accordion.Item className="bg-[var(--retro-bg-strong)]" value="note">
+        <Accordion.Header className="text-sm text-[var(--retro-ink)]">
+          <span>Your note</span>
+        </Accordion.Header>
+        <Accordion.Content className="border-t border-[var(--retro-line)] bg-transparent px-4 py-4">
           <label className="sr-only" htmlFor={textareaId}>
             Your note
           </label>
           <textarea
-            className="min-h-28 w-full rounded-[1rem] border border-[var(--retro-line)] bg-[color:rgba(255,255,255,0.03)] px-4 py-3 text-sm leading-6 text-[var(--retro-ink)] outline-none placeholder:text-white/35 focus:border-[var(--retro-line-strong)]"
+            className="min-h-28 w-full rounded-[1rem] border border-[var(--retro-line)] bg-[color:rgba(255,255,255,0.03)] px-4 py-3 text-sm leading-6 text-[var(--retro-ink)] outline-none placeholder:text-[var(--retro-ink-soft)] focus:border-[var(--retro-line-strong)]"
             id={textareaId}
             onBlur={(event) => onSaveNote(event.currentTarget.value)}
             onChange={(event) => setDraft(event.currentTarget.value)}
@@ -85,8 +75,16 @@ export function CardNoteEditor({
               </Button>
             ) : null}
           </div>
+        </Accordion.Content>
+      </Accordion.Item>
+
+      {!isOpen && showCollapsedPreview && note ? (
+        <div className="border-t border-[var(--retro-line)] px-4 py-3">
+          <p className="line-clamp-3 whitespace-pre-line text-sm leading-6 text-[var(--retro-ink-muted)]">
+            {note}
+          </p>
         </div>
       ) : null}
-    </div>
+    </Accordion>
   )
 }
