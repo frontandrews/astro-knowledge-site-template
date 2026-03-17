@@ -1,0 +1,57 @@
+---
+import type { CollectionEntry } from 'astro:content'
+
+import { getAppHref } from '../lib/app-links'
+import type { GuideTreeNode } from '../lib/guide-tree'
+
+type Props = {
+  node: GuideTreeNode
+}
+
+const { node } = Astro.props
+
+function getPrimaryDeckHref(post: CollectionEntry<'blog'>) {
+  const deckId = post.data.relatedDeckIds[0]
+  return deckId ? getAppHref(`/decks/${deckId}`) : null
+}
+---
+
+<li class={`guide-tree__item guide-tree__item--depth-${node.depth}`}>
+  <div class="guide-tree__branch">
+    <div class="guide-tree__label-row">
+      <p class="guide-tree__label">{node.label}</p>
+      <span class="badge">{node.guideCount} guide{node.guideCount === 1 ? '' : 's'}</span>
+    </div>
+
+    {node.posts.length > 0 ? (
+      <div class="guide-tree__posts">
+        {node.posts.map((post) => (
+          <article class="panel guide-tree__post">
+            <div class="meta-list">
+              <span class="badge badge--accent">{post.data.category}</span>
+              {post.data.topic ? <span class="badge">{post.data.topic}</span> : null}
+            </div>
+            <div>
+              <h3>{post.data.title}</h3>
+              <p class="article-excerpt">{post.data.summary}</p>
+            </div>
+            <div class="meta-list">
+              <a class="button-link button-link--primary" href={`/blog/${post.id}`}>Open guide</a>
+              {getPrimaryDeckHref(post) ? (
+                <a class="button-link" href={getPrimaryDeckHref(post)!}>Open practice</a>
+              ) : null}
+            </div>
+          </article>
+        ))}
+      </div>
+    ) : null}
+  </div>
+
+  {node.children.length > 0 ? (
+    <ul class="guide-tree">
+      {node.children.map((child) => (
+        <Astro.self node={child} />
+      ))}
+    </ul>
+  ) : null}
+</li>

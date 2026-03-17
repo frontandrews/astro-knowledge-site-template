@@ -3,15 +3,14 @@ import { getCollection } from 'astro:content'
 
 import ArticleCard from '../../components/ArticleCard.astro'
 import BaseLayout from '../../layouts/BaseLayout.astro'
+import { sortGuides } from '../../lib/guide-tree'
 
-const posts = (await getCollection('blog')).sort(
-  (left, right) => right.data.pubDate.getTime() - left.data.pubDate.getTime(),
-)
+const posts = sortGuides(await getCollection('blog'))
 const categories = [...new Set(posts.map((post) => post.data.category))]
 ---
 
 <BaseLayout
-  description="Browse Prepdeck guides and checklists before you jump into practice."
+  description="Browse Prepdeck guides and checklists for programming, AI engineering, communication, and leadership."
   title="Guides"
 >
   <section class="hero">
@@ -23,7 +22,8 @@ const categories = [...new Set(posts.map((post) => post.data.category))]
       <h1>Read first. Practice right after.</h1>
       <p>
         These guides are meant to be usable, not decorative. Read the summary, steal the
-        checklist, then open the related deck when you want to rehearse the answer.
+        checklist, then open the related deck when you want to rehearse the answer or the
+        operating habit behind it.
       </p>
     </div>
   </section>

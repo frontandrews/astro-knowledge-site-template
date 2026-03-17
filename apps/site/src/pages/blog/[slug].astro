@@ -2,10 +2,12 @@
 import type { CollectionEntry } from 'astro:content'
 import { getCollection, render } from 'astro:content'
 import { getDeckSummaryById } from '@prepdeck/content/manifest'
+import { getTopicLabel } from '@prepdeck/content'
 
 import BaseLayout from '../../layouts/BaseLayout.astro'
 import ArticleCard from '../../components/ArticleCard.astro'
 import { getAppHref } from '../../lib/app-links'
+import { sortGuides } from '../../lib/guide-tree'
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog')
@@ -26,9 +28,7 @@ type Props = {
 
 const { post } = Astro.props
 const { Content } = await render(post)
-const allPosts = (await getCollection('blog')).sort(
-  (left, right) => right.data.pubDate.getTime() - left.data.pubDate.getTime(),
-)
+const allPosts = sortGuides(await getCollection('blog'))
 const relatedDecks = post.data.relatedDeckIds
   .map((deckId) => getDeckSummaryById(deckId))
   .filter((deck): deck is NonNullable<typeof deck> => Boolean(deck))
@@ -38,10 +38,11 @@ const relatedPosts = allPosts
       return false
     }
 
+    const isExplicitRelationship = post.data.relationships.includes(entry.id)
     const sharesTopic = entry.data.topic && entry.data.topic === post.data.topic
     const sharesTag = entry.data.tags.some((tag) => post.data.tags.includes(tag))
 
-    return Boolean(sharesTopic || sharesTag)
+    return Boolean(isExplicitRelationship || sharesTopic || sharesTag)
   })
   .slice(0, 2)
 const currentIndex = allPosts.findIndex((entry) => entry.id === post.id)
@@ -57,6 +58,11 @@ const nextPost = currentIndex > 0 ? allPosts[currentIndex - 1] ?? null : null
         {post.data.topic ? <span class="badge">{post.data.topic}</span> : null}
         {post.data.tags.map((tag) => (
           <span class="badge">{tag}</span>
+        ))}
+      </div>
+      <div class="meta-list article-breadcrumbs">
+        {post.data.path.map((segment) => (
+          <span class="badge">{segment}</span>
         ))}
       </div>
       <h1 class="article-title">{post.data.title}</h1>
@@ -131,7 +137,7 @@ const nextPost = currentIndex > 0 ? allPosts[currentIndex - 1] ?? null : null
           {relatedDecks.map((deck) => (
             <div class="panel article-related-card">
               <div class="meta-list">
-                <span class="badge badge--accent">{deck.topic}</span>
+                <span class="badge badge--accent">{getTopicLabel(deck.topic)}</span>
                 <span class="badge">{deck.cardCount} cards</span>
                 <span class="badge">{deck.estimatedMinutes} min</span>
               </div>

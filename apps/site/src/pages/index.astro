@@ -1,73 +1,66 @@
 ---
 import { getCollection } from 'astro:content'
 
-import ArticleCard from '../components/ArticleCard.astro'
+import GuideTreeNode from '../components/GuideTreeNode.astro'
 import BaseLayout from '../layouts/BaseLayout.astro'
 import { getAppHref } from '../lib/app-links'
+import { buildGuideTree } from '../lib/guide-tree'
 
-const posts = (await getCollection('blog')).sort(
-  (left, right) => right.data.pubDate.getTime() - left.data.pubDate.getTime(),
-)
-const featuredPosts = posts.slice(0, 3)
-const topics = [...new Set(posts.map((post) => post.data.topic).filter(Boolean))]
+const posts = await getCollection('blog')
+const guideTree = buildGuideTree(posts)
+const rootAreas = guideTree.length
 ---
 
 <BaseLayout
-  description="Short guides and checklists that you can read first, then turn into focused practice inside Prepdeck."
-  title="Guides"
+  description="A tree-style index of guides for programming, AI engineering, communication, and leadership."
+  title="Guide map"
 >
   <section class="hero">
     <div class="hero__grid">
       <div>
         <div class="hero__badges">
-          <span class="badge badge--accent">Read first</span>
-          <span class="badge">Practice next</span>
+          <span class="badge badge--accent">Guide map</span>
           <span class="badge">{posts.length} guides</span>
+          <span class="badge">{rootAreas} root areas</span>
         </div>
-        <h1>Short guides that turn into practice fast.</h1>
+        <h1>Browse the map. Open what matters. Practice right after.</h1>
         <p>
-          Prepdeck works best when reading and practice stay connected. Start with a clear
-          guide, grab the checklist, then open the matching deck when you want to rehearse
-          the concept instead of just reading about it.
+          Prepdeck works better when the content is easy to scan. Start from the tree,
+          open one guide, then jump into practice when you want to rehearse the topic.
         </p>
         <div class="meta-list">
-          <a class="button-link button-link--primary" href="/blog">Browse guides</a>
-          <a class="button-link" href={getAppHref('/')}>Open practice</a>
+          <a class="button-link button-link--primary" href={getAppHref('/')}>Open practice</a>
+          <a class="button-link" href="/blog">Flat guide list</a>
         </div>
       </div>
 
       <div class="panel">
         <p class="section-eyebrow">How to use it</p>
         <ul class="article-prose compact-list">
-          <li>Pick one guide and read the summary first.</li>
-          <li>Use the checklist to shape how you explain the topic.</li>
-          <li>Open the related deck and practice the answer while it is still fresh.</li>
+          <li>Pick a main area first.</li>
+          <li>Drill into the sub-area that matches your current gap.</li>
+          <li>Open the guide, then practice the linked deck if one exists.</li>
         </ul>
       </div>
     </div>
   </section>
 
   <section class="section">
-    <h2 class="section-heading">Browse by topic</h2>
-    <p class="section-copy">
-      Start from the area you want to sharpen, then move straight into practice.
-    </p>
-    <div class="meta-list">
-      {topics.map((topic) => (
-        <span class="badge">{topic}</span>
-      ))}
+    <div class="section-header">
+      <div>
+        <p class="section-eyebrow">Tree navigation</p>
+        <h2 class="section-heading">Everything available right now</h2>
+        <p class="section-copy">
+          One home for the current reading paths, grouped by primary category and nested
+          sub-category.
+        </p>
+      </div>
     </div>
-  </section>
 
-  <section class="section">
-    <h2 class="section-heading">Start with these guides</h2>
-    <p class="section-copy">
-      Summary-first reading paths that already connect to the practice app.
-    </p>
-    <div class="panel-grid panel-grid--articles">
-      {featuredPosts.map((post) => (
-        <ArticleCard post={post} />
+    <ul class="guide-tree guide-tree--root">
+      {guideTree.map((node) => (
+        <GuideTreeNode node={node} />
       ))}
-    </div>
+    </ul>
   </section>
 </BaseLayout>
