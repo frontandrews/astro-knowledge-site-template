@@ -2,8 +2,7 @@ import { getDeckSummaryById } from '@prepdeck/content/manifest'
 import type { PropsWithChildren } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 
-import { Badge } from '@/components/ui/badge'
-import { LinkButton } from '@/components/ui/link-button'
+import { AppHeader } from '@/components/app-header'
 import { Panel } from '@/components/ui/panel'
 import { PwaStatusPanel } from '@/components/pwa-status-panel'
 import { getTopicLabel } from '@/lib/topic-labels'
@@ -25,86 +24,18 @@ export function AppShell({ children }: PropsWithChildren) {
   return (
     <div className="min-h-screen bg-transparent text-[var(--retro-ink)]">
       <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-4 pb-[calc(6.5rem+env(safe-area-inset-bottom))] pt-[calc(1.25rem+env(safe-area-inset-top))] sm:px-6 sm:pb-24 sm:pt-5">
-        {shell.mode === 'home' ? (
-          <Panel className="mb-6 bg-[var(--retro-surface)] px-4 py-3">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <Link
-                  to="/"
-                  className="text-xs font-bold uppercase tracking-[0.3em] text-[var(--retro-line)]"
-                >
-                  Prepdeck
-                </Link>
-                <p className="mt-2 max-w-2xl text-sm leading-6 text-white/80">
-                  Local-first career practice with phone-sized study flows, saved notes,
-                  and no signup wall.
-                </p>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                <Badge tone="accent">Local notes</Badge>
-                <Badge>PWA</Badge>
-                <Badge tone={isPremium ? 'success' : 'warning'}>
-                  {isPremium ? 'Premium active' : 'Ad-supported'}
-                </Badge>
-                <LinkButton size="sm" to="/progress" variant="ghost">
-                  Progress
-                </LinkButton>
-                <LinkButton size="sm" to="/settings" variant="ghost">
-                  Settings
-                </LinkButton>
-                <LinkButton size="sm" to="/premium" variant="ghost">
-                  Premium
-                </LinkButton>
-              </div>
-            </div>
-          </Panel>
-        ) : (
-          <Panel className="sticky top-[calc(0.75rem+env(safe-area-inset-top))] z-20 mb-4 bg-[var(--retro-surface)] px-4 py-3 sm:top-3">
-            <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap gap-2">
-                  {shell.backTo ? (
-                    <LinkButton size="sm" to={shell.backTo} variant="ghost">
-                      {shell.backLabel}
-                    </LinkButton>
-                  ) : null}
-                  {showHomeShortcut ? (
-                    <LinkButton size="sm" to="/" variant="secondary">
-                      Home
-                    </LinkButton>
-                  ) : null}
-                  {showProgressShortcut ? (
-                    <LinkButton size="sm" to="/progress" variant="ghost">
-                      Progress
-                    </LinkButton>
-                  ) : null}
-                  {showSettingsShortcut ? (
-                    <LinkButton size="sm" to="/settings" variant="ghost">
-                      Settings
-                    </LinkButton>
-                  ) : null}
-                  {showPremiumShortcut ? (
-                    <LinkButton size="sm" to="/premium" variant="ghost">
-                      Premium
-                    </LinkButton>
-                  ) : null}
-                </div>
-                <p className="mt-3 text-[0.68rem] font-bold uppercase tracking-[0.22em] text-[var(--retro-line)]">
-                  {shell.eyebrow}
-                </p>
-                <p className="mt-1 truncate text-lg font-black text-[var(--retro-ink)]">
-                  {shell.title}
-                </p>
-              </div>
-              <Link
-                to="/"
-                className="shrink-0 pt-0.5 text-[0.7rem] font-bold uppercase tracking-[0.24em] text-[var(--retro-line)]"
-              >
-                Prepdeck
-              </Link>
-            </div>
-          </Panel>
-        )}
+        <AppHeader
+          backLabel={shell.backLabel}
+          backTo={shell.backTo}
+          eyebrow={shell.eyebrow}
+          isPremium={isPremium}
+          mode={shell.mode}
+          showHomeShortcut={showHomeShortcut}
+          showPremiumShortcut={showPremiumShortcut}
+          showProgressShortcut={showProgressShortcut}
+          showSettingsShortcut={showSettingsShortcut}
+          title={shell.title}
+        />
 
         <main className="flex-1">{children}</main>
       </div>
@@ -262,10 +193,10 @@ function BottomNavigation({ pathname }: { pathname: string }) {
               <Link
                 aria-current={isActive ? 'page' : undefined}
                 className={[
-                  'flex min-h-12 items-center justify-center rounded-[0.95rem] border-2 px-2 text-[0.68rem] font-bold uppercase tracking-[0.18em] transition',
+                  'flex min-h-12 items-center justify-center rounded-[0.95rem] border-2 px-2 font-head text-[0.68rem] uppercase tracking-[0.18em] transition',
                   isActive
-                    ? 'border-[var(--retro-line-strong)] bg-[var(--retro-accent)] text-white shadow-[4px_4px_0_var(--retro-shadow)]'
-                    : 'border-[var(--retro-line)] bg-[color:rgba(255,255,255,0.04)] text-[var(--retro-ink)] shadow-[4px_4px_0_var(--retro-line)]',
+                    ? 'bg-primary text-primary-foreground shadow-md'
+                    : 'bg-card text-foreground shadow-sm',
                 ].join(' ')}
                 key={item.href}
                 to={item.href}

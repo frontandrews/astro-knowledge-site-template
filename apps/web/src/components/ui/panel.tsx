@@ -1,5 +1,6 @@
 import type { HTMLAttributes } from 'react'
 
+import { Card } from '@/components/retroui/Card'
 import { cn } from '@/lib/utils'
 
 type PanelProps = HTMLAttributes<HTMLDivElement> & {
@@ -8,11 +9,11 @@ type PanelProps = HTMLAttributes<HTMLDivElement> & {
 
 export function Panel({ className, inset = false, ...props }: PanelProps) {
   return (
-    <div
+    <Card
       className={cn(
-        'rounded-[1.6rem] border-2 border-[var(--retro-line-strong)] bg-[var(--retro-surface)] shadow-[6px_6px_0_var(--retro-shadow-soft)]',
+        'block rounded-[1.6rem] border-[var(--retro-line-strong)] bg-[var(--retro-surface)] shadow-lg',
         inset &&
-          'bg-[var(--retro-surface-muted)] shadow-[inset_0_0_0_2px_var(--retro-line),6px_6px_0_var(--retro-shadow-soft)]',
+          'bg-[var(--retro-surface-muted)] shadow-[inset_0_0_0_2px_var(--retro-line),var(--shadow-lg)]',
         className,
       )}
       {...props}

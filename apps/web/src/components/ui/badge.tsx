@@ -1,29 +1,56 @@
 import type { HTMLAttributes } from 'react'
 
-import { cn } from '@/lib/utils'
+import { Badge as RetroBadge } from '@/components/retroui/Badge'
 
 type BadgeProps = HTMLAttributes<HTMLSpanElement> & {
   tone?: 'default' | 'accent' | 'danger' | 'success' | 'warning'
 }
 
-const toneClassName: Record<NonNullable<BadgeProps['tone']>, string> = {
-  accent:
-    'bg-[var(--retro-accent-soft)] text-[var(--retro-ink)] border-[var(--retro-line-strong)]',
-  danger: 'bg-[color:rgba(155,103,120,0.22)] text-white border-[var(--retro-danger)]',
-  default:
-    'bg-[color:rgba(255,255,255,0.04)] text-[var(--retro-ink)] border-[var(--retro-line)]',
-  success: 'bg-[color:rgba(96,141,159,0.22)] text-white border-[var(--retro-success)]',
-  warning: 'bg-[color:rgba(101,121,153,0.22)] text-white border-[var(--retro-warning)]',
+const toneMap: Record<
+  NonNullable<BadgeProps['tone']>,
+  { className: string; variant: 'default' | 'outline' | 'solid' | 'surface' }
+> = {
+  accent: {
+    className:
+      'bg-[var(--retro-accent-soft)] text-[var(--retro-ink)] outline-[var(--retro-line-strong)]',
+    variant: 'surface',
+  },
+  danger: {
+    className:
+      'bg-[color:rgba(180,87,116,0.22)] text-[var(--retro-ink)] outline-[var(--retro-danger)]',
+    variant: 'outline',
+  },
+  default: {
+    className:
+      'bg-[color:rgba(255,255,255,0.06)] text-[var(--retro-ink)] outline-[var(--retro-line)]',
+    variant: 'outline',
+  },
+  success: {
+    className:
+      'bg-[color:rgba(95,138,164,0.22)] text-[var(--retro-ink)] outline-[var(--retro-success)]',
+    variant: 'outline',
+  },
+  warning: {
+    className:
+      'bg-[color:rgba(122,145,181,0.22)] text-[var(--retro-ink)] outline-[var(--retro-warning)]',
+    variant: 'outline',
+  },
 }
 
 export function Badge({ className, tone = 'default', ...props }: BadgeProps) {
+  const config = toneMap[tone]
+
   return (
-    <span
-      className={cn(
-        'inline-flex items-center rounded-full border-2 px-3 py-1 text-[0.7rem] font-semibold uppercase tracking-[0.18em]',
-        toneClassName[tone],
+    <RetroBadge
+      className={[
+        'inline-flex items-center uppercase tracking-[0.18em]',
+        config.className,
         className,
-      )}
+      ]
+        .filter(Boolean)
+        .join(' ')}
+      size="sm"
+      variant={config.variant}
       {...props}
     />
   )

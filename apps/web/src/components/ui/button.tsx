@@ -1,12 +1,20 @@
-import type { VariantProps } from 'class-variance-authority'
 import type { ButtonHTMLAttributes } from 'react'
 
-import { cn } from '@/lib/utils'
+import { Button as RetroButton } from '@/components/retroui/Button'
 import { buttonVariants } from '@/components/ui/button-styles'
 
-type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> &
-  VariantProps<typeof buttonVariants>
+type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
+  size?: 'default' | 'sm'
+  variant?: 'danger' | 'ghost' | 'primary' | 'secondary' | 'success' | 'warning'
+}
 
 export function Button({ className, size, variant, ...props }: ButtonProps) {
-  return <button className={cn(buttonVariants({ size, variant }), className)} {...props} />
+  return (
+    <RetroButton
+      className={buttonVariants({ className, size, variant })}
+      size={size === 'sm' ? 'sm' : 'md'}
+      variant={variant === 'secondary' || variant === 'ghost' ? variant : 'default'}
+      {...props}
+    />
+  )
 }

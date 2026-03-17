@@ -12,23 +12,26 @@ import { AppRoutes } from '@/routes/app-routes'
 import { MonetizationProvider } from '@/state/monetization-context'
 import { PreferencesProvider } from '@/state/preferences-context'
 import { ProgressProvider } from '@/state/progress-context'
+import { ThemeProvider } from '@/state/theme-context'
 
 function Providers({
   children,
   initialEntries = ['/'],
 }: PropsWithChildren<{ initialEntries?: string[] }>) {
   return (
-    <MonetizationProvider>
-      <PreferencesProvider>
-        <ProgressProvider>
-          <MotionConfig reducedMotion="never">
-            <LazyMotion features={domMax}>
-              <MemoryRouter initialEntries={initialEntries}>{children}</MemoryRouter>
-            </LazyMotion>
-          </MotionConfig>
-        </ProgressProvider>
-      </PreferencesProvider>
-    </MonetizationProvider>
+    <ThemeProvider>
+      <MonetizationProvider>
+        <PreferencesProvider>
+          <ProgressProvider>
+            <MotionConfig reducedMotion="never">
+              <LazyMotion features={domMax}>
+                <MemoryRouter initialEntries={initialEntries}>{children}</MemoryRouter>
+              </LazyMotion>
+            </MotionConfig>
+          </ProgressProvider>
+        </PreferencesProvider>
+      </MonetizationProvider>
+    </ThemeProvider>
   )
 }
 
