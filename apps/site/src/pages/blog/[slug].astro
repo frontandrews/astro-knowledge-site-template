@@ -1,0 +1,63 @@
+---
+import type { CollectionEntry } from 'astro:content'
+import { getCollection, render } from 'astro:content'
+
+import BaseLayout from '../../layouts/BaseLayout.astro'
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog')
+
+  return posts.map((post) => ({
+    params: {
+      slug: post.id,
+    },
+    props: {
+      post,
+    },
+  }))
+}
+
+type Props = {
+  post: CollectionEntry<'blog'>
+}
+
+const { post } = Astro.props
+const { Content } = await render(post)
+---
+
+<BaseLayout description={post.data.description} title={post.data.title}>
+  <article class="article-shell">
+    <header class="article-header">
+      <div class="meta-list">
+        <span class="badge badge--accent">{post.data.topic ?? 'Article'}</span>
+        {post.data.tags.map((tag) => (
+          <span class="badge">{tag}</span>
+        ))}
+      </div>
+      <h1 class="article-title">{post.data.title}</h1>
+      <p class="article-excerpt">{post.data.description}</p>
+      <div class="meta-list">
+        <span class="badge">
+          {post.data.pubDate.toLocaleDateString('en-US', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+          })}
+        </span>
+        {post.data.updatedDate ? (
+          <span class="badge">
+            Updated {post.data.updatedDate.toLocaleDateString('en-US', {
+              day: 'numeric',
+              month: 'short',
+              year: 'numeric',
+            })}
+          </span>
+        ) : null}
+      </div>
+    </header>
+
+    <div class="article-prose">
+      <Content />
+    </div>
+  </article>
+</BaseLayout>

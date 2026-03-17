@@ -1,0 +1,61 @@
+---
+import { getCollection } from 'astro:content'
+
+import ArticleCard from '../components/ArticleCard.astro'
+import BaseLayout from '../layouts/BaseLayout.astro'
+
+const posts = (await getCollection('blog')).sort(
+  (left, right) => right.data.pubDate.getTime() - left.data.pubDate.getTime(),
+)
+const featuredPosts = posts.slice(0, 3)
+---
+
+<BaseLayout
+  description="Prepdeck Journal is the content layer behind deeper interview explanations, written as SEO-friendly static articles."
+  title="Prepdeck Journal"
+>
+  <section class="hero">
+    <div class="hero__grid">
+      <div>
+        <div class="hero__badges">
+          <span class="badge badge--accent">Astro</span>
+          <span class="badge">Static blog</span>
+          <span class="badge">SEO-friendly</span>
+        </div>
+        <h1>Long-form explanations for the topics behind the cards.</h1>
+        <p>
+          The flashcards are fast on purpose. The journal is where each concept can expand
+          into a real article with examples, tradeoffs, and code snippets. Keeping this in
+          Astro lets the content layer stay static, fast, and searchable without forcing the
+          study app to become a content site.
+        </p>
+        <div class="meta-list">
+          <a class="button-link button-link--primary" href="/blog">Browse the blog</a>
+        </div>
+      </div>
+
+      <div class="panel">
+        <p class="section-copy">
+          This site is intentionally separate from the app:
+        </p>
+        <ul class="article-prose">
+          <li>The app can stay local-first and interaction-heavy.</li>
+          <li>The blog can focus on discoverability, reading, and search traffic.</li>
+          <li><code>learnMoreSlug</code> links can point cards to full articles here.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-heading">Featured articles</h2>
+    <p class="section-copy">
+      Seed content that already maps well to the current interview decks.
+    </p>
+    <div class="panel-grid panel-grid--articles">
+      {featuredPosts.map((post) => (
+        <ArticleCard post={post} />
+      ))}
+    </div>
+  </section>
+</BaseLayout>

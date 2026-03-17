@@ -1,0 +1,17 @@
+{
+  "name": "@prepdeck/site",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "astro build",
+    "check": "astro check",
+    "dev": "astro dev",
+    "preview": "astro preview"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.8",
+    "astro": "^6.0.5",
+    "typescript": "^5.9.3"
+  }
+}

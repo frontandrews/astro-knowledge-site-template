@@ -1,0 +1,31 @@
+---
+import type { CollectionEntry } from 'astro:content'
+
+type Props = {
+  post: CollectionEntry<'blog'>
+}
+
+const { post } = Astro.props
+---
+
+<article class="panel article-card">
+  <div class="meta-list">
+    <span class="badge badge--accent">{post.data.topic ?? 'Article'}</span>
+    {post.data.tags.slice(0, 2).map((tag) => (
+      <span class="badge">{tag}</span>
+    ))}
+  </div>
+  <div>
+    <h3>{post.data.title}</h3>
+    <p class="article-excerpt">{post.data.summary}</p>
+  </div>
+  <div class="meta-list">
+    <span class="badge">{post.data.pubDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+    {post.data.relatedDeckIds.length > 0 ? (
+      <span class="badge">{post.data.relatedDeckIds.length} related deck{post.data.relatedDeckIds.length === 1 ? '' : 's'}</span>
+    ) : null}
+  </div>
+  <a class="button-link button-link--primary" href={`/blog/${post.id}`}>
+    Read article
+  </a>
+</article>

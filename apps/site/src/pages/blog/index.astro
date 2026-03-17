@@ -1,0 +1,36 @@
+---
+import { getCollection } from 'astro:content'
+
+import ArticleCard from '../../components/ArticleCard.astro'
+import BaseLayout from '../../layouts/BaseLayout.astro'
+
+const posts = (await getCollection('blog')).sort(
+  (left, right) => right.data.pubDate.getTime() - left.data.pubDate.getTime(),
+)
+---
+
+<BaseLayout
+  description="Browse the technical interview articles behind Prepdeck's deeper learn-more content."
+  title="Blog"
+>
+  <section class="hero">
+    <div>
+      <div class="hero__badges">
+        <span class="badge badge--accent">Blog</span>
+        <span class="badge">{posts.length} articles</span>
+      </div>
+      <h1>Prepdeck Journal</h1>
+      <p>
+        Deeper breakdowns for interview topics that deserve more than a flashcard answer.
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="panel-grid panel-grid--articles">
+      {posts.map((post) => (
+        <ArticleCard post={post} />
+      ))}
+    </div>
+  </section>
+</BaseLayout>

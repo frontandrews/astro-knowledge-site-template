@@ -1,0 +1,55 @@
+---
+import '../styles/global.css'
+
+type Props = {
+  description: string
+  title: string
+}
+
+const {
+  description,
+  title,
+} = Astro.props
+
+const pageTitle = `${title} | Prepdeck Journal`
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <title>{pageTitle}</title>
+    <meta content={description} name="description" />
+    <meta content={pageTitle} property="og:title" />
+    <meta content={description} property="og:description" />
+    <meta content="website" property="og:type" />
+    <meta content="summary_large_image" name="twitter:card" />
+    <meta content={pageTitle} name="twitter:title" />
+    <meta content={description} name="twitter:description" />
+  </head>
+  <body>
+    <div class="site-shell">
+      <header class="site-header">
+        <div class="site-header__inner">
+          <div class="site-brand">
+            <a class="site-brand__eyebrow" href="/">Prepdeck Journal</a>
+            <div class="site-brand__summary">
+              SEO-friendly learning articles that back the flashcards, decks, and
+              learn-more paths in the Prepdeck app.
+            </div>
+          </div>
+          <nav class="site-nav">
+            <a class="site-nav__link" href="/">Home</a>
+            <a class="site-nav__link" href="/blog">Blog</a>
+          </nav>
+        </div>
+      </header>
+      <slot />
+      <footer class="site-footer">
+        Prepdeck keeps the study app and the content site separate on purpose: the app
+        stays fast and local-first, while the journal stays static and SEO-friendly.
+      </footer>
+    </div>
+  </body>
+</html>
