@@ -95,14 +95,20 @@ describe('app routes', () => {
     ).toBeInTheDocument()
   })
 
-  it('shows learn-more notes and code examples for cards that include them', async () => {
+  it('keeps learn-more content collapsed until the user opens it', async () => {
     const user = userEvent.setup()
 
     renderApp(['/study/react-rendering-core?mode=start'])
 
     await user.click(screen.getByRole('button', { name: 'Show answer' }))
 
-    expect(screen.getByText('Learn more')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /learn more/i })).toBeInTheDocument()
+    expect(
+      screen.queryByText(/Derived state usually shows up when someone copies props into state/i),
+    ).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: /learn more/i }))
+
     expect(
       screen.getByText(/Derived state usually shows up when someone copies props into state/i),
     ).toBeInTheDocument()

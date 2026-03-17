@@ -77,6 +77,7 @@ function StudySession({ deck, initialIndex }: { deck: Deck; initialIndex: number
   const { rememberDeckPosition, setCardStatus } = useProgress()
   const [currentIndex, setCurrentIndex] = useState(initialIndex)
   const [isAnswerVisible, setIsAnswerVisible] = useState(false)
+  const [isLearnMoreOpen, setIsLearnMoreOpen] = useState(false)
   const currentCard = deck.cards[currentIndex]
 
   useEffect(() => {
@@ -102,6 +103,7 @@ function StudySession({ deck, initialIndex }: { deck: Deck; initialIndex: number
     const nextCard = deck.cards[currentIndex + 1]
     setCurrentIndex((previousIndex) => previousIndex + 1)
     setIsAnswerVisible(false)
+    setIsLearnMoreOpen(false)
     rememberDeckPosition(deck.id, nextCard?.id ?? null)
   }
 
@@ -154,25 +156,45 @@ function StudySession({ deck, initialIndex }: { deck: Deck; initialIndex: number
                   ))}
                 </ul>
               </div>
-              {currentCard.learnMore ? (
-                <div>
-                  <p className="text-sm font-black text-[var(--retro-ink)]">Learn more</p>
-                  <p className="mt-3 whitespace-pre-line text-sm leading-6 text-white/80">
-                    {currentCard.learnMore}
-                  </p>
-                </div>
-              ) : null}
-              {currentCard.exampleCode ? (
-                <div>
-                  <div className="flex items-center justify-between gap-3">
-                    <p className="text-sm font-black text-[var(--retro-ink)]">Code example</p>
-                    {currentCard.exampleLanguage ? (
-                      <Badge>{currentCard.exampleLanguage}</Badge>
-                    ) : null}
-                  </div>
-                  <pre className="mt-3 overflow-x-auto rounded-[1rem] border border-[var(--retro-line)] bg-[var(--retro-bg-strong)] p-4 text-xs leading-6 text-white/90">
-                    <code>{currentCard.exampleCode}</code>
-                  </pre>
+              {currentCard.learnMore || currentCard.exampleCode ? (
+                <div className="rounded-[1rem] border border-[var(--retro-line)] bg-[var(--retro-bg-strong)]">
+                  <button
+                    aria-expanded={isLearnMoreOpen}
+                    className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm font-black text-[var(--retro-ink)]"
+                    onClick={() => setIsLearnMoreOpen((open) => !open)}
+                    type="button"
+                  >
+                    <span>Learn more</span>
+                    <span className="text-[var(--retro-line)]">
+                      {isLearnMoreOpen ? 'Hide' : 'Open'}
+                    </span>
+                  </button>
+                  {isLearnMoreOpen ? (
+                    <div className="border-t border-[var(--retro-line)] px-4 py-4">
+                      {currentCard.learnMore ? (
+                        <div>
+                          <p className="whitespace-pre-line text-sm leading-6 text-white/80">
+                            {currentCard.learnMore}
+                          </p>
+                        </div>
+                      ) : null}
+                      {currentCard.exampleCode ? (
+                        <div className={currentCard.learnMore ? 'mt-4' : ''}>
+                          <div className="flex items-center justify-between gap-3">
+                            <p className="text-sm font-black text-[var(--retro-ink)]">
+                              Code example
+                            </p>
+                            {currentCard.exampleLanguage ? (
+                              <Badge>{currentCard.exampleLanguage}</Badge>
+                            ) : null}
+                          </div>
+                          <pre className="mt-3 overflow-x-auto rounded-[1rem] border border-[var(--retro-line)] bg-[color:rgba(255,255,255,0.03)] p-4 text-xs leading-6 text-white/90">
+                            <code>{currentCard.exampleCode}</code>
+                          </pre>
+                        </div>
+                      ) : null}
+                    </div>
+                  ) : null}
                 </div>
               ) : null}
             </div>
