@@ -2,7 +2,12 @@ import { getDeckById } from '@prepdeck/content'
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
-import { createEmptyProgressStore, setCardStatus } from '@/lib/progress'
+import {
+  PREVIOUS_STORAGE_KEY,
+  createEmptyProgressStore,
+  setCardNote,
+  setCardStatus,
+} from '@/lib/progress'
 import { renderApp, seedProgress } from '@/test/test-utils'
 
 function getReactDeck() {
@@ -116,6 +121,47 @@ describe('app routes', () => {
     expect(screen.getByText(/const visibleUsers = users\.filter/i)).toBeInTheDocument()
   })
 
+  it('keeps personal notes collapsed until the user opens them in study mode', async () => {
+    const user = userEvent.setup()
+
+    renderApp(['/study/react-rendering-core?mode=start'])
+
+    await user.click(screen.getByRole('button', { name: 'Show answer' }))
+
+    expect(screen.getByRole('button', { name: /your note/i })).toBeInTheDocument()
+    expect(
+      screen.queryByPlaceholderText(/Capture your version of the answer/i),
+    ).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: /your note/i }))
+
+    expect(
+      screen.getByPlaceholderText(/Capture your version of the answer/i),
+    ).toBeInTheDocument()
+  })
+
+  it('saves a study note and restores it after reload', async () => {
+    const user = userEvent.setup()
+
+    const firstRender = renderApp(['/study/react-rendering-core?mode=start'])
+
+    await user.click(screen.getByRole('button', { name: 'Show answer' }))
+    await user.click(screen.getByRole('button', { name: /your note/i }))
+
+    const noteField = screen.getByPlaceholderText(/Capture your version of the answer/i)
+    await user.type(noteField, 'Mention duplicated source of truth')
+    await user.tab()
+
+    firstRender.unmount()
+
+    renderApp(['/study/react-rendering-core?mode=start'])
+
+    await user.click(screen.getByRole('button', { name: 'Show answer' }))
+    await user.click(screen.getByRole('button', { name: /your note/i }))
+
+    expect(screen.getByDisplayValue('Mention duplicated source of truth')).toBeInTheDocument()
+  })
+
   it('sends continue mode to success when every card has already been seen', async () => {
     const deck = getReactDeck()
     let store = createEmptyProgressStore()
@@ -146,5 +192,56 @@ describe('app routes', () => {
     await user.click(screen.getByRole('button', { name: 'Unmark' }))
 
     expect(await screen.findByText('There are no cards in this bucket yet.')).toBeInTheDocument()
+  })
+
+  it('shows and edits saved note previews in review mode', async () => {
+    const user = userEvent.setup()
+    const deck = getReactDeck()
+    let store = createEmptyProgressStore()
+    store = setCardStatus(store, deck.id, deck.cards[0].id, 'learned')
+    store = setCardNote(store, deck.id, deck.cards[0].id, 'Lead with sync bugs and source of truth')
+    seedProgress(store)
+
+    const firstRender = renderApp(['/decks/react-rendering-core/review'])
+
+    expect(screen.getByText('Lead with sync bugs and source of truth')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: /your note/i }))
+    const noteField = screen.getByDisplayValue('Lead with sync bugs and source of truth')
+    await user.clear(noteField)
+    await user.type(noteField, 'Start with duplicated state and synchronization risk')
+    await user.tab()
+
+    firstRender.unmount()
+
+    renderApp(['/decks/react-rendering-core/review'])
+
+    expect(
+      screen.getByText('Start with duplicated state and synchronization risk'),
+    ).toBeInTheDocument()
+  })
+
+  it('migrates previously saved progress data into the current store on app load', () => {
+    const deck = getReactDeck()
+
+    window.localStorage.setItem(
+      PREVIOUS_STORAGE_KEY,
+      JSON.stringify({
+        version: 1,
+        decks: {
+          [deck.id]: {
+            lastCardId: deck.cards[0].id,
+            lastStudiedAt: '2026-03-17T10:00:00.000Z',
+            cards: {
+              [deck.cards[0].id]: 'learned',
+            },
+          },
+        },
+      }),
+    )
+
+    renderApp(['/'])
+
+    expect(screen.getByText('1 / 2 learned')).toBeInTheDocument()
   })
 })

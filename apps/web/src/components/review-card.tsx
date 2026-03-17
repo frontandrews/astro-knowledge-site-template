@@ -1,10 +1,14 @@
 import type { Flashcard, ProgressStatus } from '@prepdeck/schemas'
 
+import { CardNoteEditor } from '@/components/card-note-editor'
 import { Button } from '@/components/ui/button'
 import { Panel } from '@/components/ui/panel'
 
 type ReviewCardProps = {
   card: Flashcard
+  note: string
+  onClearNote: () => void
+  onSaveNote: (note: string) => void
   onSetStatus: (status: ProgressStatus) => void
   onUnmarkLearned: () => void
   status: ProgressStatus
@@ -14,6 +18,9 @@ const BUTTONS: ProgressStatus[] = ['learned', 'partial', 'not_learned']
 
 export function ReviewCard({
   card,
+  note,
+  onClearNote,
+  onSaveNote,
   onSetStatus,
   onUnmarkLearned,
   status,
@@ -42,6 +49,14 @@ export function ReviewCard({
             Unmark
           </Button>
         ) : null}
+      </div>
+      <div className="mt-4">
+        <CardNoteEditor
+          note={note}
+          onClearNote={onClearNote}
+          onSaveNote={onSaveNote}
+          showCollapsedPreview
+        />
       </div>
     </Panel>
   )

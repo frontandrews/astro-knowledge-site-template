@@ -32,8 +32,15 @@ function getInitialStatus(counts: typeof EMPTY_COUNTS): ProgressStatus {
 
 export function ReviewPage() {
   const { deckId } = useParams()
-  const { progressStore, resetDeckProgress, setCardStatus, setLearnedToUnseen } =
-    useProgress()
+  const {
+    clearCardNote,
+    getCardNote,
+    progressStore,
+    resetDeckProgress,
+    setCardNote,
+    setCardStatus,
+    setLearnedToUnseen,
+  } = useProgress()
   const [isResetOpen, setIsResetOpen] = useState(false)
   const deck = deckId ? getDeckById(deckId) : undefined
   const counts = deck ? getDeckCounts(progressStore, deck) : EMPTY_COUNTS
@@ -99,6 +106,9 @@ export function ReviewPage() {
             <ReviewCard
               card={card}
               key={card.id}
+              note={getCardNote(deck.id, card.id)}
+              onClearNote={() => clearCardNote(deck.id, card.id)}
+              onSaveNote={(note) => setCardNote(deck.id, card.id, note)}
               onSetStatus={(status) => setCardStatus(deck.id, card.id, status)}
               onUnmarkLearned={() => setLearnedToUnseen(deck.id, card.id)}
               status={getCardStatus(progressStore, deck.id, card.id)}
@@ -113,7 +123,7 @@ export function ReviewPage() {
 
       <ConfirmDialog
         confirmLabel="Reset deck"
-        description={`This clears every card status saved for ${deck.title}.`}
+        description={`This clears every saved card status and note for ${deck.title}.`}
         isOpen={isResetOpen}
         onCancel={() => setIsResetOpen(false)}
         onConfirm={() => {

@@ -4,6 +4,7 @@ import { getDeckById } from '@prepdeck/content'
 import { useEffect, useState } from 'react'
 import { Link, Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 
+import { CardNoteEditor } from '@/components/card-note-editor'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { LinkButton } from '@/components/ui/link-button'
@@ -74,11 +75,18 @@ function StudySuccess({ deck }: { deck: Deck }) {
 
 function StudySession({ deck, initialIndex }: { deck: Deck; initialIndex: number }) {
   const navigate = useNavigate()
-  const { rememberDeckPosition, setCardStatus } = useProgress()
+  const {
+    clearCardNote,
+    getCardNote,
+    rememberDeckPosition,
+    setCardNote,
+    setCardStatus,
+  } = useProgress()
   const [currentIndex, setCurrentIndex] = useState(initialIndex)
   const [isAnswerVisible, setIsAnswerVisible] = useState(false)
   const [isLearnMoreOpen, setIsLearnMoreOpen] = useState(false)
   const currentCard = deck.cards[currentIndex]
+  const currentNote = getCardNote(deck.id, currentCard.id)
 
   useEffect(() => {
     if (!currentCard) {
@@ -197,6 +205,12 @@ function StudySession({ deck, initialIndex }: { deck: Deck; initialIndex: number
                   ) : null}
                 </div>
               ) : null}
+              <CardNoteEditor
+                key={currentCard.id}
+                note={currentNote}
+                onClearNote={() => clearCardNote(deck.id, currentCard.id)}
+                onSaveNote={(note) => setCardNote(deck.id, currentCard.id, note)}
+              />
             </div>
           ) : (
             <p className="text-sm leading-7 text-white/80">

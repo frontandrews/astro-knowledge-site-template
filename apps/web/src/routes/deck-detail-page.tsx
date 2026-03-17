@@ -80,7 +80,7 @@ export function DeckDetailPage() {
 
       <ConfirmDialog
         confirmLabel="Reset deck"
-        description={`This clears all saved progress for ${deck.title}.`}
+        description={`This clears all saved progress and notes for ${deck.title}.`}
         isOpen={isResetOpen}
         onCancel={() => setIsResetOpen(false)}
         onConfirm={() => {

@@ -159,7 +159,7 @@ export function HomePage() {
 
       <ConfirmDialog
         confirmLabel="Reset all"
-        description="This clears every learned, partial, and not-learned status across all decks."
+        description="This clears every saved status and personal note across all decks."
         isOpen={isResetAllOpen}
         onCancel={() => setIsResetAllOpen(false)}
         onConfirm={() => {
