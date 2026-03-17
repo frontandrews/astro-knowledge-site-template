@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { LinkButton } from '@/components/ui/link-button'
 import { Panel } from '@/components/ui/panel'
+import { getArticleHref, getDeckArticleLinks } from '@/lib/article-links'
 import { ProgressMeter } from '@/components/ui/progress-meter'
 import { getDeckCounts } from '@/lib/progress'
 import { createStudyHref } from '@/lib/study-session'
@@ -34,6 +35,7 @@ export function DeckDetailPage() {
 
   const counts = getDeckCounts(progressStore, deck)
   const weakCardCount = counts.partial + counts.notLearned
+  const articleLinks = getDeckArticleLinks(deck)
 
   return (
     <>
@@ -108,6 +110,51 @@ export function DeckDetailPage() {
             Reset deck
           </Button>
         </div>
+
+        {articleLinks.length > 0 ? (
+          <Panel className="mt-6 bg-[var(--retro-surface-muted)] p-4" inset>
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <p className="text-[0.68rem] font-bold uppercase tracking-[0.22em] text-[var(--retro-line)]">
+                  Deep-dive reading
+                </p>
+                <h3 className="mt-2 text-xl font-black text-[var(--retro-ink)]">
+                  Full articles tied to this deck
+                </h3>
+                <p className="mt-2 max-w-2xl text-sm leading-6 text-white/75">
+                  Use the cards for reps. Open the full article when you want the longer
+                  explanation, examples, and tradeoff framing behind a concept.
+                </p>
+              </div>
+              <Badge tone="accent">{articleLinks.length} article{articleLinks.length === 1 ? '' : 's'}</Badge>
+            </div>
+
+            <div className="mt-4 space-y-3">
+              {articleLinks.map((article) => (
+                <Panel className="bg-[var(--retro-surface)] p-4" inset key={article.slug}>
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <p className="text-sm font-black text-[var(--retro-ink)]">
+                        {article.question}
+                      </p>
+                      <p className="mt-2 text-sm leading-6 text-white/75">
+                        Open the paired long-form article from the journal.
+                      </p>
+                    </div>
+                    <a
+                      className="inline-flex min-h-10 items-center justify-center rounded-[0.95rem] border-2 border-[var(--retro-line-strong)] bg-[var(--retro-surface)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--retro-ink)] shadow-[4px_4px_0_var(--retro-shadow)] transition hover:bg-[var(--retro-surface-strong)]"
+                      href={getArticleHref(article.slug)}
+                      rel="noreferrer"
+                      target="_blank"
+                    >
+                      Read article
+                    </a>
+                  </div>
+                </Panel>
+              ))}
+            </div>
+          </Panel>
+        ) : null}
       </Panel>
 
       <ConfirmDialog

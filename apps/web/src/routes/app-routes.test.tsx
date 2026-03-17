@@ -147,6 +147,11 @@ describe('app routes', () => {
     expect(screen.getByRole('button', { name: 'Study weak cards' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Review progress' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Reset deck' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Full articles tied to this deck' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Read article' })).toHaveAttribute(
+      'href',
+      '/blog/react-derived-state-without-extra-bugs',
+    )
   })
 
   it('uses the compact shell outside the home route', () => {

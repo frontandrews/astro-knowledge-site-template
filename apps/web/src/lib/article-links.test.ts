@@ -1,4 +1,6 @@
-import { resolveArticleHref } from '@/lib/article-links'
+import { getDeckById } from '@prepdeck/content'
+
+import { getDeckArticleLinks, resolveArticleHref } from '@/lib/article-links'
 
 describe('article links', () => {
   it('falls back to the same-domain blog path when no site URL is configured', () => {
@@ -20,5 +22,17 @@ describe('article links', () => {
         'https://prepdeck.dev/blog/',
       ),
     ).toBe('https://prepdeck.dev/blog/node-single-threaded-does-not-mean-what-people-think')
+  })
+
+  it('collects unique article links from a deck', () => {
+    const deck = getDeckById('react-rendering-core')
+
+    expect(deck).toBeDefined()
+    expect(getDeckArticleLinks(deck!)).toEqual([
+      {
+        question: 'Why is derived state dangerous in React?',
+        slug: 'react-derived-state-without-extra-bugs',
+      },
+    ])
   })
 })

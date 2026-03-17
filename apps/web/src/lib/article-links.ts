@@ -1,3 +1,5 @@
+import type { Deck } from '@prepdeck/schemas'
+
 const BLOG_PATH = '/blog'
 
 function getBlogBase(siteBaseUrl?: string): string {
@@ -16,4 +18,28 @@ export function resolveArticleHref(slug: string, siteBaseUrl?: string): string {
 
 export function getArticleHref(slug: string): string {
   return resolveArticleHref(slug, import.meta.env.VITE_PUBLIC_SITE_URL)
+}
+
+export type DeckArticleLink = {
+  question: string
+  slug: string
+}
+
+export function getDeckArticleLinks(deck: Deck): DeckArticleLink[] {
+  const seenSlugs = new Set<string>()
+
+  return deck.cards.flatMap((card) => {
+    if (!card.learnMoreSlug || seenSlugs.has(card.learnMoreSlug)) {
+      return []
+    }
+
+    seenSlugs.add(card.learnMoreSlug)
+
+    return [
+      {
+        question: card.question,
+        slug: card.learnMoreSlug,
+      },
+    ]
+  })
 }
