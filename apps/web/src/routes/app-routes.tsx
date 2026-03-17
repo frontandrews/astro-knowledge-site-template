@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import { AppShell } from '@/components/app-shell'
 import { DeckDetailPage } from '@/routes/deck-detail-page'
 import { HomePage } from '@/routes/home-page'
+import { PremiumPage } from '@/routes/premium-page'
 import { ReviewPage } from '@/routes/review-page'
 import { StudyPage } from '@/routes/study-page'
 
@@ -12,6 +13,7 @@ export function AppRoutes() {
       <Routes>
         <Route element={<HomePage />} path="/" />
         <Route element={<DeckDetailPage />} path="/decks/:deckId" />
+        <Route element={<PremiumPage />} path="/premium" />
         <Route element={<ReviewPage />} path="/decks/:deckId/review" />
         <Route element={<StudyPage />} path="/study/:deckId" />
         <Route element={<Navigate replace to="/" />} path="*" />

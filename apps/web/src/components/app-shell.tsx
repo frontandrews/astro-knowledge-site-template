@@ -6,10 +6,15 @@ import { Badge } from '@/components/ui/badge'
 import { LinkButton } from '@/components/ui/link-button'
 import { Panel } from '@/components/ui/panel'
 import { getTopicLabel } from '@/lib/topic-labels'
+import { useMonetization } from '@/state/monetization-context'
 
 export function AppShell({ children }: PropsWithChildren) {
   const location = useLocation()
   const shell = getShellConfig(location.pathname)
+  const { isPremium } = useMonetization()
+  const showHomeShortcut = shell.mode === 'compact' && shell.backTo !== '/'
+  const showPremiumShortcut =
+    shell.mode === 'compact' && !location.pathname.startsWith('/premium')
 
   return (
     <div className="min-h-screen bg-transparent text-[var(--retro-ink)]">
@@ -32,7 +37,12 @@ export function AppShell({ children }: PropsWithChildren) {
               <div className="flex flex-wrap gap-2">
                 <Badge tone="accent">Local notes</Badge>
                 <Badge>PWA</Badge>
-                <Badge tone="success">No signup</Badge>
+                <Badge tone={isPremium ? 'success' : 'warning'}>
+                  {isPremium ? 'Premium active' : 'Ad-supported'}
+                </Badge>
+                <LinkButton size="sm" to="/premium" variant="ghost">
+                  Premium
+                </LinkButton>
               </div>
             </div>
           </Panel>
@@ -46,9 +56,16 @@ export function AppShell({ children }: PropsWithChildren) {
                       {shell.backLabel}
                     </LinkButton>
                   ) : null}
-                  <LinkButton size="sm" to="/" variant="secondary">
-                    Home
-                  </LinkButton>
+                  {showHomeShortcut ? (
+                    <LinkButton size="sm" to="/" variant="secondary">
+                      Home
+                    </LinkButton>
+                  ) : null}
+                  {showPremiumShortcut ? (
+                    <LinkButton size="sm" to="/premium" variant="ghost">
+                      Premium
+                    </LinkButton>
+                  ) : null}
                 </div>
                 <p className="mt-3 text-[0.68rem] font-bold uppercase tracking-[0.22em] text-[var(--retro-line)]">
                   {shell.eyebrow}
@@ -127,6 +144,16 @@ function getShellConfig(pathname: string): ShellConfig {
       eyebrow: deck ? getTopicLabel(deck.topic) : 'Deck',
       mode: 'compact',
       title: deck?.title ?? 'Deck details',
+    }
+  }
+
+  if (segments[0] === 'premium') {
+    return {
+      backLabel: 'Back home',
+      backTo: '/',
+      eyebrow: 'Monetization',
+      mode: 'compact',
+      title: 'Premium',
     }
   }
 

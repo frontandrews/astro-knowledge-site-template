@@ -1,15 +1,18 @@
 import { BrowserRouter } from 'react-router-dom'
 
 import { AppRoutes } from '@/routes/app-routes'
+import { MonetizationProvider } from '@/state/monetization-context'
 import { ProgressProvider } from '@/state/progress-context'
 
 function App() {
   return (
-    <ProgressProvider>
-      <BrowserRouter>
-        <AppRoutes />
-      </BrowserRouter>
-    </ProgressProvider>
+    <MonetizationProvider>
+      <ProgressProvider>
+        <BrowserRouter>
+          <AppRoutes />
+        </BrowserRouter>
+      </ProgressProvider>
+    </MonetizationProvider>
   )
 }
 
