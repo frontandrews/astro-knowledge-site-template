@@ -5,6 +5,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { Badge } from '@/components/ui/badge'
 import { LinkButton } from '@/components/ui/link-button'
 import { Panel } from '@/components/ui/panel'
+import { PwaStatusPanel } from '@/components/pwa-status-panel'
 import { getTopicLabel } from '@/lib/topic-labels'
 import { useMonetization } from '@/state/monetization-context'
 
@@ -109,6 +110,7 @@ export function AppShell({ children }: PropsWithChildren) {
       </div>
 
       {showBottomNavigation ? <BottomNavigation pathname={location.pathname} /> : null}
+      <PwaStatusPanel hasBottomNavigation={showBottomNavigation} />
     </div>
   )
 }

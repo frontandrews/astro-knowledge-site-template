@@ -9,6 +9,7 @@ import {
   setCardNote,
   setCardStatus,
 } from '@/lib/progress'
+import { setPwaStatus } from '@/lib/pwa-status'
 import {
   createEmptySessionHistoryStore,
   recordCompletedSession,
@@ -103,6 +104,19 @@ describe('app routes', () => {
     await user.click(screen.getByRole('button', { name: 'Install app' }))
 
     expect(prompt).toHaveBeenCalledTimes(1)
+  })
+
+  it('shows an update banner when a newer app version is ready', () => {
+    setPwaStatus({
+      needRefresh: true,
+      offlineReady: false,
+      updateServiceWorker: vi.fn(),
+    })
+
+    renderApp(['/'])
+
+    expect(screen.getByRole('heading', { name: 'A newer version of Prepdeck is ready.' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Reload app' })).toBeInTheDocument()
   })
 
   it('summarizes local progress on the home page without the full tracking sections', () => {

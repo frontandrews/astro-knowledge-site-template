@@ -3,10 +3,11 @@ import { createRoot } from 'react-dom/client'
 
 import { registerSW } from 'virtual:pwa-register'
 
+import { initPwaStatus } from '@/lib/pwa-status'
 import App from './App'
 import './index.css'
 
-registerSW({ immediate: true })
+initPwaStatus(registerSW)
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

@@ -19,7 +19,29 @@ export default defineConfig({
         theme_color: '#101425',
         background_color: '#101425',
         display: 'standalone',
+        orientation: 'portrait',
         start_url: '/',
+        categories: ['education', 'productivity', 'developer tools'],
+        shortcuts: [
+          {
+            name: 'Daily queue',
+            short_name: 'Daily',
+            description: 'Jump into your daily smart queue.',
+            url: '/daily-queue',
+          },
+          {
+            name: 'Mock interview',
+            short_name: 'Mock',
+            description: 'Start a mixed mock interview session.',
+            url: '/mock-interview',
+          },
+          {
+            name: 'Progress',
+            short_name: 'Progress',
+            description: 'Open your progress hub.',
+            url: '/progress',
+          },
+        ],
         icons: [
           {
             src: '/favicon.svg',
