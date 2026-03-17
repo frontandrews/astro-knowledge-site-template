@@ -154,6 +154,27 @@ function StudySession({ deck, initialIndex }: { deck: Deck; initialIndex: number
                   ))}
                 </ul>
               </div>
+              {currentCard.learnMore ? (
+                <div>
+                  <p className="text-sm font-black text-[var(--retro-ink)]">Learn more</p>
+                  <p className="mt-3 whitespace-pre-line text-sm leading-6 text-white/80">
+                    {currentCard.learnMore}
+                  </p>
+                </div>
+              ) : null}
+              {currentCard.exampleCode ? (
+                <div>
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-sm font-black text-[var(--retro-ink)]">Code example</p>
+                    {currentCard.exampleLanguage ? (
+                      <Badge>{currentCard.exampleLanguage}</Badge>
+                    ) : null}
+                  </div>
+                  <pre className="mt-3 overflow-x-auto rounded-[1rem] border border-[var(--retro-line)] bg-[var(--retro-bg-strong)] p-4 text-xs leading-6 text-white/90">
+                    <code>{currentCard.exampleCode}</code>
+                  </pre>
+                </div>
+              ) : null}
             </div>
           ) : (
             <p className="text-sm leading-7 text-white/80">

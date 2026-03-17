@@ -19,6 +19,9 @@
         "Promises are microtasks",
         "setTimeout is a macrotask"
       ],
+      "learnMore": "A useful mental model is: finish the current stack, drain microtasks, then move to the next macrotask. That explains why Promise handlers often run sooner than people expect.\n\nIn interviews, it helps to connect this to responsiveness. Too many microtasks can still starve other work, so understanding the queue order matters for both correctness and performance.",
+      "exampleCode": "console.log('start')\n\nsetTimeout(() => {\n  console.log('timeout')\n}, 0)\n\nPromise.resolve().then(() => {\n  console.log('promise')\n})\n\nconsole.log('end')\n\n// start\n// end\n// promise\n// timeout",
+      "exampleLanguage": "ts",
       "commonTraps": [
         "saying setTimeout runs immediately with zero delay",
         "mixing up call stack and queue ordering"
@@ -41,6 +44,9 @@
         "object references are values",
         "mutation differs from reassignment"
       ],
+      "learnMore": "This is one of those interview questions that sounds trickier than it is. The clean answer is: JavaScript always passes values. For objects, that value happens to be a reference-like pointer.\n\nThat is why changing object contents is visible through other variables that point to the same object, while reassigning the parameter only changes the local variable binding.",
+      "exampleCode": "function rename(user) {\n  user.name = 'Andrews'\n}\n\nfunction replaceUser(user) {\n  user = { name: 'New user' }\n}\n\nconst original = { name: 'Old name' }\n\nrename(original)\nconsole.log(original.name) // Andrews\n\nreplaceUser(original)\nconsole.log(original.name) // Andrews",
+      "exampleLanguage": "ts",
       "commonTraps": [
         "saying everything is pass-by-reference",
         "confusing shared object mutation with parameter passing semantics"

@@ -20,6 +20,9 @@
         "integrity and transactions favor SQL",
         "schema flexibility and document shape may favor NoSQL"
       ],
+      "learnMore": "This answer gets stronger when you tie the database choice back to business risk. Payments, ledgers, and domains with strict consistency rules usually lean SQL because relationships, constraints, and transactions matter a lot.\n\nContent-heavy or document-shaped systems may lean NoSQL when the access pattern is simple and flexibility matters more than relational guarantees. The point is not that one is modern and the other is old. The point is the workload.",
+      "exampleCode": "-- SQL example\nSELECT orders.id, customers.email\nFROM orders\nJOIN customers ON customers.id = orders.customer_id;\n\n// Document example\n{\n  \"orderId\": \"ord_123\",\n  \"customer\": { \"email\": \"user@example.com\" },\n  \"items\": [{ \"sku\": \"book-1\", \"qty\": 2 }]\n}",
+      "exampleLanguage": "sql/json",
       "commonTraps": [
         "saying NoSQL scales and SQL does not",
         "answering without talking about domain guarantees"
@@ -42,6 +45,9 @@
         "microservices need real pressure to justify complexity",
         "operational cost matters"
       ],
+      "learnMore": "A lot of weak answers make this sound ideological. A better answer is operational. Monoliths reduce coordination cost, local debugging is easier, and transactional workflows are often simpler.\n\nMicroservices only start paying rent when you have clear domain seams, different scaling profiles, or teams that truly need to ship independently. Otherwise you just move complexity from code structure into networking, deployment, and observability.",
+      "exampleCode": "// Monolith: one deployable service\n/api/orders\n/api/payments\n/api/inventory\n\n// Microservices: separate deployables with explicit boundaries\norders-service\npayments-service\ninventory-service",
+      "exampleLanguage": "text",
       "commonTraps": [
         "treating microservices as a maturity badge",
         "ignoring deployment and observability cost"

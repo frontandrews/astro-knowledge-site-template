@@ -19,6 +19,9 @@
         "synchronization bugs",
         "prefer computing when possible"
       ],
+      "learnMore": "Derived state usually shows up when someone copies props into state or stores values that can already be computed during render. That feels convenient for a moment, but it creates two places that now need to stay in sync.\n\nA better default is to store the smallest real source of truth possible and derive everything else from it. If the computation is expensive, memoization is usually the first thing to try before creating more state.",
+      "exampleCode": "function UserList({ users, search }) {\n  const visibleUsers = users.filter((user) =>\n    user.name.toLowerCase().includes(search.toLowerCase()),\n  )\n\n  return <Results users={visibleUsers} />\n}",
+      "exampleLanguage": "tsx",
       "commonTraps": [
         "saying derived state is always wrong",
         "ignoring cases where memoized computation is enough"
@@ -41,6 +44,9 @@
         "scope and boundaries matter",
         "split providers by concern"
       ],
+      "learnMore": "The usual problem is not that Context exists, but that one provider starts carrying everything: auth, theme, feature flags, current workspace, filters, temporary UI state. Then a small change in one field can make a large part of the tree reevaluate.\n\nIn interviews, a strong answer is to talk about boundaries. Keep fast-changing state close to where it is needed, split providers by concern, and avoid turning Context into a generic global store.",
+      "exampleCode": "const ThemeContext = createContext(null)\nconst SessionContext = createContext(null)\n\nfunction AppProviders({ children }) {\n  return (\n    <SessionProvider>\n      <ThemeProvider>{children}</ThemeProvider>\n    </SessionProvider>\n  )\n}",
+      "exampleLanguage": "tsx",
       "commonTraps": [
         "saying Context is bad by default",
         "confusing server state with app-wide UI state"

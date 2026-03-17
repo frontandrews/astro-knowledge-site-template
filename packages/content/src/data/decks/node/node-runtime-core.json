@@ -19,6 +19,9 @@
         "runtime can use thread pool or workers",
         "distinguish JS execution from the whole runtime"
       ],
+      "learnMore": "The phrase 'Node is single-threaded' is only partly true. It is useful as shorthand for the main JavaScript execution path, but it becomes misleading when people forget about libuv, the thread pool, and worker threads.\n\nA strong interview answer separates the event loop from the runtime. That shows you understand why Node handles lots of I/O well, yet can still suffer badly when CPU-heavy work blocks the main thread.",
+      "exampleCode": "import { Worker } from 'node:worker_threads'\n\nfunction runHeavyJob() {\n  return new Worker(new URL('./worker.js', import.meta.url))\n}\n\n// main request handling stays responsive while CPU work moves away\nrunHeavyJob()",
+      "exampleLanguage": "ts",
       "commonTraps": [
         "answering simply yes or no without nuance",
         "assuming async automatically means multi-threaded execution"
@@ -41,6 +44,9 @@
         "cluster for multiple processes and core usage",
         "different tradeoffs around isolation and communication"
       ],
+      "learnMore": "Worker threads are about parallel computation inside one process. Cluster is about process-level scaling and isolation. That means the communication model, memory boundaries, and failure behavior are different.\n\nThe clean interview framing is: worker threads are usually about keeping CPU-heavy work off the main event loop, while cluster is usually about scaling request handling across cores with stronger isolation.",
+      "exampleCode": "import cluster from 'node:cluster'\nimport { Worker } from 'node:worker_threads'\n\nif (cluster.isPrimary) {\n  cluster.fork()\n}\n\nconst hashWorker = new Worker(new URL('./hash-worker.js', import.meta.url))",
+      "exampleLanguage": "ts",
       "commonTraps": [
         "treating them as interchangeable",
         "ignoring process isolation differences"

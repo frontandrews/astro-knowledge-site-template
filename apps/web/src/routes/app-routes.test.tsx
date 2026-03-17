@@ -95,6 +95,21 @@ describe('app routes', () => {
     ).toBeInTheDocument()
   })
 
+  it('shows learn-more notes and code examples for cards that include them', async () => {
+    const user = userEvent.setup()
+
+    renderApp(['/study/react-rendering-core?mode=start'])
+
+    await user.click(screen.getByRole('button', { name: 'Show answer' }))
+
+    expect(screen.getByText('Learn more')).toBeInTheDocument()
+    expect(
+      screen.getByText(/Derived state usually shows up when someone copies props into state/i),
+    ).toBeInTheDocument()
+    expect(screen.getByText('Code example')).toBeInTheDocument()
+    expect(screen.getByText(/const visibleUsers = users\.filter/i)).toBeInTheDocument()
+  })
+
   it('sends continue mode to success when every card has already been seen', async () => {
     const deck = getReactDeck()
     let store = createEmptyProgressStore()

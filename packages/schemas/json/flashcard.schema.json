@@ -47,6 +47,18 @@
         "minLength": 1
       }
     },
+    "learnMore": {
+      "type": "string",
+      "minLength": 1
+    },
+    "exampleCode": {
+      "type": "string",
+      "minLength": 1
+    },
+    "exampleLanguage": {
+      "type": "string",
+      "minLength": 1
+    },
     "commonTraps": {
       "type": "array",
       "items": {
