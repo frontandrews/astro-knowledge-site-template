@@ -157,6 +157,16 @@ function getShellConfig(pathname: string): ShellConfig {
     }
   }
 
+  if (segments[0] === 'mock-interview') {
+    return {
+      backLabel: 'Back home',
+      backTo: '/',
+      eyebrow: 'Mock interview',
+      mode: 'compact',
+      title: 'Mixed interview run',
+    }
+  }
+
   return {
     backLabel: 'Back home',
     backTo: '/',

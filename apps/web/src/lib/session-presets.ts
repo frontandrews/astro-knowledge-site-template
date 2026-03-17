@@ -1,6 +1,6 @@
 import type { Deck, DeckManifestEntry } from '@prepdeck/schemas'
 
-import { createStudyHref } from '@/lib/study-session'
+import { createMockInterviewHref, createStudyHref } from '@/lib/study-session'
 import { getTopicLabel } from '@/lib/topic-labels'
 
 type DeckCountsLike = {
@@ -21,7 +21,7 @@ type DeckRecordLike = {
 export type SessionPreset = {
   detail: string
   href: string
-  id: 'continue' | 'interview' | 'weak' | 'warmup'
+  id: 'continue' | 'interview' | 'mock' | 'weak' | 'warmup'
   label: string
   meta: string[]
   title: string
@@ -36,6 +36,8 @@ export function getSessionPresets(records: DeckRecordLike[]): SessionPreset[] {
     presets.push(createContinuePreset(continueRecord))
     usedDeckIds.add(continueRecord.deck.id)
   }
+
+  presets.push(createMockPreset())
 
   const interviewRecord = getInterviewRecord(records, usedDeckIds)
   if (interviewRecord) {
@@ -55,6 +57,18 @@ export function getSessionPresets(records: DeckRecordLike[]): SessionPreset[] {
   }
 
   return presets
+}
+
+function createMockPreset(): SessionPreset {
+  return {
+    detail:
+      'Rotate through multiple topics in one timed run so the session feels closer to a real screen.',
+    href: createMockInterviewHref(),
+    id: 'mock',
+    label: 'Start mock interview',
+    meta: ['Mixed topics', 'Interview mode', '5 prompts'],
+    title: 'Mixed mock interview',
+  }
 }
 
 function createContinuePreset(record: DeckRecordLike): SessionPreset {

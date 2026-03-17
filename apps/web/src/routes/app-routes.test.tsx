@@ -35,6 +35,7 @@ describe('app routes', () => {
     expect(screen.getByText('Ad-supported free plan')).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Session presets' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Continue latest' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Start mock interview' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Run interview rep' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Take a quick warm-up' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Mastery snapshot' })).toBeInTheDocument()
@@ -181,6 +182,26 @@ describe('app routes', () => {
     expect(screen.getByRole('button', { name: 'Strong' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Decent' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Needs work' })).toBeInTheDocument()
+  })
+
+  it('runs a mixed mock interview across multiple decks', async () => {
+    const user = userEvent.setup()
+    const deck = getReactDeck()
+    let store = createEmptyProgressStore()
+    store = setCardStatus(store, deck.id, deck.cards[1].id, 'partial')
+    seedProgress(store)
+
+    renderApp(['/mock-interview'])
+
+    expect(screen.getByText('Mixed topics')).toBeInTheDocument()
+    expect(screen.getByText('Mixed mock interview')).toBeInTheDocument()
+    expect(screen.getByText('React Rendering Core')).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'End early' }))
+    await user.click(screen.getByRole('button', { name: 'Reveal answer' }))
+
+    expect(screen.getByText('Strong answer')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /follow-up drill/i })).toBeInTheDocument()
   })
 
   it('walks interview follow-ups one prompt at a time', async () => {
