@@ -3,12 +3,10 @@ import { getCollection } from 'astro:content'
 
 import GuideMapCard from '../components/GuideMapCard.astro'
 import BaseLayout from '../layouts/BaseLayout.astro'
-import { getAppHref } from '../lib/app-links'
 import { buildGuideMap } from '../lib/guide-map'
 
 const posts = await getCollection('blog')
 const sections = buildGuideMap(posts)
-const explicitLinks = posts.reduce((total, post) => total + post.data.relationships.length, 0)
 ---
 
 <BaseLayout
@@ -20,16 +18,7 @@ const explicitLinks = posts.reduce((total, post) => total + post.data.relationsh
       <div class="page-toolbar__intro">
         <p class="section-eyebrow">Connection map</p>
         <h1 class="section-heading section-heading--compact">Map</h1>
-      </div>
-
-      <div class="page-toolbar__meta">
-        <span class="badge">{posts.length} guides</span>
-        <span class="badge">{explicitLinks} links</span>
-      </div>
-
-      <div class="page-toolbar__actions">
-        <a class="button-link button-link--primary" href="/">Tree</a>
-        <a class="button-link" href={getAppHref('/')}>Practice</a>
+        <p class="page-toolbar__copy">Explore related guides across categories.</p>
       </div>
     </div>
   </section>

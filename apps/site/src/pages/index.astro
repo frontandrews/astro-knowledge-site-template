@@ -3,7 +3,6 @@ import { getCollection } from 'astro:content'
 
 import GuideTreeNode from '../components/GuideTreeNode.astro'
 import BaseLayout from '../layouts/BaseLayout.astro'
-import { getAppHref } from '../lib/app-links'
 import { buildGuideTree } from '../lib/guide-tree'
 
 const posts = await getCollection('blog')
@@ -19,17 +18,7 @@ const guideTree = buildGuideTree(posts)
       <div class="page-toolbar__intro">
         <p class="section-eyebrow">Guide tree</p>
         <h1 class="section-heading section-heading--compact">Guides</h1>
-      </div>
-
-      <div class="page-toolbar__meta">
-        <span class="badge">{posts.length} guides</span>
-        <span class="badge">{guideTree.length} categories</span>
-      </div>
-
-      <div class="page-toolbar__actions">
-        <a class="button-link button-link--primary" href={getAppHref('/')}>Practice</a>
-        <a class="button-link" href="/map">Map</a>
-        <a class="button-link" href="/blog">List</a>
+        <p class="page-toolbar__copy">Read first. Test when you want to validate it.</p>
       </div>
     </div>
 
