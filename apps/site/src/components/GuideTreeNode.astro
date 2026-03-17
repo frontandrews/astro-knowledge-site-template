@@ -10,7 +10,6 @@ type Props = {
 
 const { node } = Astro.props
 const hasChildren = node.children.length > 0
-const shouldStartOpen = node.depth === 0
 const anchorId = `guide-node-${node.key.toLowerCase().replaceAll(/[^a-z0-9]+/g, '-')}`
 
 function getPrimaryDeckHref(post: CollectionEntry<'blog'>) {
@@ -24,65 +23,36 @@ function getPrimaryDeckHref(post: CollectionEntry<'blog'>) {
   data-guide-node={node.key}
   data-guide-post-ids={node.postIds.join(',')}
 >
-  {hasChildren ? (
-    <details class="guide-tree__details" data-guide-tree-details open={shouldStartOpen}>
-      <summary class="guide-tree__summary">
-        <div class="guide-tree__label-row" id={anchorId}>
-          <p class="guide-tree__label">{node.label}</p>
-          <span class="badge badge--progress" data-guide-progress={node.key}>0/{node.guideCount}</span>
-        </div>
-      </summary>
-
-      <div class="guide-tree__branch">
-        {node.posts.length > 0 ? (
-          <div class="guide-tree__posts">
-            {node.posts.map((post) => (
-              <article class="guide-tree__post" data-guide-post={post.id}>
-                <a class="guide-tree__post-link" href={`/blog/${post.id}`}>
-                  <h3 class="guide-tree__post-title">{post.data.title}</h3>
-                </a>
-                <div class="guide-tree__post-actions">
-                  <a class="button-link button-link--primary" href={`/blog/${post.id}`}>Read</a>
-                  {getPrimaryDeckHref(post) ? (
-                    <a class="button-link" href={getPrimaryDeckHref(post)!}>Test</a>
-                  ) : null}
-                </div>
-              </article>
-            ))}
-          </div>
-        ) : null}
-
-        <ul class="guide-tree">
-          {node.children.map((child) => (
-            <Astro.self node={child} />
-          ))}
-        </ul>
-      </div>
-    </details>
-  ) : (
-    <div class="guide-tree__branch">
-      <div class="guide-tree__label-row" id={anchorId}>
-        <p class="guide-tree__label">{node.label}</p>
-        <span class="badge badge--progress" data-guide-progress={node.key}>0/{node.guideCount}</span>
-      </div>
-
-      {node.posts.length > 0 ? (
-        <div class="guide-tree__posts">
-          {node.posts.map((post) => (
-            <article class="guide-tree__post" data-guide-post={post.id}>
-              <a class="guide-tree__post-link" href={`/blog/${post.id}`}>
-                <h3 class="guide-tree__post-title">{post.data.title}</h3>
-              </a>
-              <div class="guide-tree__post-actions">
-                <a class="button-link button-link--primary" href={`/blog/${post.id}`}>Read</a>
-                {getPrimaryDeckHref(post) ? (
-                  <a class="button-link" href={getPrimaryDeckHref(post)!}>Test</a>
-                ) : null}
-              </div>
-            </article>
-          ))}
-        </div>
-      ) : null}
+  <div class="guide-tree__branch">
+    <div class="guide-tree__label-row" id={anchorId}>
+      <p class="guide-tree__label">{node.label}</p>
+      <span class="badge badge--progress" data-guide-progress={node.key}>0/{node.guideCount}</span>
     </div>
-  )}
+
+    {node.posts.length > 0 ? (
+      <div class="guide-tree__posts">
+        {node.posts.map((post) => (
+          <article class="guide-tree__post" data-guide-post={post.id}>
+            <a class="guide-tree__post-link" href={`/blog/${post.id}`}>
+              <h3 class="guide-tree__post-title">{post.data.title}</h3>
+            </a>
+            <div class="guide-tree__post-actions">
+              <a class="button-link button-link--primary" href={`/blog/${post.id}`}>Read</a>
+              {getPrimaryDeckHref(post) ? (
+                <a class="button-link" href={getPrimaryDeckHref(post)!}>Test</a>
+              ) : null}
+            </div>
+          </article>
+        ))}
+      </div>
+    ) : null}
+
+    {hasChildren ? (
+      <ul class="guide-tree">
+        {node.children.map((child) => (
+          <Astro.self node={child} />
+        ))}
+      </ul>
+    ) : null}
+  </div>
 </li>

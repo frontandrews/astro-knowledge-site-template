@@ -1,15 +1,15 @@
 :root {
   --radius: 0.5rem;
   --site-bg: #fefefe;
-  --site-surface: #4d91e9;
+  --site-surface: hwb(210 85% 14%);
   --site-surface-strong: #fae583;
   --site-line: #000;
   --site-line-strong: #000;
   --site-ink: #000;
   --site-ink-soft: rgba(0, 0, 0, 0.78);
   --site-ink-muted: rgba(0, 0, 0, 0.58);
-  --site-accent: #c4cf5c;
-  --site-accent-soft: #83c2fa;
+ --site-accent: #c7d8ff;
+  --site-accent-soft: #fae583;
   --site-success: #3f8f63;
   color: var(--site-ink);
   font-family:
@@ -153,13 +153,12 @@ pre {
 
 .site-theme-toggle {
   cursor: pointer;
-  min-width: 2.9rem;
-  padding-inline: 0.8rem;
+  gap: 0.45rem;
 }
 
 .site-theme-toggle__icon {
-  width: 1.1rem;
-  height: 1.1rem;
+  width: 0.9rem;
+  height: 0.9rem;
   flex-shrink: 0;
 }
 
@@ -416,51 +415,6 @@ pre {
 .guide-tree__branch {
   display: grid;
   gap: 0.9rem;
-}
-
-.guide-tree__details {
-  display: grid;
-  gap: 0.9rem;
-}
-
-.guide-tree__summary {
-  list-style: none;
-  cursor: pointer;
-}
-
-.guide-tree__summary::-webkit-details-marker {
-  display: none;
-}
-
-.guide-tree__summary::marker {
-  content: "";
-}
-
-.guide-tree__summary .guide-tree__label-row {
-  position: relative;
-  padding-left: 1.8rem;
-}
-
-.guide-tree__summary .guide-tree__label-row::before {
-  content: "+";
-  position: absolute;
-  left: 0;
-  top: 0.05rem;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.1rem;
-  height: 1.1rem;
-  border: 2px solid var(--site-line);
-  border-radius: calc(var(--radius) * 0.5);
-  color: var(--site-line-strong);
-  font-size: 0.85rem;
-  font-weight: 900;
-  line-height: 1;
-}
-
-.guide-tree__details[open] > .guide-tree__summary .guide-tree__label-row::before {
-  content: "−";
 }
 
 .guide-tree__label-row {

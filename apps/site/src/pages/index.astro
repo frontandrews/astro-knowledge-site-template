@@ -112,7 +112,7 @@ const guideTree = buildGuideTree(posts)
     const hasFilter = activeCategories.size > 0
 
     rootNodes.forEach((node) => {
-      const label = node.querySelector(':scope > details > summary .guide-tree__label, :scope > .guide-tree__branch .guide-tree__label')?.textContent?.trim()
+      const label = node.querySelector(':scope > .guide-tree__branch > .guide-tree__label-row .guide-tree__label')?.textContent?.trim()
       const shouldShow = !hasFilter || (label && activeCategories.has(label))
       node.toggleAttribute('hidden', !shouldShow)
     })
