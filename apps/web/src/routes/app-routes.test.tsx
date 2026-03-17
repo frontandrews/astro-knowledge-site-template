@@ -389,6 +389,31 @@ describe('app routes', () => {
     ).toBeInTheDocument()
   })
 
+  it('filters review cards by search and note-only mode', async () => {
+    const user = userEvent.setup()
+    const deck = getReactDeck()
+    let store = createEmptyProgressStore()
+    store = setCardStatus(store, deck.id, deck.cards[0].id, 'learned')
+    store = setCardStatus(store, deck.id, deck.cards[1].id, 'learned')
+    store = setCardNote(store, deck.id, deck.cards[0].id, 'Lead with sync bugs and source of truth')
+    seedProgress(store)
+
+    renderApp(['/decks/react-rendering-core/review'])
+
+    const searchField = screen.getByLabelText('Search current bucket')
+    await user.type(searchField, 'sync bugs')
+
+    expect(screen.getByText(deck.cards[0].question)).toBeInTheDocument()
+    expect(screen.queryByText(deck.cards[1].question)).not.toBeInTheDocument()
+
+    await user.clear(searchField)
+    await user.click(screen.getByRole('button', { name: 'Has notes' }))
+
+    expect(screen.getByText('Showing 1 of 2 cards in this bucket.')).toBeInTheDocument()
+    expect(screen.getByText(deck.cards[0].question)).toBeInTheDocument()
+    expect(screen.queryByText(deck.cards[1].question)).not.toBeInTheDocument()
+  })
+
   it('migrates previously saved progress data into the current store on app load', () => {
     const deck = getReactDeck()
 
