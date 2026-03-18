@@ -58,7 +58,6 @@ const guideTree = buildGuideTree(posts)
 </BaseLayout>
 
 <script is:inline>
-  const allNodes = [...document.querySelectorAll('[data-guide-node]')]
   const rootNodes = [...document.querySelectorAll('.guide-tree--root > [data-guide-node]')]
   const categoryButtons = [...document.querySelectorAll('[data-tree-filter]')]
   const activeCategories = new Set()
@@ -70,24 +69,7 @@ const guideTree = buildGuideTree(posts)
     }
   })()
 
-  const syncGuideProgress = () => {
-    allNodes.forEach((node) => {
-      const ids = (node.getAttribute('data-guide-post-ids') || '').split(',').filter(Boolean)
-      const completed = ids.filter((id) => completedGuides.has(id)).length
-      const progress = node.querySelector('[data-guide-progress]')
-
-      if (progress) {
-        progress.textContent = ids.length === 0
-          ? 'Coming soon'
-          : completed === 0
-            ? 'Not started'
-            : completed === ids.length
-              ? 'Completed'
-              : 'Learning'
-        progress.classList.toggle('badge--complete', completed === ids.length && ids.length > 0)
-      }
-    })
-
+  const syncCompletedPosts = () => {
     document.querySelectorAll('[data-guide-post]').forEach((post) => {
       const id = post.getAttribute('data-guide-post')
       post.classList.toggle('guide-tree__post--complete', Boolean(id && completedGuides.has(id)))
@@ -123,6 +105,6 @@ const guideTree = buildGuideTree(posts)
     })
   })
 
-  syncGuideProgress()
+  syncCompletedPosts()
   applyTreeFilter()
 </script>

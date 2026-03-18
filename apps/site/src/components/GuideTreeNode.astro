@@ -28,7 +28,6 @@ function getPrimaryDeckHref(post: CollectionEntry<'guides'>) {
   <div class="guide-tree__branch">
     <div class="guide-tree__label-row" id={anchorId}>
       <p class="guide-tree__label">{node.label}</p>
-      <span class="badge badge--progress" data-guide-progress={node.key}>Not started</span>
     </div>
 
     {node.posts.length > 0 ? (
