@@ -11,6 +11,7 @@ type Props = {
 
 const { node } = Astro.props
 const hasChildren = node.children.length > 0
+const isEmptyLeaf = node.posts.length === 0 && !hasChildren
 const anchorId = `guide-node-${node.key.toLowerCase().replaceAll(/[^a-z0-9]+/g, '-')}`
 
 function getPrimaryDeckHref(post: CollectionEntry<'guides'>) {
@@ -47,6 +48,8 @@ function getPrimaryDeckHref(post: CollectionEntry<'guides'>) {
         ))}
       </div>
     ) : null}
+
+    {isEmptyLeaf ? <p class="guide-tree__placeholder">Coming soon</p> : null}
 
     {hasChildren ? (
       <ul class="guide-tree">

@@ -1,10 +1,10 @@
 ---
 import { getCollection } from 'astro:content'
-import { getGuideSectionSegment, PATH_TO_SENIOR_PILLARS, SUPPORTED_GUIDE_LOCALES } from '@prepdeck/content'
+import { getGuideSectionSegment, SUPPORTED_GUIDE_LOCALES } from '@prepdeck/content'
 
-import ArticleCard from '../../../components/ArticleCard.astro'
+import GuideTreeNode from '../../../components/GuideTreeNode.astro'
 import BaseLayout from '../../../layouts/BaseLayout.astro'
-import { sortGuides } from '../../../lib/guide-tree'
+import { buildGuideTree } from '../../../lib/guide-tree'
 
 export async function getStaticPaths() {
   return SUPPORTED_GUIDE_LOCALES.map((locale) => ({
@@ -16,13 +16,12 @@ export async function getStaticPaths() {
 }
 
 const { locale = 'en' } = Astro.params
-const posts = sortGuides(
+const posts = (
   (await getCollection('guides')).filter(
     (post) => post.data.locale === locale && post.data.status !== 'archived',
-  ),
+  )
 )
-const categories = [...new Set(posts.map((post) => post.data.category))]
-const topics = [...new Set(posts.map((post) => post.data.topic).filter(Boolean))]
+const guideTree = buildGuideTree(posts)
 ---
 
 <BaseLayout
@@ -37,221 +36,93 @@ const topics = [...new Set(posts.map((post) => post.data.topic).filter(Boolean))
       </div>
     </div>
 
-    {posts.length > 0 ? (
-      <div class="panel guide-directory-controls">
-        <div class="guide-directory-controls__grid">
-          <label class="guide-directory-search">
-            <input
-              class="guide-directory-search__input"
-              data-guide-search
-              name="search"
-              placeholder="React, RAG, standups, scope..."
-              type="search"
-            />
-          </label>
-
-          <div>
-            <div class="meta-list" data-guide-filter-group="category">
-              <button class="guide-filter-chip guide-filter-chip--active" data-filter-value="all" type="button">
-                All
-              </button>
-              {categories.map((category) => (
-                <button class="guide-filter-chip" data-filter-value={category} type="button">
-                  {category}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <div class="meta-list" data-guide-filter-group="topic">
-              <button class="guide-filter-chip guide-filter-chip--active" data-filter-value="all" type="button">
-                All
-              </button>
-              {topics.map((topic) => (
-                <button class="guide-filter-chip" data-filter-value={topic} type="button">
-                  {topic}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <div class="meta-list" data-guide-filter-group="practice">
-              <button class="guide-filter-chip guide-filter-chip--active" data-filter-value="all" type="button">
-                All
-              </button>
-              <button class="guide-filter-chip" data-filter-value="with-practice" type="button">
-                Has practice deck
-              </button>
-              <button class="guide-filter-chip" data-filter-value="reading-only" type="button">
-                Reading only
-              </button>
-            </div>
-          </div>
-        </div>
+    <div class="tree-controls tree-controls--compact">
+      <p class="section-eyebrow">Filter by category</p>
+      <div class="meta-list">
+        {guideTree.map((node) => (
+          <button class="guide-filter-chip" data-tree-filter={node.label} type="button">
+            {node.label}
+          </button>
+        ))}
       </div>
-    ) : null}
+    </div>
   </section>
 
-  {posts.length > 0 ? categories.map((category) => (
-    <section class="section section--compact" data-guide-section={category}>
-      <h2 class="section-heading section-heading--compact">{category}</h2>
-      <div class="panel-grid panel-grid--articles">
-        {posts
-          .filter((post) => post.data.category === category)
-          .map((post) => (
-            <div
-              data-guide-card
-              data-guide-category={post.data.category}
-              data-guide-has-practice={post.data.relatedDeckIds.length > 0 ? 'true' : 'false'}
-              data-guide-search={`${post.data.title} ${post.data.summary} ${post.data.category} ${post.data.topic ?? ''} ${post.data.tags.join(' ')} ${post.data.path.join(' ')}`.toLowerCase()}
-              data-guide-topic={post.data.topic ?? ''}
-            >
-              <ArticleCard post={post} />
-            </div>
-          ))}
-      </div>
-    </section>
-  )) : (
-    <section class="section section--compact">
-      <div class="panel empty-state-panel">
-        <h2 class="section-heading section-heading--compact">No active guides yet for this language.</h2>
-        <p class="section-copy">The new path is being rebuilt. These are the pillars the next guides will follow.</p>
-        <ul class="planned-pillar-list">
-          {PATH_TO_SENIOR_PILLARS.map((pillar) => (
-            <li>
-              <strong>{pillar.order}. {pillar.title}</strong>
-              <span>{pillar.summary}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </section>
-  )}
-
-  {posts.length > 0 ? (
-    <section class="section guide-directory-empty" data-guide-empty hidden>
-      <div class="panel">
-        <h2 class="section-heading section-heading--compact">No guides match the current filters.</h2>
-        <p class="section-copy">
-          Clear one filter or widen the search to reopen the full directory.
-        </p>
-      </div>
-    </section>
-  ) : null}
+  <section class="section section--compact">
+    <ul class="guide-tree guide-tree--root">
+      {guideTree.map((node) => (
+        <GuideTreeNode node={node} />
+      ))}
+    </ul>
+  </section>
 </BaseLayout>
 
 <script is:inline>
-  const searchInput = document.querySelector('[data-guide-search]')
-  const guideCards = [...document.querySelectorAll('[data-guide-card]')]
-  const guideSections = [...document.querySelectorAll('[data-guide-section]')]
-  const emptyState = document.querySelector('[data-guide-empty]')
-  const url = new URL(window.location.href)
-  const filters = {
-    category: url.searchParams.get('category') || 'all',
-    topic: url.searchParams.get('topic') || 'all',
-    practice: url.searchParams.get('practice') || 'all',
-  }
+  const allNodes = [...document.querySelectorAll('[data-guide-node]')]
+  const rootNodes = [...document.querySelectorAll('.guide-tree--root > [data-guide-node]')]
+  const categoryButtons = [...document.querySelectorAll('[data-tree-filter]')]
+  const activeCategories = new Set()
+  const completedGuides = (() => {
+    try {
+      return new Set(JSON.parse(window.localStorage.getItem('prepdeck.site.completed-guides.v1') || '[]'))
+    } catch {
+      return new Set()
+    }
+  })()
 
-  if (searchInput instanceof HTMLInputElement) {
-    searchInput.value = url.searchParams.get('q') || ''
-  }
+  const syncGuideProgress = () => {
+    allNodes.forEach((node) => {
+      const ids = (node.getAttribute('data-guide-post-ids') || '').split(',').filter(Boolean)
+      const completed = ids.filter((id) => completedGuides.has(id)).length
+      const progress = node.querySelector('[data-guide-progress]')
 
-  const applyFilters = () => {
-    let visibleCards = 0
-    const query = (searchInput instanceof HTMLInputElement ? searchInput.value : '').trim().toLowerCase()
-
-    guideCards.forEach((card) => {
-      const category = card.getAttribute('data-guide-category') ?? ''
-      const topic = card.getAttribute('data-guide-topic') ?? ''
-      const hasPractice = card.getAttribute('data-guide-has-practice') === 'true'
-      const searchText = card.getAttribute('data-guide-search') ?? ''
-
-      const matchesCategory = filters.category === 'all' || category === filters.category
-      const matchesTopic = filters.topic === 'all' || topic === filters.topic
-      const matchesPractice =
-        filters.practice === 'all' ||
-        (filters.practice === 'with-practice' && hasPractice) ||
-        (filters.practice === 'reading-only' && !hasPractice)
-      const matchesQuery = !query || searchText.includes(query)
-      const isVisible = matchesCategory && matchesTopic && matchesPractice && matchesQuery
-
-      card.toggleAttribute('hidden', !isVisible)
-
-      if (isVisible) {
-        visibleCards += 1
+      if (progress) {
+        progress.textContent = ids.length === 0
+          ? 'Coming soon'
+          : completed === 0
+            ? 'Not started'
+            : completed === ids.length
+              ? 'Completed'
+              : 'Learning'
+        progress.classList.toggle('badge--complete', completed === ids.length && ids.length > 0)
       }
     })
 
-    guideSections.forEach((section) => {
-      const visibleChildren = section.querySelectorAll('[data-guide-card]:not([hidden])').length
-      section.toggleAttribute('hidden', visibleChildren === 0)
+    document.querySelectorAll('[data-guide-post]').forEach((post) => {
+      const id = post.getAttribute('data-guide-post')
+      post.classList.toggle('guide-tree__post--complete', Boolean(id && completedGuides.has(id)))
     })
+  }
 
-    if (emptyState) {
-      emptyState.toggleAttribute('hidden', visibleCards !== 0)
-    }
+  const applyTreeFilter = () => {
+    const hasFilter = activeCategories.size > 0
 
-    const nextUrl = new URL(window.location.href)
+    rootNodes.forEach((node) => {
+      const label = node.querySelector(':scope > .guide-tree__branch > .guide-tree__label-row .guide-tree__label')?.textContent?.trim()
+      const shouldShow = !hasFilter || (label && activeCategories.has(label))
+      node.toggleAttribute('hidden', !shouldShow)
+    })
+  }
 
-    if (query) {
-      nextUrl.searchParams.set('q', query)
-    } else {
-      nextUrl.searchParams.delete('q')
-    }
+  categoryButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      const value = button.getAttribute('data-tree-filter')
 
-    ;(['category', 'topic', 'practice']).forEach((key) => {
-      const value = filters[key]
+      if (!value) {
+        return
+      }
 
-      if (value && value !== 'all') {
-        nextUrl.searchParams.set(key, value)
+      if (activeCategories.has(value)) {
+        activeCategories.delete(value)
       } else {
-        nextUrl.searchParams.delete(key)
+        activeCategories.add(value)
       }
-    })
 
-    window.history.replaceState({}, '', `${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`)
-  }
-
-  document.querySelectorAll('[data-guide-filter-group]').forEach((group) => {
-    const filterGroup = group.getAttribute('data-guide-filter-group')
-    const currentValue = filterGroup ? filters[filterGroup] : 'all'
-
-    group.querySelectorAll('.guide-filter-chip').forEach((button) => {
-      const isActive = button.getAttribute('data-filter-value') === currentValue
-      button.classList.toggle('guide-filter-chip--active', isActive)
+      button.classList.toggle('guide-filter-chip--active', activeCategories.has(value))
+      applyTreeFilter()
     })
   })
 
-  document.querySelectorAll('[data-guide-filter-group]').forEach((group) => {
-    group.addEventListener('click', (event) => {
-      const target = event.target
-
-      if (!(target instanceof HTMLButtonElement)) {
-        return
-      }
-
-      const filterGroup = group.getAttribute('data-guide-filter-group')
-      const filterValue = target.getAttribute('data-filter-value')
-
-      if (!filterGroup || !filterValue) {
-        return
-      }
-
-      filters[filterGroup] = filterValue
-
-      group.querySelectorAll('.guide-filter-chip').forEach((button) => {
-        button.classList.toggle('guide-filter-chip--active', button === target)
-      })
-
-      applyFilters()
-    })
-  })
-
-  if (searchInput instanceof HTMLInputElement) {
-    searchInput.addEventListener('input', applyFilters)
-  }
-
-  applyFilters()
+  syncGuideProgress()
+  applyTreeFilter()
 </script>
