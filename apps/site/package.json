@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "build": "astro build",
+    "build": "astro build && pagefind --site dist",
     "check": "astro check",
     "dev": "astro dev",
     "preview": "astro preview"
@@ -19,6 +19,7 @@
     "@astrojs/check": "^0.9.8",
     "@astrojs/sitemap": "^3.7.1",
     "astro": "^6.0.5",
+    "pagefind": "^1.4.0",
     "typescript": "^5.9.3"
   }
 }

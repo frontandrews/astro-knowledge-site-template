@@ -1,41 +1,38 @@
 ---
 import type { CollectionEntry } from 'astro:content'
 import { getGuideHrefFromEntry } from '../lib/guide-links'
-import { getSiteCopy } from '../lib/site-copy'
 
 type Props = {
   categoryLabel?: string
   className?: string
   eyebrow?: string
+  meta?: string
   post: CollectionEntry<'guides'>
+  subtitle?: string
+  variant?: 'minimal' | 'rich'
 }
 
 const {
   categoryLabel,
   className,
   eyebrow,
+  meta,
   post,
+  subtitle = post.data.description,
+  variant = 'minimal',
 } = Astro.props
 const href = getGuideHrefFromEntry(post)
-const copy = getSiteCopy(post.data.locale)
 ---
 
 <article
-  class:list={['panel', 'article-card', className]}
+  class:list={['article-card', `article-card--${variant}`, className]}
   data-guide-card-category={categoryLabel}
   data-guide-post={post.data.guideId}
 >
   <a class="article-card__link" href={href}>
-    <div class="article-card__body">
-      {eyebrow ? <p class="article-card__eyebrow">{eyebrow}</p> : null}
-      <h3 class="article-card__title">{post.data.title}</h3>
-      <p class="article-card__summary">{post.data.description}</p>
-    </div>
-    <div class="article-card__footer">
-      <span class="article-card__cta">
-        <span>{copy.learn}</span>
-        <span aria-hidden="true">→</span>
-      </span>
-    </div>
+    {eyebrow ? <p class="article-card__eyebrow">{eyebrow}</p> : null}
+    <h3 class="article-card__title">{post.data.title}</h3>
+    {variant === 'rich' && subtitle ? <p class="article-card__subtitle">{subtitle}</p> : null}
+    {variant === 'rich' && meta ? <p class="article-card__meta">{meta}</p> : null}
   </a>
 </article>

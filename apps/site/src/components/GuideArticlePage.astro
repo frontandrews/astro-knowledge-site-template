@@ -3,6 +3,7 @@ import type { CollectionEntry } from 'astro:content'
 import { getCollection, render } from 'astro:content'
 
 import BaseLayout from '../layouts/BaseLayout.astro'
+import { getGuideEditorialContext } from '../lib/editorial-roadmaps'
 import { formatEditorialDate } from '../lib/format-date'
 import { getGuideHrefFromEntry } from '../lib/guide-links'
 import { getGuideBreadcrumb } from '../lib/guide-taxonomy'
@@ -38,6 +39,7 @@ const portugueseHref =
     : portugueseVersion
       ? getGuideHrefFromEntry(portugueseVersion)
       : null
+const editorialContext = getGuideEditorialContext(post, allGuideEntries)
 const connectedPosts = activePosts.filter((entry) => {
   if (entry.data.guideId === post.data.guideId) {
     return false
@@ -70,11 +72,8 @@ const siblingPosts = activePosts
     return entry.data.pillarId === post.data.pillarId && entry.data.branchId === post.data.branchId
   })
   .slice(0, 3)
-const currentIndex = activePosts.findIndex((entry) => entry.data.guideId === post.data.guideId)
-const previousPost = currentIndex >= 0 ? activePosts[currentIndex + 1] ?? null : null
-const nextPost = currentIndex > 0 ? activePosts[currentIndex - 1] ?? null : null
 const nextReads = [...new Map(
-  [nextPost, previousPost, ...connectedPosts, ...siblingPosts, ...relatedPosts]
+  [...connectedPosts, ...siblingPosts, ...relatedPosts]
     .filter((entry): entry is NonNullable<typeof entry> => Boolean(entry))
     .filter((entry) => entry.data.guideId !== post.data.guideId)
     .map((entry) => [entry.data.guideId, entry]),
@@ -113,6 +112,33 @@ const dateLocale = post.data.locale === 'pt-br' ? 'pt-BR' : 'en-US'
           ) : null}
         </div>
       </div>
+
+      {editorialContext ? (
+        <div class="article-roadmap-banner">
+          <div class="article-roadmap-banner__copy">
+            <p class="section-eyebrow">{copy.startHere.roadmapEyebrow}</p>
+            <h2 class="section-heading section-heading--compact">{editorialContext.roadmap.title}</h2>
+            <p class="page-toolbar__copy">
+              {copy.startHere.stepLabel} {editorialContext.stepIndex} / {editorialContext.totalSteps}
+            </p>
+          </div>
+          <div class="article-roadmap-banner__actions">
+            <a class="article-roadmap-banner__link" href={editorialContext.roadmap.href}>
+              {copy.startHere.backToRoadmap}
+            </a>
+            {editorialContext.previousArticle ? (
+              <a class="article-roadmap-banner__link" href={editorialContext.previousArticle.href}>
+                {copy.startHere.previousArticle}
+              </a>
+            ) : null}
+            {editorialContext.nextArticle ? (
+              <a class="article-roadmap-banner__link" href={editorialContext.nextArticle.href}>
+                {copy.startHere.nextArticle}
+              </a>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
     </header>
 
     <div class="article-prose">
@@ -139,9 +165,8 @@ const dateLocale = post.data.locale === 'pt-br' ? 'pt-BR' : 'en-US'
         </div>
         <div class="panel-grid panel-grid--next-reads">
           {nextReads.map((entry) => (
-            <a class="panel next-read-card" href={getGuideHrefFromEntry(entry)}>
+            <a class="next-read-card" href={getGuideHrefFromEntry(entry)}>
               <h3>{entry.data.title}</h3>
-              <p class="article-excerpt">{entry.data.description}</p>
             </a>
           ))}
         </div>

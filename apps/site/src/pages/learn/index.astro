@@ -1,17 +1,17 @@
 ---
 import { getCollection } from 'astro:content'
 
-import GuideTreeNode from '../../components/GuideTreeNode.astro'
+import ArticleCard from '../../components/ArticleCard.astro'
 import BaseLayout from '../../layouts/BaseLayout.astro'
+import { formatEditorialDate } from '../../lib/format-date'
 import { getGuideIndexHref } from '../../lib/guide-links'
-import { getTranslatedSiteLabel } from '../../lib/site-labels'
-import { buildGuideTree, sortGuides } from '../../lib/guide-tree'
+import { getGuideTaxonomy, getLocalizedPillarLabel } from '../../lib/guide-taxonomy'
+import { sortGuides } from '../../lib/guide-tree'
 import { getSiteCopy } from '../../lib/site-copy'
 
 const posts = sortGuides((await getCollection('guides')).filter(
   (post) => post.data.status !== 'archived' && post.data.locale === 'en',
 ))
-const guideTree = buildGuideTree(posts, 'en')
 const filterTones = [
   { dark: '#24364f', light: '#dbeafe' },
   { dark: '#2d3358', light: '#dbe4ff' },
@@ -21,6 +21,19 @@ const filterTones = [
   { dark: '#274737', light: '#e2f2ea' },
 ]
 const copy = getSiteCopy('en')
+const guideCards = posts.map((post) => {
+  const { pillar } = getGuideTaxonomy(post)
+
+  return {
+    filterId: pillar?.id ?? 'other',
+    filterLabel: pillar ? getLocalizedPillarLabel(pillar, 'en') : 'Other',
+    meta: formatEditorialDate(post.data.pubDate, 'en-US'),
+    post,
+  }
+})
+const filters = [...new Map(guideCards.map((entry) => [entry.filterId, entry.filterLabel])).entries()].map(
+  ([id, label]) => ({ id, label }),
+)
 ---
 
 <BaseLayout
@@ -39,33 +52,39 @@ const copy = getSiteCopy('en')
     <div class="tree-controls tree-controls--compact">
       <p class="section-eyebrow">{copy.guideIndex.filterLabel}</p>
       <div class="meta-list">
-        {guideTree.map((node, index) => {
+        {filters.map((filter, index) => {
           const tone = filterTones[index % filterTones.length]
 
           return (
             <button
               class="guide-filter-chip"
-              data-tree-filter={node.label}
+              data-tree-filter={filter.id}
               style={`--chip-accent: ${tone.light}; --chip-accent-dark: ${tone.dark};`}
               type="button"
             >
-              <span>{getTranslatedSiteLabel(node.label, 'en')}</span>
+              <span>{filter.label}</span>
             </button>
           )
         })}
       </div>
     </div>
 
-    <ul class="guide-tree guide-tree--root">
-      {guideTree.map((node) => (
-        <GuideTreeNode locale="en" node={node} />
+    <div class="guide-directory-list">
+      {guideCards.map(({ filterId, meta, post }) => (
+        <ArticleCard
+          categoryLabel={filterId}
+          className="guide-directory-list__item"
+          meta={meta}
+          post={post}
+          variant="rich"
+        />
       ))}
-    </ul>
+    </div>
   </section>
 </BaseLayout>
 
 <script is:inline>
-  const rootNodes = [...document.querySelectorAll('.guide-tree--root > [data-guide-node]')]
+  const cards = [...document.querySelectorAll('.guide-directory-list [data-guide-post]')]
   const categoryButtons = [...document.querySelectorAll('[data-tree-filter]')]
   let activeCategory = null
   const completedGuides = (() => {
@@ -86,8 +105,8 @@ const copy = getSiteCopy('en')
   const applyTreeFilter = () => {
     const hasFilter = Boolean(activeCategory)
 
-    rootNodes.forEach((node) => {
-      const label = node.getAttribute('data-guide-node-label')
+    cards.forEach((node) => {
+      const label = node.getAttribute('data-guide-card-category')
       const shouldShow = !hasFilter || label === activeCategory
       node.toggleAttribute('hidden', !shouldShow)
     })

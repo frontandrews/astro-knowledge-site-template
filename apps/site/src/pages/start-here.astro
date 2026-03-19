@@ -1,0 +1,15 @@
+---
+import { getCollection } from 'astro:content'
+
+import StartHerePage from '../components/StartHerePage.astro'
+import { resolveEditorialRoadmap } from '../lib/editorial-roadmaps'
+
+const guides = await getCollection('guides')
+const roadmap = resolveEditorialRoadmap('en', guides)
+
+if (!roadmap) {
+  throw new Error('Primary editorial roadmap could not be resolved for en.')
+}
+---
+
+<StartHerePage locale="en" roadmap={roadmap} />

@@ -33,18 +33,9 @@ const selectionLabel = locale === 'pt-br' ? 'Escolha um termo' : 'Select a term'
     <p class="section-eyebrow">{selectionLabel}</p>
     <div class="panel-grid panel-grid--articles">
       {terms.map((term) => (
-        <article class="panel article-card">
+        <article class="article-card">
           <a class="article-card__link" href={getGlossaryHrefFromEntry(term)}>
-            <div class="article-card__body">
-              <h3 class="article-card__title">{term.data.title}</h3>
-              <p class="article-card__summary">{term.data.description}</p>
-            </div>
-            <div class="article-card__footer">
-              <span class="article-card__cta">
-                <span>{selectionLabel}</span>
-                <span aria-hidden="true">→</span>
-              </span>
-            </div>
+            <h3 class="article-card__title">{term.data.title}</h3>
           </a>
         </article>
       ))}

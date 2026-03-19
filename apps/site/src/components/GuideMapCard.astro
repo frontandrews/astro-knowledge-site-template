@@ -1,28 +1,19 @@
 ---
-import { getAppHref } from '../lib/app-links'
 import type { GuideMapItem } from '../lib/guide-map'
-import { getSiteCopy } from '../lib/site-copy'
 
 type Props = {
   item: GuideMapItem
 }
 
 const { item } = Astro.props
-const primaryDeckId = item.relatedDeckIds[0] ?? null
-const copy = getSiteCopy(item.routePath.startsWith('pt-br/') ? 'pt-br' : 'en')
 ---
 
-<article class="panel guide-map-card">
+<article class="guide-map-card">
   <p class="section-eyebrow">{item.path.join(' / ')}</p>
 
-  <h3>{item.title}</h3>
-
-  <div class="meta-list">
-    <a class="button-link button-link--primary" href={`/${item.routePath}`}>{copy.learn}</a>
-    {primaryDeckId ? (
-      <a class="button-link" href={getAppHref(`/decks/${primaryDeckId}`)}>{copy.article.practice}</a>
-    ) : null}
-  </div>
+  <a class="article-card__link" href={`/${item.routePath}`}>
+    <h3>{item.title}</h3>
+  </a>
 
   {item.connections.length > 0 ? (
     <div class="guide-map-card__connections">

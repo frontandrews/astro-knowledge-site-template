@@ -3,7 +3,11 @@ import '../styles/global.css'
 import { Icon } from 'astro-icon/components'
 
 import { getGuideIndexHref, getGuideLocaleFromPathname } from '../lib/guide-links'
+import { getGlossaryIndexHref } from '../lib/glossary-links'
+import { getSearchHref } from '../lib/search-links'
 import { getSiteCopy } from '../lib/site-copy'
+import { getStartHereHref } from '../lib/start-here-links'
+import { getTopicIndexHref } from '../lib/topic-links'
 
 type Props = {
   description: string
@@ -26,13 +30,21 @@ const copy = getSiteCopy(guideLocale)
 const englishGuideIndexHref = englishHref ?? getGuideIndexHref('en')
 const portugueseGuideIndexHref = portugueseHref ?? getGuideIndexHref('pt-br')
 const homeHref = guideLocale === 'pt-br' ? '/pt-br' : '/'
+const startHereHref = getStartHereHref(guideLocale)
+const learnHref = getGuideIndexHref(guideLocale)
+const topicsHref = getTopicIndexHref(guideLocale)
+const glossaryHref = getGlossaryIndexHref(guideLocale)
+const searchHref = getSearchHref(guideLocale)
 const currentYear = new Date().getFullYear()
 const alternateLocale = guideLocale === 'pt-br' ? 'en' : 'pt-br'
 const localeRedirectHref = guideLocale === 'pt-br' ? englishGuideIndexHref : portugueseGuideIndexHref
+const isStartHerePage = pathname === startHereHref
+const isLearnPage = pathname === learnHref || pathname.startsWith(`${learnHref}/`)
+const isSearchPage = pathname === searchHref
 ---
 
 <!doctype html>
-<html lang={guideLocale === 'pt-br' ? 'pt-BR' : 'en'}>
+<html class="dark" lang={guideLocale === 'pt-br' ? 'pt-BR' : 'en'}>
   <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1" name="viewport" />
@@ -50,12 +62,7 @@ const localeRedirectHref = guideLocale === 'pt-br' ? englishGuideIndexHref : por
     <meta content="summary_large_image" name="twitter:card" />
     <meta content={pageTitle} name="twitter:title" />
     <meta content={description} name="twitter:description" />
-    <script is:inline>
-      try {
-        const storedTheme = window.localStorage.getItem('seniorpath.site.theme.v1')
-        document.documentElement.classList.toggle('dark', storedTheme !== 'light')
-      } catch {}
-    </script>
+    <slot name="head" />
   </head>
   <body data-locale-alternate={alternateLocale} data-locale-redirect-href={localeRedirectHref}>
     <header class="site-header">
@@ -66,6 +73,17 @@ const localeRedirectHref = guideLocale === 'pt-br' ? englishGuideIndexHref : por
             </span>
             <span class="site-brand__label">{copy.header.brand}</span>
           </a>
+          <nav aria-label="Primary" class="site-nav">
+            <a class:list={['site-nav__link', isStartHerePage && 'site-nav__link--active']} href={startHereHref}>
+              {copy.layout.startHere}
+            </a>
+            <a class:list={['site-nav__link', isLearnPage && 'site-nav__link--active']} href={learnHref}>
+              {copy.learn}
+            </a>
+            <a class:list={['site-nav__link', isSearchPage && 'site-nav__link--active']} href={searchHref}>
+              {copy.layout.search}
+            </a>
+          </nav>
           <div class="site-header__actions">
             <div aria-label="Language switcher" class="site-lang-switcher">
               <a
@@ -87,16 +105,12 @@ const localeRedirectHref = guideLocale === 'pt-br' ? englishGuideIndexHref : por
                 PT
               </a>
             </div>
-            <button aria-label={copy.layout.themeToggle} class="site-theme-toggle" data-theme-toggle type="button">
-              <Icon aria-hidden="true" class="site-theme-toggle__icon site-theme-toggle__icon--sun" name="lucide:sun" />
-              <Icon aria-hidden="true" class="site-theme-toggle__icon site-theme-toggle__icon--moon" name="lucide:moon" />
-            </button>
           </div>
       </div>
     </header>
-    <div class="site-shell">
+    <main class="site-shell" data-pagefind-body>
       <slot />
-    </div>
+    </main>
     <footer class="site-footer">
       <div class="site-frame site-footer__main">
           <div class="site-footer__intro">
@@ -110,11 +124,15 @@ const localeRedirectHref = guideLocale === 'pt-br' ? englishGuideIndexHref : por
           </div>
           <div class="site-footer__group">
             <div class="site-footer__stack">
-              <a class="site-footer__link" href={homeHref}>{copy.footer.home}</a>
+              <a class="site-footer__link" href={startHereHref}>{copy.footer.startHere}</a>
+              <a class="site-footer__link" href={learnHref}>{copy.footer.learn}</a>
+              <a class="site-footer__link" href={searchHref}>{copy.footer.search}</a>
             </div>
           </div>
           <div class="site-footer__group">
             <div class="site-footer__stack">
+              <a class="site-footer__link" href={topicsHref}>{copy.footer.topics}</a>
+              <a class="site-footer__link" href={glossaryHref}>{copy.footer.glossary}</a>
               <a class="site-footer__link" href="/terms">{copy.footer.terms}</a>
               <a class="site-footer__link" href="/privacy">{copy.footer.privacy}</a>
             </div>
@@ -130,16 +148,7 @@ const localeRedirectHref = guideLocale === 'pt-br' ? englishGuideIndexHref : por
 </html>
 
 <script is:inline>
-  const themeButton = document.querySelector('[data-theme-toggle]')
   const localeChoiceLinks = [...document.querySelectorAll('[data-locale-choice]')]
-
-  themeButton?.addEventListener('click', () => {
-    const nextIsDark = !document.documentElement.classList.contains('dark')
-    document.documentElement.classList.toggle('dark', nextIsDark)
-    try {
-      window.localStorage.setItem('seniorpath.site.theme.v1', nextIsDark ? 'dark' : 'light')
-    } catch {}
-  })
 
   localeChoiceLinks.forEach((link) => {
     link.addEventListener('click', () => {

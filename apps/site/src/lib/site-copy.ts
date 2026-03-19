@@ -20,13 +20,17 @@ type SiteCopy = {
   }
   footer: {
     description: string
+    glossary: string
     home: string
     learn: string
     privacy: string
     practice: string
     rights: string
+    search: string
+    startHere: string
     terms: string
     title: string
+    topics: string
   }
   guideIndex: {
     comingSoon: string
@@ -45,11 +49,38 @@ type SiteCopy = {
   header: {
     brand: string
   }
+  startHere: {
+    articleLabel: string
+    backToRoadmap: string
+    browseLibrary: string
+    conceptLabel: string
+    copy: string
+    glossary: string
+    introEyebrow: string
+    linearHeading: string
+    nextArticle: string
+    previousArticle: string
+    roadmapEyebrow: string
+    stepLabel: string
+    supportCopy: string
+    supportHeading: string
+    title: string
+    topics: string
+  }
   learn: string
   layout: {
+    glossary: string
     home: string
     practice: string
+    search: string
+    startHere: string
     themeToggle: string
+    topics: string
+  }
+  search: {
+    copy: string
+    devNotice: string
+    title: string
   }
   topicIndex: {
     copy: string
@@ -78,17 +109,40 @@ const siteCopy: Record<SiteLocale, SiteCopy> = {
       updatedPrefix: 'Updated',
     },
     footer: {
-      description: 'Clear guides for people who want to understand better, not just decorate answers.',
+      description: 'Guided editorial maps and clear guides for people who want to think better before they solve.',
+      glossary: 'Glossary',
       home: 'Home',
       learn: 'Path to Senior',
       privacy: 'Privacy policy',
       practice: 'Practice',
       rights: 'All rights reserved.',
+      search: 'Search',
+      startHere: 'Start Here',
       terms: 'Terms and conditions',
       title: 'SeniorPath',
+      topics: 'Topics',
     },
     header: {
       brand: 'SeniorPath',
+    },
+    startHere: {
+      articleLabel: 'Article',
+      backToRoadmap: 'Back to Start Here',
+      browseLibrary: 'Browse the library',
+      conceptLabel: 'Concept',
+      copy:
+        'A guided editorial roadmap for how to think before you jump into solutions, interviews, or challenge-style problems.',
+      glossary: 'Look up a term',
+      introEyebrow: 'Editorial roadmap',
+      linearHeading: 'Follow the route in order',
+      nextArticle: 'Next article',
+      previousArticle: 'Previous article',
+      roadmapEyebrow: 'Start Here',
+      stepLabel: 'Step',
+      supportCopy: 'When you want to browse more freely, use the library, topics, or glossary as support.',
+      supportHeading: 'Keep exploring',
+      title: 'How to think before you solve',
+      topics: 'Explore topics',
     },
     guideIndex: {
       comingSoon: 'Coming soon',
@@ -97,7 +151,7 @@ const siteCopy: Record<SiteLocale, SiteCopy> = {
       title: 'Learn without the fluff',
     },
     challengeIndex: {
-      copy: 'Practice spaces reserved for worked examples, step-by-step solutions, and applied scenarios.',
+      copy: 'This section is reserved for future editorial walkthroughs and worked examples.',
       title: 'Challenges',
     },
     glossaryIndex: {
@@ -106,9 +160,18 @@ const siteCopy: Record<SiteLocale, SiteCopy> = {
     },
     learn: 'Learn',
     layout: {
+      glossary: 'Glossary',
       home: 'Home',
       practice: 'Practice',
+      search: 'Search',
+      startHere: 'Start Here',
       themeToggle: 'Toggle theme',
+      topics: 'Topics',
+    },
+    search: {
+      copy: 'Search across guides, topics, and glossary entries from one place.',
+      devNotice: 'Search index is generated during build. Use preview/build to test Pagefind locally.',
+      title: 'Search the site',
     },
     topicIndex: {
       copy: 'Cross-cutting hubs that connect guides by theme instead of by curriculum branch.',
@@ -135,17 +198,40 @@ const siteCopy: Record<SiteLocale, SiteCopy> = {
       updatedPrefix: 'Atualizado',
     },
     footer: {
-      description: 'Guias claros para pessoas que querem entender, não apenas decorar respostas.',
+      description: 'Mapas editoriais guiados e guias claros para quem quer pensar melhor antes de resolver.',
+      glossary: 'Glossario',
       home: 'Inicio',
       learn: 'Caminho para Senior',
       privacy: 'Politica de privacidade',
       practice: 'Praticar',
       rights: 'Todos os direitos reservados.',
+      search: 'Busca',
+      startHere: 'Comece aqui',
       terms: 'Termos e condicoes',
       title: 'SeniorPath',
+      topics: 'Topicos',
     },
     header: {
       brand: 'SeniorPath',
+    },
+    startHere: {
+      articleLabel: 'Artigo',
+      backToRoadmap: 'Voltar para Comece aqui',
+      browseLibrary: 'Explorar a biblioteca',
+      conceptLabel: 'Conceito',
+      copy:
+        'Um roadmap editorial guiado para como pensar antes de pular para solucoes, entrevistas ou desafios de codigo.',
+      glossary: 'Consultar um termo',
+      introEyebrow: 'Roadmap editorial',
+      linearHeading: 'Siga a rota em ordem',
+      nextArticle: 'Proximo artigo',
+      previousArticle: 'Artigo anterior',
+      roadmapEyebrow: 'Comece aqui',
+      stepLabel: 'Etapa',
+      supportCopy: 'Quando voce quiser explorar com mais liberdade, use a biblioteca, os topicos e o glossario como apoio.',
+      supportHeading: 'Continue explorando',
+      title: 'Como pensar antes de resolver',
+      topics: 'Explorar topicos',
     },
     guideIndex: {
       comingSoon: 'Em breve',
@@ -154,7 +240,7 @@ const siteCopy: Record<SiteLocale, SiteCopy> = {
       title: 'Aprenda sem enrolação',
     },
     challengeIndex: {
-      copy: 'Espacos de pratica reservados para exemplos resolvidos, passo a passo e cenarios aplicados.',
+      copy: 'Esta secao fica reservada para walkthroughs editoriais e exemplos resolvidos no futuro.',
       title: 'Desafios',
     },
     glossaryIndex: {
@@ -163,9 +249,18 @@ const siteCopy: Record<SiteLocale, SiteCopy> = {
     },
     learn: 'Aprender',
     layout: {
+      glossary: 'Glossario',
       home: 'Inicio',
       practice: 'Praticar',
+      search: 'Busca',
+      startHere: 'Comece aqui',
       themeToggle: 'Alternar tema',
+      topics: 'Topicos',
+    },
+    search: {
+      copy: 'Busque em guias, topicos e termos do glossario em um unico lugar.',
+      devNotice: 'O indice de busca e gerado no build. Use preview/build para testar o Pagefind localmente.',
+      title: 'Buscar no site',
     },
     topicIndex: {
       copy: 'Hubs transversais que conectam os guias por tema, nao so pela trilha curricular.',

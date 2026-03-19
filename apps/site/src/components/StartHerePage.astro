@@ -1,0 +1,222 @@
+---
+import type { ResolvedEditorialRoadmap } from '../lib/editorial-roadmaps'
+import { Icon } from 'astro-icon/components'
+
+import BaseLayout from '../layouts/BaseLayout.astro'
+import { formatEditorialDate } from '../lib/format-date'
+import { getGlossaryIndexHref } from '../lib/glossary-links'
+import { getGuideHrefFromEntry, getGuideIndexHref } from '../lib/guide-links'
+import { getSiteCopy, type SiteLocale } from '../lib/site-copy'
+import { getStartHereHref } from '../lib/start-here-links'
+import { getTopicIndexHref } from '../lib/topic-links'
+
+type Props = {
+  locale: SiteLocale
+  roadmap: ResolvedEditorialRoadmap
+}
+
+type RoadmapPathNode = {
+  href: string
+  id: string
+  kind: ResolvedEditorialRoadmap['nodes'][number]['kind']
+  meta: string | null
+  order: number
+  subtitle: string
+  title: string
+}
+
+const { locale, roadmap } = Astro.props
+const copy = getSiteCopy(locale)
+const englishHref = getStartHereHref('en')
+const portugueseHref = getStartHereHref('pt-br')
+const dateLocale = locale === 'pt-br' ? 'pt-BR' : 'en-US'
+
+const roadmapPathNodes: RoadmapPathNode[] = roadmap.nodes.map((node, index) => ({
+  href: node.kind === 'article' ? node.href : `#${node.id}`,
+  id: node.id,
+  kind: node.kind,
+  meta: node.kind === 'article' ? formatEditorialDate(node.post.data.pubDate, dateLocale, { month: 'short' }) : null,
+  order: index + 1,
+  subtitle: node.kind === 'article' ? node.post.data.description : node.summary,
+  title: node.kind === 'article' ? node.post.data.title : node.title,
+}))
+
+const roadmapRows = Array.from(
+  { length: Math.ceil(roadmapPathNodes.length / 3) },
+  (_, index) => roadmapPathNodes.slice(index * 3, index * 3 + 3),
+)
+
+const desktopRoadmapRows = roadmapRows.map((row, index) => (index % 2 === 0 ? row : [...row].reverse()))
+---
+
+<BaseLayout
+  description={roadmap.summary}
+  englishHref={englishHref}
+  portugueseHref={portugueseHref}
+  title={roadmap.title}
+>
+  <section class="section section--compact">
+    <div class="hero start-here-hero">
+      <div class="start-here-hero__copy">
+        <p class="section-eyebrow">{copy.startHere.introEyebrow}</p>
+        <h1>{roadmap.title}</h1>
+        <p class="section-copy">{copy.startHere.copy}</p>
+        <p class="section-copy">{roadmap.intro}</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--compact">
+    <div class="page-toolbar page-toolbar--stacked">
+      <p class="section-eyebrow">{copy.startHere.roadmapEyebrow}</p>
+      <h2 class="section-heading section-heading--compact">{roadmap.title}</h2>
+      <p class="page-toolbar__copy">{roadmap.summary}</p>
+    </div>
+
+    <div aria-label={roadmap.title} class="start-here-roadmap start-here-roadmap--desktop">
+      <div class="start-here-roadmap__grid">
+        {desktopRoadmapRows.map((row, rowIndex) => (
+          <Fragment>
+            <ol class="start-here-roadmap__row">
+              {row.map((node, index) => (
+                <Fragment>
+                  <li class="start-here-roadmap__node">
+                    <a
+                      class:list={[
+                        'start-here-roadmap__item',
+                        node.kind === 'concept' && 'start-here-roadmap__item--concept',
+                      ]}
+                      href={node.href}
+                    >
+                      <span class="start-here-roadmap__badge">
+                        {node.kind === 'concept' ? copy.startHere.conceptLabel : String(node.order).padStart(2, '0')}
+                      </span>
+                      <span class="start-here-roadmap__title">{node.title}</span>
+                      <span class="start-here-roadmap__subtitle">{node.subtitle}</span>
+                      {node.meta ? <span class="start-here-roadmap__meta">{node.meta}</span> : null}
+                    </a>
+                  </li>
+
+                  {index < row.length - 1 ? (
+                    <li aria-hidden="true" class="start-here-roadmap__arrow">
+                      <Icon
+                        class="start-here-roadmap__arrow-icon"
+                        name={rowIndex % 2 === 0 ? 'lucide:move-right' : 'lucide:move-left'}
+                      />
+                    </li>
+                  ) : null}
+                </Fragment>
+              ))}
+            </ol>
+
+            {rowIndex < roadmapRows.length - 1 ? (
+              <div
+                aria-hidden="true"
+                class:list={[
+                  'start-here-roadmap__drop',
+                  rowIndex % 2 === 0 ? 'start-here-roadmap__drop--right' : 'start-here-roadmap__drop--left',
+                ]}
+              >
+                <span class="start-here-roadmap__drop-icon">
+                  <Icon class="start-here-roadmap__arrow-icon" name="lucide:move-down" />
+                </span>
+              </div>
+            ) : null}
+          </Fragment>
+        ))}
+      </div>
+    </div>
+
+    <div aria-label={roadmap.title} class="start-here-roadmap start-here-roadmap--mobile">
+      <ol class="start-here-roadmap__stack">
+        {roadmapPathNodes.map((node, index) => (
+          <Fragment>
+            <li class="start-here-roadmap__stack-node">
+              <a
+                class:list={[
+                  'start-here-roadmap__item',
+                  node.kind === 'concept' && 'start-here-roadmap__item--concept',
+                ]}
+                href={node.href}
+              >
+                <span class="start-here-roadmap__badge">
+                  {node.kind === 'concept' ? copy.startHere.conceptLabel : String(node.order).padStart(2, '0')}
+                </span>
+                <span class="start-here-roadmap__title">{node.title}</span>
+                <span class="start-here-roadmap__subtitle">{node.subtitle}</span>
+                {node.meta ? <span class="start-here-roadmap__meta">{node.meta}</span> : null}
+              </a>
+            </li>
+
+            {index < roadmapPathNodes.length - 1 ? (
+              <li aria-hidden="true" class="start-here-roadmap__stack-arrow">
+                <Icon class="start-here-roadmap__arrow-icon" name="lucide:move-down" />
+              </li>
+            ) : null}
+          </Fragment>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="section section--compact">
+    <div class="section-header">
+      <div>
+        <p class="section-eyebrow">{copy.startHere.roadmapEyebrow}</p>
+        <h2 class="section-heading section-heading--compact">{copy.startHere.linearHeading}</h2>
+      </div>
+    </div>
+
+    <div class="start-here-steps">
+      {roadmap.nodes.map((node, index) => (
+        <article class={`start-here-step start-here-step--${node.kind}`} id={node.kind === 'concept' ? node.id : undefined}>
+          {node.kind === 'concept' ? (
+            <>
+              <div class="start-here-step__header">
+                <p class="article-card__eyebrow">
+                  {copy.startHere.stepLabel} {index + 1} • {copy.startHere.conceptLabel}
+                </p>
+                <h3 class="section-heading section-heading--compact">{node.title}</h3>
+              </div>
+
+              <p class="page-toolbar__copy">{node.summary}</p>
+              <p class="start-here-step__body">{node.panelBody}</p>
+
+              {node.relatedGuides.length > 0 ? (
+                <div class="meta-list start-here-step__related">
+                  {node.relatedGuides.map((guide) => (
+                    <a class="badge badge--link" href={getGuideHrefFromEntry(guide)}>{guide.data.title}</a>
+                  ))}
+                </div>
+              ) : null}
+            </>
+          ) : (
+            <a class="start-here-step__article-link" href={node.href}>
+              <div class="start-here-step__header">
+                <p class="article-card__eyebrow">
+                  {copy.startHere.stepLabel} {index + 1} • {copy.startHere.articleLabel}
+                </p>
+                <h3 class="section-heading section-heading--compact">{node.post.data.title}</h3>
+              </div>
+              <p class="page-toolbar__copy">{node.post.data.description}</p>
+            </a>
+          )}
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="section section--compact">
+    <div class="page-toolbar page-toolbar--stacked">
+      <p class="section-eyebrow">{copy.startHere.supportHeading}</p>
+      <h2 class="section-heading section-heading--compact">{copy.startHere.supportHeading}</h2>
+      <p class="page-toolbar__copy">{copy.startHere.supportCopy}</p>
+    </div>
+
+    <div class="start-here-support-links">
+      <a class="start-here-support-link" href={getGuideIndexHref(locale)}>{copy.startHere.browseLibrary}</a>
+      <a class="start-here-support-link" href={getTopicIndexHref(locale)}>{copy.startHere.topics}</a>
+      <a class="start-here-support-link" href={getGlossaryIndexHref(locale)}>{copy.startHere.glossary}</a>
+    </div>
+  </section>
+</BaseLayout>

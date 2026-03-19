@@ -3,7 +3,7 @@ import type { TopicDefinition } from '@seniorpath/content'
 
 import BaseLayout from '../layouts/BaseLayout.astro'
 import { getTopicHref, getTopicIndexHref } from '../lib/topic-links'
-import { getLocalizedTopicLabel, getLocalizedTopicSummary } from '../lib/topic-taxonomy'
+import { getLocalizedTopicLabel } from '../lib/topic-taxonomy'
 import { getSiteCopy, type SiteLocale } from '../lib/site-copy'
 
 type TopicWithCount = {
@@ -38,20 +38,10 @@ const selectionLabel = locale === 'pt-br' ? 'Escolha um topico' : 'Select a topi
   <section class="section section--compact">
     <p class="section-eyebrow">{selectionLabel}</p>
     <div class="panel-grid panel-grid--articles">
-      {topics.map(({ count, topic }) => (
-        <article class="panel article-card">
+      {topics.map(({ topic }) => (
+        <article class="article-card">
           <a class="article-card__link" href={getTopicHref(topic.id, locale)}>
-            <div class="article-card__body">
-              <p class="article-card__eyebrow">{count} {locale === 'pt-br' ? 'guias' : 'guides'}</p>
-              <h3 class="article-card__title">{getLocalizedTopicLabel(topic.id, locale)}</h3>
-              <p class="article-card__summary">{getLocalizedTopicSummary(topic.id, locale)}</p>
-            </div>
-            <div class="article-card__footer">
-              <span class="article-card__cta">
-                <span>{selectionLabel}</span>
-                <span aria-hidden="true">→</span>
-              </span>
-            </div>
+            <h3 class="article-card__title">{getLocalizedTopicLabel(topic.id, locale)}</h3>
           </a>
         </article>
       ))}

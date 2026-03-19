@@ -1,0 +1,79 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro'
+import { getSearchHref } from '../lib/search-links'
+import { getSiteCopy, type SiteLocale } from '../lib/site-copy'
+
+type Props = {
+  locale: SiteLocale
+}
+
+const { locale } = Astro.props
+const copy = getSiteCopy(locale)
+const isDev = import.meta.env.DEV
+const englishHref = getSearchHref('en')
+const portugueseHref = getSearchHref('pt-br')
+const pagefindConfig = {
+  autofocus: true,
+  element: '#search',
+  excerptLength: 18,
+  resetStyles: false,
+  showImages: false,
+  showSubResults: true,
+  translations:
+    locale === 'pt-br'
+      ? {
+          placeholder: 'Buscar no SeniorPath',
+          zero_results: 'Nenhum resultado para [SEARCH_TERM]',
+        }
+      : {
+          placeholder: 'Search SeniorPath',
+          zero_results: 'No results for [SEARCH_TERM]',
+        },
+}
+---
+
+<BaseLayout
+  description={copy.search.copy}
+  englishHref={englishHref}
+  portugueseHref={portugueseHref}
+  title={copy.search.title}
+>
+  {!isDev ? (
+    <Fragment slot="head">
+      <link href="/pagefind/pagefind-ui.css" rel="stylesheet" />
+      <script is:inline src="/pagefind/pagefind-ui.js"></script>
+    </Fragment>
+  ) : null}
+
+  <section class="section section--compact">
+    <div class="panel page-toolbar page-toolbar--stacked">
+      <p class="section-eyebrow">{copy.layout.search}</p>
+      <h1 class="section-heading section-heading--compact">{copy.search.title}</h1>
+      <p class="page-toolbar__copy">{copy.search.copy}</p>
+    </div>
+
+    <div class="search-shell">
+      {isDev ? (
+        <div class="search-dev-note">
+          <p>{copy.search.devNotice}</p>
+        </div>
+      ) : (
+        <div class="search-pagefind" id="search"></div>
+      )}
+    </div>
+  </section>
+</BaseLayout>
+
+{
+  !isDev ? (
+    <script define:vars={{ pagefindConfig }} is:inline>
+      window.addEventListener('DOMContentLoaded', () => {
+        if (typeof window.PagefindUI !== 'function') {
+          return
+        }
+
+        new window.PagefindUI(pagefindConfig)
+      })
+    </script>
+  ) : null
+}
