@@ -1,0 +1,17 @@
+---
+import { getCollection } from 'astro:content'
+
+import ConceptsIndexPage from '@/components/ConceptsIndexPage.astro'
+import { getConceptsHref } from '@/lib/concepts-links'
+import { getAvailableConceptDomains, getConceptDomainRouteSegment } from '@/lib/concept-taxonomy'
+
+const concepts = await getCollection('concepts')
+const activeConcepts = concepts.filter((concept) => concept.data.locale === 'pt-br' && concept.data.status !== 'archived')
+const domains = getAvailableConceptDomains(concepts, 'pt-br').map((domain) => ({
+  count: activeConcepts.filter((concept) => concept.data.domainId === domain.id).length,
+  domainId: domain.id,
+  href: getConceptsHref('pt-br', getConceptDomainRouteSegment(domain.id, 'pt-br')),
+}))
+---
+
+<ConceptsIndexPage domains={domains} locale="pt-br" />

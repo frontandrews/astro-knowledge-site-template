@@ -1,0 +1,44 @@
+---
+import { getCollection } from 'astro:content'
+
+import ConceptDomainPage from '@/components/ConceptDomainPage.astro'
+import { getConceptsHref } from '@/lib/concepts-links'
+import {
+  getAvailableConceptGroups,
+  getConceptDomainByRouteSegment,
+  getConceptDomainRouteSegment,
+  getConceptGroupRouteSegment,
+} from '@/lib/concept-taxonomy'
+
+export async function getStaticPaths() {
+  const concepts = await getCollection('concepts')
+  const activeConcepts = concepts.filter((concept) => concept.data.locale === 'en' && concept.data.status !== 'archived')
+  const domainIds = [...new Set(activeConcepts.map((concept) => concept.data.domainId))]
+
+  return domainIds.map((domainId) => ({
+    params: { domain: getConceptDomainRouteSegment(domainId, 'en') },
+    props: {
+      domainId,
+      groups: getAvailableConceptGroups(activeConcepts, domainId, 'en').map((group) => ({
+        count: activeConcepts.filter(
+          (concept) => concept.data.domainId === domainId && concept.data.groupId === group.id,
+        ).length,
+        groupId: group.id,
+        href: getConceptsHref(
+          'en',
+          getConceptDomainRouteSegment(domainId, 'en'),
+          getConceptGroupRouteSegment(domainId, group.id, 'en'),
+        ),
+      })),
+    },
+  }))
+}
+
+const { domainId, groups } = Astro.props
+
+if (!getConceptDomainByRouteSegment(Astro.params.domain ?? '', 'en')) {
+  throw new Error(`Unknown concept domain: ${Astro.params.domain}`)
+}
+---
+
+<ConceptDomainPage domainId={domainId} groups={groups} locale="en" />

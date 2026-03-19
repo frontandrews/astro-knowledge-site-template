@@ -1,15 +1,8 @@
 ---
-import { getCollection } from 'astro:content'
+import { getPrimaryEditorialRoadmapHref } from '@/lib/editorial-roadmaps'
 
-import StartHerePage from '../components/StartHerePage.astro'
-import { resolveEditorialRoadmap } from '../lib/editorial-roadmaps'
+const href = getPrimaryEditorialRoadmapHref('en')
+void href
 
-const guides = await getCollection('guides')
-const roadmap = resolveEditorialRoadmap('en', guides)
-
-if (!roadmap) {
-  throw new Error('Primary editorial roadmap could not be resolved for en.')
-}
+return Astro.redirect(href, 301)
 ---
-
-<StartHerePage locale="en" roadmap={roadmap} />

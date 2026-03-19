@@ -1,0 +1,20 @@
+---
+import { getCollection } from 'astro:content'
+
+import StartHerePage from '@/components/StartHerePage.astro'
+import { resolveEditorialRoadmaps } from '@/lib/editorial-roadmaps'
+
+export async function getStaticPaths() {
+  const guides = await getCollection('guides')
+  const roadmaps = resolveEditorialRoadmaps('pt-br', guides)
+
+  return roadmaps.map((roadmap) => ({
+    params: { slug: roadmap.slug },
+    props: { roadmap },
+  }))
+}
+
+const { roadmap } = Astro.props
+---
+
+<StartHerePage locale="pt-br" roadmap={roadmap} />

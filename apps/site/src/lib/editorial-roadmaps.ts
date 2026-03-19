@@ -1,7 +1,7 @@
 import type { CollectionEntry } from 'astro:content'
 
-import { getGuideHrefFromEntry } from './guide-links'
-import { getStartHereHref } from './start-here-links'
+import { getGuideHrefFromEntry } from '@/lib/guide-links'
+import { getTracksHref } from '@/lib/tracks-links'
 
 export type EditorialLocale = 'en' | 'pt-br'
 
@@ -10,6 +10,11 @@ type LocalizedText = Record<EditorialLocale, string>
 type RoadmapPosition = {
   x: number
   y: number
+}
+
+type EditorialRoadmapTag = {
+  id: string
+  label: LocalizedText
 }
 
 type EditorialRoadmapNodeBase = {
@@ -37,7 +42,9 @@ export type EditorialRoadmap = {
   intro: LocalizedText
   label: LocalizedText
   nodes: RoadmapNode[]
+  slug: LocalizedText
   summary: LocalizedText
+  tags: EditorialRoadmapTag[]
   title: LocalizedText
 }
 
@@ -70,7 +77,10 @@ export type ResolvedEditorialRoadmap = {
   label: string
   locale: EditorialLocale
   nodes: ResolvedRoadmapNode[]
+  slug: string
+  slugs: LocalizedText
   summary: string
+  tags: Array<{ id: string; label: string }>
   title: string
 }
 
@@ -93,10 +103,44 @@ const START_HERE_ROADMAP: EditorialRoadmap = {
     en: 'Start Here',
     'pt-br': 'Comece aqui',
   },
+  slug: {
+    en: 'how-to-think-before-you-solve',
+    'pt-br': 'como-pensar-antes-de-resolver',
+  },
   summary: {
     en: 'A guided route through the concepts and guides that help you think clearly before solving.',
     'pt-br': 'Uma rota guiada pelos conceitos e guias que ajudam voce a pensar com clareza antes de resolver.',
   },
+  tags: [
+    {
+      id: 'foundations',
+      label: {
+        en: 'Foundations',
+        'pt-br': 'Fundamentos',
+      },
+    },
+    {
+      id: 'problem-solving',
+      label: {
+        en: 'Problem solving',
+        'pt-br': 'Resolucao de problemas',
+      },
+    },
+    {
+      id: 'interviews',
+      label: {
+        en: 'Interviews',
+        'pt-br': 'Entrevistas',
+      },
+    },
+    {
+      id: 'communication',
+      label: {
+        en: 'Communication',
+        'pt-br': 'Comunicacao',
+      },
+    },
+  ],
   title: {
     en: 'How to think before you solve',
     'pt-br': 'Como pensar antes de resolver',
@@ -212,19 +256,21 @@ export function getPrimaryEditorialRoadmap() {
   return START_HERE_ROADMAP
 }
 
-export function resolveEditorialRoadmap(
+export function getPrimaryEditorialRoadmapHref(locale: EditorialLocale) {
+  return getTracksHref(locale, getLocalizedText(START_HERE_ROADMAP.slug, locale))
+}
+
+function resolveRoadmap(
+  roadmap: EditorialRoadmap,
   locale: EditorialLocale,
   guides: CollectionEntry<'guides'>[],
-  roadmapId = START_HERE_ROADMAP.id,
-): ResolvedEditorialRoadmap | null {
-  const roadmap = EDITORIAL_ROADMAPS.find((entry) => entry.id === roadmapId)
-
-  if (!roadmap) {
-    return null
-  }
-
+): ResolvedEditorialRoadmap {
   const localeGuides = guides.filter(
-    (entry) => entry.data.status !== 'archived' && isEditorialLocale(entry.data.locale) && entry.data.locale === locale,
+    (entry) =>
+      entry.data.status !== 'archived' &&
+      entry.data.trackEligible &&
+      isEditorialLocale(entry.data.locale) &&
+      entry.data.locale === locale,
   )
   const byGuideId = new Map(localeGuides.map((entry) => [entry.data.guideId, entry]))
   const nodes: ResolvedRoadmapNode[] = []
@@ -263,18 +309,48 @@ export function resolveEditorialRoadmap(
   }
 
   const articleNodes = nodes.filter((node): node is ResolvedRoadmapArticleNode => node.kind === 'article')
+  const slug = getLocalizedText(roadmap.slug, locale)
 
   return {
     articleNodes,
-    href: getStartHereHref(locale),
+    href: getTracksHref(locale, slug),
     id: roadmap.id,
     intro: getLocalizedText(roadmap.intro, locale),
     label: getLocalizedText(roadmap.label, locale),
     locale,
     nodes,
+    slug,
+    slugs: roadmap.slug,
     summary: getLocalizedText(roadmap.summary, locale),
+    tags: roadmap.tags.map((tag) => ({
+      id: tag.id,
+      label: getLocalizedText(tag.label, locale),
+    })),
     title: getLocalizedText(roadmap.title, locale),
   }
+}
+
+export function resolveEditorialRoadmaps(
+  locale: EditorialLocale,
+  guides: CollectionEntry<'guides'>[],
+): ResolvedEditorialRoadmap[] {
+  return EDITORIAL_ROADMAPS.map((roadmap) => resolveRoadmap(roadmap, locale, guides))
+}
+
+export function resolveEditorialRoadmap(
+  locale: EditorialLocale,
+  guides: CollectionEntry<'guides'>[],
+  roadmapId = START_HERE_ROADMAP.id,
+): ResolvedEditorialRoadmap | null {
+  return resolveEditorialRoadmaps(locale, guides).find((roadmap) => roadmap.id === roadmapId) ?? null
+}
+
+export function resolveEditorialRoadmapBySlug(
+  locale: EditorialLocale,
+  guides: CollectionEntry<'guides'>[],
+  slug: string,
+): ResolvedEditorialRoadmap | null {
+  return resolveEditorialRoadmaps(locale, guides).find((roadmap) => roadmap.slug === slug) ?? null
 }
 
 export function getGuideEditorialContext(
@@ -282,7 +358,9 @@ export function getGuideEditorialContext(
   guides: CollectionEntry<'guides'>[],
 ): EditorialGuideContext | null {
   const locale = isEditorialLocale(post.data.locale) ? post.data.locale : 'en'
-  const roadmap = resolveEditorialRoadmap(locale, guides)
+  const roadmap = resolveEditorialRoadmaps(locale, guides).find((entry) =>
+    entry.articleNodes.some((node) => node.guideId === post.data.guideId),
+  )
 
   if (!roadmap) {
     return null

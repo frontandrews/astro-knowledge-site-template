@@ -1,0 +1,11 @@
+---
+import { getCollection } from 'astro:content'
+
+import TracksPage from '@/components/TracksPage.astro'
+import { resolveEditorialRoadmaps } from '@/lib/editorial-roadmaps'
+
+const guides = await getCollection('guides')
+const roadmaps = resolveEditorialRoadmaps('pt-br', guides)
+---
+
+<TracksPage locale="pt-br" roadmaps={roadmaps} />

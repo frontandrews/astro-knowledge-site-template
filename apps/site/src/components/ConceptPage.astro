@@ -1,0 +1,120 @@
+---
+import type { CollectionEntry } from 'astro:content'
+import { getCollection, render } from 'astro:content'
+
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import FilterableDirectory from '@/components/FilterableDirectory.svelte'
+import { getConceptHrefFromEntry, getConceptsHref } from '@/lib/concepts-links'
+import {
+  getConceptDomainRouteSegment,
+  getConceptGroupRouteSegment,
+  getLocalizedConceptDomainLabel,
+  getLocalizedConceptGroupLabel,
+} from '@/lib/concept-taxonomy'
+import { formatEditorialDate } from '@/lib/format-date'
+import { getGuideHrefFromEntry } from '@/lib/guide-links'
+import type { SiteLocale } from '@/lib/site-copy'
+import { ui } from '@/lib/ui'
+import ArticleSection from '@/components/ui/ArticleSection.astro'
+import ContentArticleHeader from '@/components/ui/ContentArticleHeader.astro'
+
+type Props = {
+  concept: CollectionEntry<'concepts'>
+}
+
+const { concept } = Astro.props
+const { Content } = await render(concept)
+const allConcepts = await getCollection('concepts')
+const allGuides = await getCollection('guides')
+const alternateConcept = allConcepts.find(
+  (entry) => entry.data.conceptId === concept.data.conceptId && entry.data.locale !== concept.data.locale,
+)
+const relatedGuides = allGuides.filter(
+  (entry) =>
+    entry.data.locale === concept.data.locale &&
+    entry.data.status !== 'archived' &&
+    concept.data.relatedGuideIds.includes(entry.data.guideId),
+)
+const locale = concept.data.locale === 'pt-br' ? 'pt-br' : 'en'
+const siteLocale: SiteLocale = locale
+const breadcrumbItems = [
+  {
+    href: getConceptsHref(locale),
+    label: locale === 'pt-br' ? 'Conceitos' : 'Concepts',
+  },
+  {
+    href: getConceptsHref(locale, getConceptDomainRouteSegment(concept.data.domainId, siteLocale)),
+    label: getLocalizedConceptDomainLabel(concept.data.domainId, siteLocale),
+  },
+  {
+    href: getConceptsHref(
+      locale,
+      getConceptDomainRouteSegment(concept.data.domainId, siteLocale),
+      getConceptGroupRouteSegment(concept.data.domainId, concept.data.groupId, siteLocale),
+    ),
+    label: getLocalizedConceptGroupLabel(concept.data.domainId, concept.data.groupId, siteLocale),
+  },
+  {
+    href: null,
+    label: concept.data.title,
+  },
+]
+const englishHref =
+  concept.data.locale === 'en'
+    ? getConceptHrefFromEntry(concept)
+    : alternateConcept
+      ? getConceptHrefFromEntry(alternateConcept)
+      : null
+const portugueseHref =
+  concept.data.locale === 'pt-br'
+    ? getConceptHrefFromEntry(concept)
+    : alternateConcept
+      ? getConceptHrefFromEntry(alternateConcept)
+      : null
+const dateLocale = locale === 'pt-br' ? 'pt-BR' : 'en-US'
+const relatedGuideItems = relatedGuides.map((guide) => ({
+  href: getGuideHrefFromEntry(guide),
+  tags: [],
+  title: guide.data.title,
+}))
+---
+
+<BaseLayout
+  description={concept.data.description}
+  englishHref={englishHref}
+  portugueseHref={portugueseHref}
+  title={concept.data.title}
+>
+  <article class={ui.articleShell}>
+    <ContentArticleHeader
+      breadcrumbs={breadcrumbItems}
+      description={concept.data.description}
+      meta={formatEditorialDate(concept.data.pubDate, dateLocale)}
+      title={concept.data.title}
+    />
+
+    <div class="article-prose">
+      <Content />
+    </div>
+
+    {relatedGuides.length > 0 ? (
+      <ArticleSection
+        bodyClass="mt-4"
+        title={locale === 'pt-br' ? 'Guias relacionados' : 'Related guides'}
+      >
+          <FilterableDirectory
+            items={relatedGuideItems}
+            kind="title-cards"
+          />
+      </ArticleSection>
+    ) : null}
+
+    {concept.data.tags.length > 0 ? (
+      <div class={ui.articleTagList}>
+        {concept.data.tags.map((tag) => (
+          <span class={ui.badge}>{tag}</span>
+        ))}
+      </div>
+    ) : null}
+  </article>
+</BaseLayout>
