@@ -1324,6 +1324,19 @@ pre {
   color: inherit;
 }
 
+.article-section--comments {
+  margin-top: 2.2rem;
+}
+
+.giscus-comments {
+  padding-top: 0.35rem;
+}
+
+.giscus-comments .giscus,
+.giscus-comments iframe.giscus-frame {
+  width: 100%;
+}
+
 .article-prose a {
   color: #0f5fa8;
   text-decoration: underline;

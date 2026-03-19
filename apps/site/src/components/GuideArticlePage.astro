@@ -5,6 +5,7 @@ import { getCollection, render } from 'astro:content'
 import BaseLayout from '../layouts/BaseLayout.astro'
 import { getGuideEditorialContext } from '../lib/editorial-roadmaps'
 import { formatEditorialDate } from '../lib/format-date'
+import { getGiscusConfig } from '../lib/giscus'
 import { getGuideHrefFromEntry } from '../lib/guide-links'
 import { getGuideBreadcrumb } from '../lib/guide-taxonomy'
 import { translateSiteLabels } from '../lib/site-labels'
@@ -12,6 +13,7 @@ import { sortGuides } from '../lib/guide-tree'
 import { getLocalizedGuideTopics } from '../lib/topic-taxonomy'
 import { getSiteCopy } from '../lib/site-copy'
 import Breadcrumbs from './Breadcrumbs.astro'
+import GiscusComments from './GiscusComments.astro'
 
 type Props = {
   post: CollectionEntry<'guides'>
@@ -83,6 +85,7 @@ const translatedTags = translateSiteLabels(post.data.tags, post.data.locale)
 const breadcrumbItems = getGuideBreadcrumb(post)
 const linkedTopics = getLocalizedGuideTopics(post)
 const dateLocale = post.data.locale === 'pt-br' ? 'pt-BR' : 'en-US'
+const giscusConfig = getGiscusConfig(post.data.locale === 'pt-br' ? 'pt-br' : 'en')
 ---
 
 <BaseLayout
@@ -154,6 +157,17 @@ const dateLocale = post.data.locale === 'pt-br' ? 'pt-BR' : 'en-US'
           <span class="badge">{tag}</span>
         ))}
       </div>
+    ) : null}
+
+    {giscusConfig ? (
+      <section class="article-section article-section--comments">
+        <div class="section-header">
+          <div>
+            <h2 class="section-heading section-heading--compact">{copy.article.comments}</h2>
+          </div>
+        </div>
+        <GiscusComments config={giscusConfig} />
+      </section>
     ) : null}
 
     {nextReads.length > 0 ? (

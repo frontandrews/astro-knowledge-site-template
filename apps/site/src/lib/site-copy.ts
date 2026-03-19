@@ -2,6 +2,7 @@ export type SiteLocale = 'en' | 'pt-br'
 
 type SiteCopy = {
   article: {
+    comments: string
     completed: string
     confirmBody: string
     confirmCancel: string
@@ -91,6 +92,7 @@ type SiteCopy = {
 const siteCopy: Record<SiteLocale, SiteCopy> = {
   en: {
     article: {
+      comments: 'Comments',
       completed: 'Completed',
       confirmBody:
         'When you mark this as complete, it will stop showing up in suggestions. You can still practice the topic later. Do you want to continue?',
@@ -180,6 +182,7 @@ const siteCopy: Record<SiteLocale, SiteCopy> = {
   },
   'pt-br': {
     article: {
+      comments: 'Comentarios',
       completed: 'Concluido',
       confirmBody:
         'Quando voce marcar este guia como concluido, ele para de aparecer nas sugestoes. Ainda sera possivel praticar o tema depois. Quer continuar?',

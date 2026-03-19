@@ -1,0 +1,29 @@
+---
+import type { GiscusConfig } from '../lib/giscus'
+
+type Props = {
+  config: GiscusConfig
+}
+
+const { config } = Astro.props
+---
+
+<div class="giscus-comments">
+  <script
+    async
+    crossorigin="anonymous"
+    data-category={config.category}
+    data-category-id={config.categoryId}
+    data-emit-metadata={config.emitMetadata}
+    data-input-position={config.inputPosition}
+    data-lang={config.lang}
+    data-mapping={config.mapping}
+    data-reactions-enabled={config.reactionsEnabled}
+    data-repo={config.repo}
+    data-repo-id={config.repoId}
+    data-strict={config.strict}
+    data-theme={config.theme}
+    is:inline
+    src="https://giscus.app/client.js"
+  ></script>
+</div>
