@@ -1,35 +1,20 @@
 # SeniorPath
 
-SeniorPath is a local-first study app and guide site for people who want clearer technical practice without turning learning into a messy spreadsheet.
-
-The repo combines:
-
-- a flashcards-style web app for repetition and interview practice
-- a static guide site for deeper explanations and follow-up reading
-- a shared content layer that powers both surfaces
+SeniorPath is the editorial site for guides, concepts, glossary pages, tracks, and topic navigation around senior-level engineering judgment.
 
 ## Repo Structure
 
-- `apps/web`: React + Vite app for study flows, progress, notes, and interview practice
 - `apps/site`: Astro site for guides, glossary pages, topic hubs, and static learning paths
-- `packages/content`: decks, guide metadata, roadmap taxonomy, and content helpers
-- `packages/schemas`: shared types and Zod schemas
+- `packages/content`: guide metadata, roadmap taxonomy, and content helpers
 - `docs/path-to-senior/`: editorial roadmap and taxonomy notes
-- `docs/flashcards-app/`: app behavior and implementation notes
 
 ## Stack
 
-- React
-- Vite
 - TypeScript
-- React Router
 - Astro
 - pnpm workspaces
 - Zod
-- Vitest
 - Tailwind CSS
-- vite-plugin-pwa
-- localStorage for local-first persistence
 
 ## Product Principles
 
@@ -49,10 +34,7 @@ pnpm dev
 pnpm dev:site
 ```
 
-If you want the app to open the Astro guide site during local development, copy
-`apps/web/.env.example` to `apps/web/.env.local`.
-
-If you want the guide site to open the app correctly during local development, copy
+If you need local environment settings for the site, copy
 `apps/site/.env.example` to `apps/site/.env.local`.
 
 ## Verify Changes
@@ -64,12 +46,8 @@ pnpm verify
 If you only need a narrower check:
 
 ```bash
-pnpm test
-pnpm lint
 pnpm typecheck
-pnpm typecheck:site
 pnpm build
-pnpm build:site
 ```
 
 ## Contributing
@@ -85,8 +63,6 @@ Before opening a change:
 
 Good contribution areas:
 
-- app UX polish
-- study flow improvements
 - guide/site navigation
 - accessibility fixes
 - content tooling and editorial workflow improvements

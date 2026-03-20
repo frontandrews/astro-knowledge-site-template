@@ -9,9 +9,6 @@
       "@seniorpath/content": [
         "../../packages/content/src/index.ts"
       ],
-      "@seniorpath/content/manifest": [
-        "../../packages/content/src/manifest.ts"
-      ],
       "@seniorpath/theme": [
         "../../packages/theme/src/retroui.css"
       ]

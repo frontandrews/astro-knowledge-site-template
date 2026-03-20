@@ -1,20 +1,26 @@
 export {
-  getDeckManifest,
-  getDecksByTrack,
-  getDeckSummaries,
-  getDeckSummaryById,
-  getDecksByTopic,
-} from './manifest'
-export { getAllDecks, getDeckById } from './decks'
-export {
+  getTopicAncestorIds,
   getTopicById,
+  getTopicByRouteSegment,
+  getTopicChildren,
+  getTopicGroupById,
+  getTopicGroupByRouteSegment,
+  getTopicGroupLabel,
+  getTopicGroupRouteSegment,
+  getTopicGroupSummary,
   getTopicLabel,
+  getTopicPathSegments,
+  getTopicParentId,
+  getTopicRootGroupId,
   getTopicRouteSegment,
   getTopicSummary,
   getTrackLabel,
+  resolveTopicPathSegments,
+  TOPIC_GROUP_DEFINITIONS,
   TOPIC_DEFINITIONS,
   TOPIC_LABELS,
   TRACK_LABELS,
+  type TopicGroupDefinition,
   type TopicDefinition,
 } from './taxonomy'
 export {
@@ -26,8 +32,6 @@ export {
   getPathPillarByRouteSegment,
   getPathPillarLabel,
   getPathPillarRouteSegment,
-  LEGACY_TOPIC_TO_PATH_PILLAR,
-  LEGACY_TRACK_TO_PATH_PILLAR,
   PATH_TO_SENIOR_PILLARS,
   type PathBranch,
   type PathLocale,

@@ -71,13 +71,13 @@ Recommended shape:
 
 If the public routes change later, keep the internal content model the same.
 
-## App-to-site linking
+## Cross-page linking
 
-The flashcards app should not store `learnMoreSlug`.
+Internal references should not store localized slugs.
 
-It should store:
+They should store:
 
-- `learnMoreGuideId`
+- `guideId`
 
 Then the site resolves:
 
@@ -118,8 +118,6 @@ These should live in locale dictionaries, for example:
 ```txt
 apps/site/src/i18n/en.ts
 apps/site/src/i18n/pt-br.ts
-apps/web/src/i18n/en.ts
-apps/web/src/i18n/pt-br.ts
 ```
 
 ### Guide content
