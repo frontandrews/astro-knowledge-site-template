@@ -1,0 +1,238 @@
+---
+import StaticArticlePage from '@/components/ui/StaticArticlePage.astro'
+import { getLegalContactLinks } from '@/lib/legal-contact'
+import { getPrivacyHref } from '@/lib/privacy-links'
+
+const { legalEmail, supportEmail } = getLegalContactLinks()
+const privacyContactEmail = legalEmail ?? supportEmail
+---
+
+<StaticArticlePage
+  description="Como o SeniorPath coleta, usa, compartilha e protege dados pessoais."
+  englishHref={getPrivacyHref('en')}
+  kicker="Legal"
+  portugueseHref={getPrivacyHref('pt-br')}
+  title="Politica de Privacidade"
+>
+  <p>
+    Esta Politica de Privacidade explica como o SeniorPath e os servicos relacionados operados pela
+    Fengsoft coletam, usam, compartilham e protegem dados pessoais. Alguns recursos descritos aqui
+    podem nao estar disponiveis o tempo todo. Esta politica se aplica quando voce navega no
+    SeniorPath, assina atualizacoes, entra em contato conosco, cria uma conta, participa de
+    desafios, compra produtos ou interage com ferramentas, ofertas e servicos relacionados ao
+    SeniorPath.
+  </p>
+
+  <h2>Quem controla seus dados</h2>
+  <p>
+    O SeniorPath e operado por FENGSOFT SERVICOS EM TECNOLOGIA E EDUCACAO LTDA, CNPJ
+    43.257.394/0001-70, sediada em Niteroi, Rio de Janeiro, Brasil.
+    {privacyContactEmail ? (
+      <>
+        {' '}
+        Para duvidas de privacidade ou solicitacoes sobre seus dados pessoais, entre em contato por{' '}
+        <a href={privacyContactEmail.href}>{privacyContactEmail.value}</a>.
+      </>
+    ) : null}
+  </p>
+
+  <h2>O que coletamos</h2>
+  <p>Dependendo de como voce usa o SeniorPath, podemos coletar:</p>
+  <ul>
+    <li>
+      Informacoes que voce fornece diretamente, como nome, email, detalhes de perfil, mensagens de
+      contato, envios de desafios, dados de waitlist, pedidos de suporte ou outras informacoes que
+      voce escolha nos enviar
+    </li>
+    <li>
+      Dados de conta e autenticacao, como identificadores de login, status da conta, dados do
+      provedor de autenticacao, registros de sessao e informacoes relacionadas a seguranca
+    </li>
+    <li>
+      Dados de uso, como paginas visualizadas, rotas visitadas, cliques, interacoes, horarios,
+      referrers e padroes gerais de navegacao
+    </li>
+    <li>
+      Dados tecnicos, como endereco IP, tipo de navegador, informacoes do dispositivo, sistema
+      operacional e identificadores online semelhantes
+    </li>
+    <li>
+      Dados de preferencia e estado do produto armazenados no navegador ou na conta, como locale,
+      estado salvo da interface, marcadores de progresso, progresso em desafios e configuracoes
+      semelhantes
+    </li>
+    <li>
+      Dados que recebemos de provedores ou integracoes que voce escolhe usar, como autenticacao,
+      pagamentos, newsletters, comentarios, analytics, publicidade ou ferramentas de suporte
+    </li>
+  </ul>
+
+  <h2>Como usamos dados pessoais</h2>
+  <p>Podemos usar dados pessoais para:</p>
+  <ul>
+    <li>Fornecer, operar, manter e melhorar o SeniorPath e os servicos relacionados</li>
+    <li>Memorizar preferencias e manter o site e os recursos de conta funcionando corretamente</li>
+    <li>
+      Medir trafego, entender que conteudo e util e melhorar navegacao, qualidade editorial e
+      decisoes de produto
+    </li>
+    <li>
+      Habilitar contas, fluxos de login, desafios, rastreamento de progresso, downloads, assinaturas
+      ou recursos pagos quando disponiveis
+    </li>
+    <li>Enviar newsletters, mensagens de servico, atualizacoes, anuncios de lancamento e outras comunicacoes</li>
+    <li>
+      Recomendar conteudo, produtos, servicos ou promocoes relevantes do SeniorPath, Fengsoft,
+      Capta e projetos relacionados
+    </li>
+    <li>
+      Medir campanhas, personalizar promocoes e, quando habilitado, oferecer suporte a publicidade
+      ou insercoes patrocinadas
+    </li>
+    <li>Detectar abuso, prevenir fraude, aplicar nossos termos e proteger usuarios, direitos e servicos</li>
+    <li>Cumprir obrigacoes legais, regulatorias, tributarias, contabeis ou ligadas a disputas</li>
+  </ul>
+
+  <h2>Bases legais para o tratamento</h2>
+  <p>
+    Dependendo do contexto, podemos nos basear em uma ou mais bases legais previstas na legislacao
+    aplicavel, incluindo consentimento, execucao de contrato ou medidas relacionadas a contrato,
+    cumprimento de obrigacoes legais ou regulatorias, exercicio regular de direitos e interesses
+    legitimos para operar, proteger, melhorar e expandir o SeniorPath de modo que nao prevaleca
+    sobre seus direitos e liberdades.
+  </p>
+
+  <h2>Cookies, armazenamento no navegador, analytics e tecnologias semelhantes</h2>
+  <p>
+    O SeniorPath pode usar cookies, local storage, pixels, SDKs e tecnologias semelhantes para
+    manter o site funcionando, memorizar preferencias, dar suporte a fluxos de login, medir trafego
+    e desempenho e, quando habilitado, personalizar promocoes ou publicidade.
+  </p>
+  <p>Dependendo do recurso, essas tecnologias podem se encaixar em categorias como:</p>
+  <ul>
+    <li>Estritamente necessarias, como seguranca, sessao, login e funcionalidade essencial do site</li>
+    <li>Preferencias, como locale, configuracoes salvas e estado do produto</li>
+    <li>
+      Analytics, como pageviews, caminhos de navegacao, atribuicao de campanha e medicao de uso do
+      produto
+    </li>
+    <li>Marketing, como medicao de promocoes, segmentacao de audiencia e rastreamento ligado a publicidade</li>
+  </ul>
+  <p>
+    Quando necessario, pediremos consentimento antes de usar cookies nao essenciais ou tecnologias
+    semelhantes. Voce pode recusar ou gerenciar essas categorias por meio dos nossos controles de
+    consentimento e pode mudar suas escolhas depois.
+  </p>
+  <p>
+    Recusar cookies nao essenciais nao deve impedir o acesso as partes publicas principais do site,
+    embora alguns recursos opcionais possam funcionar de forma diferente.
+  </p>
+  <p>
+    Se recursos de conta estiverem habilitados e voce estiver logado, podemos associar certos
+    eventos de uso a sua conta para salvar progresso, melhorar o produto, entender padroes de uso e
+    recomendar conteudo ou ofertas mais relevantes.
+  </p>
+
+  <h2>Newsletters, atualizacoes de produto e marketing</h2>
+  <p>
+    Se voce assinar ou interagir conosco de outra forma, podemos enviar atualizacoes editoriais,
+    anuncios de produto, noticias de lancamento, mensagens de servico e comunicacoes promocionais
+    sobre SeniorPath, Capta, servicos da Fengsoft e produtos relacionados.
+  </p>
+  <p>
+    Voce pode cancelar emails promocionais nao essenciais a qualquer momento pelo link de
+    descadastro no email ou entrando em contato conosco.
+  </p>
+  <p>
+    Podemos usar informacoes sobre suas interacoes com o SeniorPath, como paginas visitadas,
+    atividade em desafios ou inscricoes anteriores, para entender melhor o interesse em produtos
+    relacionados da Fengsoft e exibir promocoes internas, recomendacoes ou comunicacoes de
+    lancamento mais relevantes.
+  </p>
+
+  <h2>Como compartilhamos dados pessoais</h2>
+  <p>Podemos compartilhar dados pessoais com:</p>
+  <ul>
+    <li>Provedores de hospedagem, CDN, infraestrutura, seguranca, analytics e observabilidade</li>
+    <li>
+      Provedores de autenticacao, email, newsletter, pagamento, publicidade, suporte ao cliente e
+      comentarios ou comunidade
+    </li>
+    <li>Assessores profissionais, auditores ou autoridades legais quando razoavelmente necessario</li>
+    <li>Contrapartes envolvidas em fusao, aquisicao, reorganizacao, financiamento ou venda de ativos</li>
+  </ul>
+  <p>Nao vendemos seus dados pessoais.</p>
+  <p>
+    Quando prestadores de servico tratam dados em nosso nome, esperamos que o facam apenas para as
+    finalidades contratadas e com salvaguardas adequadas.
+  </p>
+
+  <h2>Transferencias internacionais</h2>
+  <p>
+    Alguns dos nossos provedores podem armazenar ou tratar dados pessoais fora do Brasil. Quando
+    isso acontecer, usaremos os mecanismos legais e as salvaguardas exigidas para transferencias
+    internacionais de dados.
+  </p>
+
+  <h2>Por quanto tempo mantemos dados</h2>
+  <p>
+    Mantemos dados pessoais apenas pelo tempo necessario para as finalidades descritas nesta
+    politica, inclusive para prestar o servico, manter registros, cumprir obrigacoes legais,
+    resolver disputas, aplicar acordos e proteger a plataforma.
+  </p>
+  <p>
+    Os prazos de retencao podem variar conforme o recurso. Por exemplo, dados de newsletter podem
+    ser mantidos ate que voce se descadastre, dados de conta podem ser mantidos enquanto a conta
+    permanecer ativa, e alguns logs ou backups podem ser retidos por motivos de seguranca, prevencao
+    a fraude, exigencias legais ou operacionais. Tambem podemos manter dados agregados ou anonimizados
+    por mais tempo.
+  </p>
+
+  <h2>Seguranca</h2>
+  <p>
+    Usamos medidas tecnicas e organizacionais razoaveis para proteger dados pessoais contra acesso
+    nao autorizado, perda, uso indevido, alteracao ou divulgacao. Nenhum metodo de armazenamento ou
+    transmissao e totalmente seguro, portanto nao podemos garantir seguranca absoluta.
+  </p>
+
+  <h2>Seus direitos</h2>
+  <p>
+    Sujeito a legislacao aplicavel, voce pode ter o direito de solicitar confirmacao do tratamento,
+    acesso, correcao, anonimizacao, bloqueio ou exclusao de dados, portabilidade, informacoes sobre
+    compartilhamento, informacoes sobre consentimento e suas consequencias, revogacao do
+    consentimento, oposicao a certos tratamentos e revisao de decisoes baseadas exclusivamente em
+    tratamento automatizado, quando aplicavel.
+  </p>
+  {privacyContactEmail ? (
+    <p>
+      Para exercer seus direitos, entre em contato por{' '}
+      <a href={privacyContactEmail.href}>{privacyContactEmail.value}</a>. Podemos solicitar
+      informacoes razoavelmente necessarias para verificar sua identidade e processar o pedido.
+    </p>
+  ) : null}
+
+  <h2>Servicos de terceiros e links externos</h2>
+  <p>
+    O SeniorPath pode usar ou apontar para servicos de terceiros, como ferramentas de analytics,
+    plataformas de newsletter, provedores de autenticacao, processadores de pagamento, GitHub,
+    Giscus, midia incorporada ou sites externos. Esses servicos operam sob seus proprios termos e
+    politicas de privacidade, e nao somos responsaveis por suas praticas independentes.
+  </p>
+
+  <h2>Mudancas nesta politica</h2>
+  <p>
+    Podemos atualizar esta Politica de Privacidade periodicamente para refletir mudancas no produto,
+    exigencias legais, provedores ou praticas de dados. A versao mais recente sempre sera publicada
+    nesta pagina com sua data de vigencia.
+  </p>
+
+  {privacyContactEmail ? (
+    <>
+      <h2>Contato</h2>
+      <p>
+        Se voce tiver duvidas sobre esta politica ou sobre como seus dados pessoais sao tratados,
+        entre em contato por <a href={privacyContactEmail.href}>{privacyContactEmail.value}</a>.
+      </p>
+    </>
+  ) : null}
+</StaticArticlePage>

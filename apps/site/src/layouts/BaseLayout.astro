@@ -19,6 +19,7 @@ import { cn } from '@/lib/cn'
 import { getConceptsHref } from '@/lib/concepts-links'
 import { getGuideIndexHref, getGuideLocaleFromPathname } from '@/lib/guide-links'
 import { getGlossaryIndexHref } from '@/lib/glossary-links'
+import { getPrivacyHref } from '@/lib/privacy-links'
 import { getSiteCopy } from '@/lib/site-copy'
 import { getTermsHref } from '@/lib/terms-links'
 import { getTracksHref } from '@/lib/tracks-links'
@@ -54,6 +55,7 @@ const conceptsHref = getConceptsHref(guideLocale)
 const challengesHref = getChallengeIndexHref(guideLocale)
 const topicsHref = getTopicIndexHref(guideLocale)
 const glossaryHref = getGlossaryIndexHref(guideLocale)
+const privacyHref = getPrivacyHref(guideLocale)
 const termsHref = getTermsHref(guideLocale)
 const rssHref = guideLocale === 'pt-br' ? '/pt-br/feed.xml' : '/feed.xml'
 const currentYear = new Date().getFullYear()
@@ -319,7 +321,7 @@ const pageShellClass =
                   {copy.footer.terms}
                 </a>
                 {copy.footer.newsletterDisclaimerBetweenLinks}
-                <a class="underline decoration-site-line-strong underline-offset-2 transition-colors duration-150 hover:text-site-link-hover" href="/privacy">
+                <a class="underline decoration-site-line-strong underline-offset-2 transition-colors duration-150 hover:text-site-link-hover" href={privacyHref}>
                   {copy.footer.privacy}
                 </a>
                 {copy.footer.newsletterDisclaimerAfterLinks}
@@ -355,7 +357,7 @@ const pageShellClass =
             <div class="grid gap-[0.85rem]">
               <a class={ui.footerLink} href={termsHref}>{copy.footer.terms}</a>
               <a class={ui.footerLink} href={rssHref}>{copy.footer.rss}</a>
-              <a class={ui.footerLink} href="/privacy">{copy.footer.privacy}</a>
+              <a class={ui.footerLink} href={privacyHref}>{copy.footer.privacy}</a>
             </div>
           </div>
         </div>
