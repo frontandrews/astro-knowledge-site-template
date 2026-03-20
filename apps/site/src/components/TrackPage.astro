@@ -1,0 +1,105 @@
+---
+import type { ResolvedEditorialRoadmap } from '@/lib/editorial-roadmaps'
+import RouteIcon from '@lucide/astro/icons/route'
+
+import ArticleCard from '@/components/ArticleCard.astro'
+import ArticleSharePanel from '@/components/ArticleSharePanel.astro'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import TrackProgressPanel from '@/components/TrackProgressPanel.astro'
+import { getGuideLevelLabel, getGuideReadingTimeMinutes } from '@/lib/article-meta'
+import { formatEditorialDate } from '@/lib/format-date'
+import { getGlossaryIndexHref } from '@/lib/glossary-links'
+import { getGuideIndexHref } from '@/lib/guide-links'
+import { getSiteCopy, type SiteLocale } from '@/lib/site-copy'
+import { getTracksHref } from '@/lib/tracks-links'
+import { getTopicIndexHref } from '@/lib/topic-links'
+import CompactSection from '@/components/ui/CompactSection.astro'
+import PageHeader from '@/components/ui/PageHeader.astro'
+import { ui } from '@/lib/ui'
+
+type Props = {
+  locale: SiteLocale
+  roadmap: ResolvedEditorialRoadmap
+}
+
+const { locale, roadmap } = Astro.props
+const copy = getSiteCopy(locale)
+const englishHref = getTracksHref('en', roadmap.slugs.en)
+const portugueseHref = getTracksHref('pt-br', roadmap.slugs['pt-br'])
+const dateLocale = locale === 'pt-br' ? 'pt-BR' : 'en-US'
+const shareUrl = Astro.url.href
+const levelOrder = {
+  beginner: 0,
+  intermediate: 1,
+  advanced: 2,
+} as const
+const trackItems = roadmap.articleNodes.map((node, index) => ({
+  guideId: node.guideId,
+  href: node.href,
+  stepLabel: String(index + 1),
+  title: node.post.data.title,
+}))
+const totalReadingMinutes = roadmap.articleNodes.reduce((sum, node) => sum + getGuideReadingTimeMinutes(node.post), 0)
+const highestLevel =
+  roadmap.articleNodes.reduce(
+    (current, node) =>
+      levelOrder[node.post.data.level] > levelOrder[current] ? node.post.data.level : current,
+    roadmap.articleNodes[0]?.post.data.level ?? 'beginner',
+  )
+const levelLabel = getGuideLevelLabel(highestLevel, locale)
+const supportLinks = [
+  {
+    href: getGuideIndexHref(locale),
+    title: copy.startHere.browseLibrary,
+  },
+  {
+    href: getTopicIndexHref(locale),
+    title: copy.startHere.topics,
+  },
+  {
+    href: getGlossaryIndexHref(locale),
+    title: copy.startHere.glossary,
+  },
+]
+---
+
+<BaseLayout
+  description={roadmap.summary}
+  englishHref={englishHref}
+  portugueseHref={portugueseHref}
+  title={roadmap.title}
+>
+  <PageHeader description={roadmap.summary} icon={RouteIcon} iconLabel={copy.layout.tracks} title={roadmap.title} />
+
+  <TrackProgressPanel
+    items={trackItems}
+    levelLabel={levelLabel}
+    locale={locale}
+    supportLinks={supportLinks}
+    totalReadingMinutes={totalReadingMinutes}
+  />
+
+  <CompactSection className="xl:mt-0 xl:max-w-none">
+    <div class={ui.linearList}>
+      {roadmap.articleNodes.map((node, index) => (
+        <ArticleCard
+          className={index === 0 ? 'border-t-0' : ''}
+          eyebrow={`${formatEditorialDate(node.post.data.pubDate, dateLocale)} - ${copy.startHere.stepLabel} ${index + 1}`}
+          eyebrowVariant="sentence"
+          post={node.post}
+          subtitle={node.post.data.description}
+          variant="linear"
+        />
+      ))}
+    </div>
+  </CompactSection>
+
+  <CompactSection className="xl:max-w-none">
+    <ArticleSharePanel
+      description={roadmap.summary}
+      locale={locale}
+      title={roadmap.title}
+      url={shareUrl}
+    />
+  </CompactSection>
+</BaseLayout>

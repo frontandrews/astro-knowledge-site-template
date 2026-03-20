@@ -82,17 +82,26 @@ type SiteCopy = {
     articleLabel: string
     backToRoadmap: string
     browseLibrary: string
+    completedCountSuffix: string
+    continueWhereLeftOff: string
     conceptLabel: string
     copy: string
+    exploreFurther: string
     glossary: string
+    inThisTrack: string
     introEyebrow: string
     linearHeading: string
     nextArticle: string
+    nextTrack: string
     previousArticle: string
+    progressLabel: string
     roadmapEyebrow: string
+    reviewTrack: string
     stepLabel: string
+    stepsLabel: string
     supportCopy: string
     supportHeading: string
+    trackCompleted: string
     title: string
     topics: string
   }
@@ -151,7 +160,7 @@ const siteCopy: Record<SiteLocale, SiteCopy> = {
       quickSummaryTitle: 'What to keep in your head',
       readingTimeLabel: 'Reading time',
       share: 'Share',
-      shareArticleTitle: 'Share this article',
+      shareArticleTitle: 'Share this page',
       shareDescription: 'Share this page directly from the site, open it in chat, or copy the link.',
       shareFallback: 'This browser could not open the share menu. Use copy link instead.',
       shareTitle: 'Share this page',
@@ -186,19 +195,28 @@ const siteCopy: Record<SiteLocale, SiteCopy> = {
     startHere: {
       articleLabel: 'Article',
       backToRoadmap: 'Back to trail',
-      browseLibrary: 'Browse the library',
+      browseLibrary: 'Browse articles',
+      completedCountSuffix: 'completed',
+      continueWhereLeftOff: 'Continue where you left off',
       conceptLabel: 'Concept',
       copy:
-        'A guided editorial roadmap for how to think before you jump into solutions, interviews, or challenge-style problems.',
+        'A guided reading path for how to think before you jump into solutions, interviews, or challenge-style problems.',
+      exploreFurther: 'Explore further',
       glossary: 'Look up a term',
+      inThisTrack: 'In this track',
       introEyebrow: 'Trail',
-      linearHeading: 'Follow the route in order',
+      linearHeading: 'Follow the reading in order',
       nextArticle: 'Next article',
+      nextTrack: 'Next track',
       previousArticle: 'Previous article',
+      progressLabel: 'Track progress',
       roadmapEyebrow: 'Trail',
+      reviewTrack: 'Review the track',
       stepLabel: 'Step',
-      supportCopy: 'When you want to browse more freely, use the library, topics, or glossary as support.',
+      stepsLabel: 'Steps',
+      supportCopy: 'When you want to browse more freely, use articles, topics, or the glossary as support.',
       supportHeading: 'Keep exploring',
+      trackCompleted: 'Track completed',
       title: 'How to think before you solve',
       topics: 'Explore topics',
     },
@@ -233,12 +251,12 @@ const siteCopy: Record<SiteLocale, SiteCopy> = {
       topics: 'Topics',
     },
     search: {
-      copy: 'Search across guides, topics, and glossary entries from one place.',
+      copy: 'Search across articles, topics, and glossary entries from one place.',
       devNotice: 'Search index is generated during build. Use preview/build to test Pagefind locally.',
       title: 'Search the site',
     },
     topicIndex: {
-      copy: 'Cross-cutting hubs that connect guides by theme instead of by curriculum branch.',
+      copy: 'Cross-cutting hubs that connect articles by theme instead of by curriculum branch.',
       title: 'Topics',
     },
   },
@@ -272,7 +290,7 @@ const siteCopy: Record<SiteLocale, SiteCopy> = {
       quickSummaryTitle: 'O que vale manter na cabeca',
       readingTimeLabel: 'Tempo de leitura',
       share: 'Compartilhar',
-      shareArticleTitle: 'Compartilhar este artigo',
+      shareArticleTitle: 'Compartilhar esta pagina',
       shareDescription: 'Compartilhe esta pagina direto do site, abra no chat ou copie o link.',
       shareFallback: 'Este navegador nao conseguiu abrir o menu de compartilhamento. Use copiar link.',
       shareTitle: 'Compartilhar esta pagina',
@@ -307,19 +325,28 @@ const siteCopy: Record<SiteLocale, SiteCopy> = {
     startHere: {
       articleLabel: 'Artigo',
       backToRoadmap: 'Voltar para a trilha',
-      browseLibrary: 'Explorar a biblioteca',
+      browseLibrary: 'Explorar artigos',
+      completedCountSuffix: 'concluidos',
+      continueWhereLeftOff: 'Continuar de onde voce parou',
       conceptLabel: 'Conceito',
       copy:
-        'Um roadmap editorial guiado para como pensar antes de pular para solucoes, entrevistas ou desafios de codigo.',
+        'Uma trilha guiada de leitura para pensar melhor antes de pular para solucoes, entrevistas ou desafios de codigo.',
+      exploreFurther: 'Explore mais',
       glossary: 'Consultar um termo',
+      inThisTrack: 'Nesta trilha',
       introEyebrow: 'Trilha',
-      linearHeading: 'Siga a rota em ordem',
+      linearHeading: 'Siga a leitura em ordem',
       nextArticle: 'Proximo artigo',
+      nextTrack: 'Proxima trilha',
       previousArticle: 'Artigo anterior',
+      progressLabel: 'Progresso da trilha',
       roadmapEyebrow: 'Trilha',
+      reviewTrack: 'Rever a trilha',
       stepLabel: 'Etapa',
-      supportCopy: 'Quando voce quiser explorar com mais liberdade, use a biblioteca, os topicos e o glossario como apoio.',
+      stepsLabel: 'Etapas',
+      supportCopy: 'Quando voce quiser explorar com mais liberdade, use os artigos, os topicos e o glossario como apoio.',
       supportHeading: 'Continue explorando',
+      trackCompleted: 'Trilha concluida',
       title: 'Como pensar antes de resolver',
       topics: 'Explorar topicos',
     },
@@ -354,12 +381,12 @@ const siteCopy: Record<SiteLocale, SiteCopy> = {
       topics: 'Topicos',
     },
     search: {
-      copy: 'Busque em guias, topicos e termos do glossario em um unico lugar.',
+      copy: 'Busque em artigos, topicos e termos do glossario em um unico lugar.',
       devNotice: 'O indice de busca e gerado no build. Use preview/build para testar o Pagefind localmente.',
       title: 'Buscar no site',
     },
     topicIndex: {
-      copy: 'Hubs transversais que conectam os guias por tema, nao so pela trilha curricular.',
+      copy: 'Hubs transversais que conectam os artigos por tema, nao so pela trilha curricular.',
       title: 'Topicos',
     },
   },

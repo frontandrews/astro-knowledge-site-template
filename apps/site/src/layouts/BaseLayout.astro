@@ -287,6 +287,7 @@ const pageShellClass =
 </html>
 
 <script>
+  import { completedGuidesChangedEvent, readCompletedGuides } from '@/lib/completed-guides'
   import { readLocalStorageString, writeLocalStorageString } from '@/lib/local-storage'
   import { siteStorageKeys } from '@/lib/storage-keys'
 
@@ -297,6 +298,19 @@ const pageShellClass =
   const mobileNavCloseIcon = document.querySelector('[data-mobile-nav-close-icon]')
   const mobileNavToggleLabel = document.querySelector('[data-mobile-nav-toggle-label]')
   const mobileNavLinks = [...document.querySelectorAll('#mobile-site-nav a')]
+  const syncCompletedGuideCards = () => {
+    const completedGuideIds = new Set(readCompletedGuides())
+    const guideCards = document.querySelectorAll('[data-guide-post]')
+
+    guideCards.forEach((card) => {
+      if (!(card instanceof HTMLElement)) {
+        return
+      }
+
+      const guideId = card.dataset.guidePost ?? ''
+      card.classList.toggle('is-complete', Boolean(guideId && completedGuideIds.has(guideId)))
+    })
+  }
 
   localeChoiceLinks.forEach((link) => {
     link.addEventListener('click', () => {
@@ -357,6 +371,14 @@ const pageShellClass =
   if (!savedLocalePreference && preferredLocale !== currentLocale && alternateHref && alternateLocale === preferredLocale) {
     window.location.replace(alternateHref)
   }
+
+  syncCompletedGuideCards()
+  window.addEventListener(completedGuidesChangedEvent, syncCompletedGuideCards)
+  window.addEventListener('storage', (event) => {
+    if (event.key === siteStorageKeys.completedGuides) {
+      syncCompletedGuideCards()
+    }
+  })
 
   const desktopNavMedia = window.matchMedia('(min-width: 896px)')
   desktopNavMedia.addEventListener('change', (event) => {

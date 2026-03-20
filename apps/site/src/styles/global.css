@@ -224,12 +224,36 @@ pre {
   }
 
   [data-guide-post].is-complete {
-    border-color: color-mix(in srgb, var(--site-success) 70%, white);
-    background: color-mix(in srgb, var(--site-success) 10%, var(--site-surface));
+    border-color: color-mix(in srgb, var(--site-line) 88%, rgba(255, 255, 255, 0.12));
+    background: color-mix(in srgb, var(--site-surface) 18%, transparent);
+    opacity: 0.7;
   }
 
   [data-guide-post].is-complete [data-card-title] {
-    color: var(--site-success);
+    color: var(--site-ink-soft);
+  }
+
+  [data-guide-post].is-complete [data-guide-post-complete-badge] {
+    display: inline-flex;
+    opacity: 1;
+  }
+
+  [data-guide-post].is-complete [data-guide-post-default-cta] {
+    opacity: 0;
+    transform: translateX(0.25rem);
+  }
+
+  [data-guide-post].is-complete:hover [data-guide-post-complete-badge],
+  [data-guide-post].is-complete:focus-within [data-guide-post-complete-badge] {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  [data-guide-post].is-complete:hover [data-guide-post-complete-text],
+  [data-guide-post].is-complete:focus-within [data-guide-post-complete-text] {
+    opacity: 1;
+    transform: translateX(0);
+    color: var(--site-link-hover);
   }
 
   [data-tree-filter].is-active {
@@ -263,6 +287,36 @@ pre {
 
   [data-reading-progress].is-complete [data-reading-progress-complete] {
     display: grid;
+  }
+
+  [data-track-step].is-complete {
+    background: color-mix(in srgb, var(--site-surface) 18%, transparent);
+  }
+
+  [data-track-step].is-complete [data-track-step-index] {
+    border-color: color-mix(in srgb, var(--site-success) 50%, transparent);
+    color: var(--site-success);
+  }
+
+  [data-track-step].is-complete [data-track-step-title] {
+    color: var(--site-ink);
+  }
+
+  [data-track-step].is-complete [data-track-step-status] {
+    opacity: 1;
+  }
+
+  [data-track-progress-root].is-complete [data-track-progress-bar] {
+    background: linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--site-success) 72%, white 28%) 0%,
+      var(--site-success) 100%
+    );
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--site-success) 40%, transparent);
+  }
+
+  [data-track-progress-root].is-complete [data-track-progress-status] {
+    color: var(--site-success);
   }
 }
 

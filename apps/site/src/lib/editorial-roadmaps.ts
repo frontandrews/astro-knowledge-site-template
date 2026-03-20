@@ -108,8 +108,8 @@ const START_HERE_ROADMAP: EditorialRoadmap = {
     'pt-br': 'como-pensar-antes-de-resolver',
   },
   summary: {
-    en: 'A guided route through the concepts and guides that help you think clearly before solving.',
-    'pt-br': 'Uma rota guiada pelos conceitos e guias que ajudam voce a pensar com clareza antes de resolver.',
+    en: 'A guided reading route through the articles that help you think clearly before solving.',
+    'pt-br': 'Uma rota guiada de leitura pelos artigos que ajudam voce a pensar com clareza antes de resolver.',
   },
   tags: [
     {

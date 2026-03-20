@@ -1,0 +1,185 @@
+---
+import ArrowRightIcon from '@/components/ui/icons/ArrowRightIcon.astro'
+import { cn } from '@/lib/cn'
+import { getSiteCopy, type SiteLocale } from '@/lib/site-copy'
+import { ui } from '@/lib/ui'
+
+type TrackItem = {
+  guideId: string
+  href: string
+  title: string
+}
+
+type SupportLink = {
+  href: string
+  title: string
+}
+
+type Props = {
+  className?: string
+  items: TrackItem[]
+  levelLabel: string
+  locale: SiteLocale
+  supportLinks: SupportLink[]
+  totalReadingMinutes: number
+}
+
+const {
+  className = '',
+  items,
+  levelLabel,
+  locale,
+  supportLinks,
+  totalReadingMinutes,
+} = Astro.props
+
+const copy = getSiteCopy(locale)
+const metaLine = `${items.length} ${copy.startHere.stepsLabel.toLocaleLowerCase(locale === 'pt-br' ? 'pt-BR' : 'en-US')} • ~${totalReadingMinutes} min • ${levelLabel}`
+const ofLabel = locale === 'pt-br' ? 'de' : 'of'
+const initialHref = items[0]?.href ?? '#'
+---
+
+<section
+  class={cn(ui.compactSection, className)}
+  data-track-progress-root
+  data-of-label={ofLabel}
+  data-progress-label={copy.startHere.progressLabel}
+  data-review-label={copy.startHere.reviewTrack}
+  data-step-label={copy.startHere.stepLabel}
+  data-track-completed-label={copy.startHere.trackCompleted}
+>
+  <div class={cn(ui.panel, 'grid gap-5 px-5 py-5 min-[64rem]:gap-6 min-[64rem]:px-6 min-[64rem]:py-6')}>
+    <div class="grid gap-2.5">
+      <p class="m-0 text-[0.82rem] font-medium tracking-[0.03em] text-site-ink-soft min-[64rem]:text-[0.9rem]">
+        {metaLine}
+      </p>
+      <div class="grid gap-2">
+        <p class="m-0 text-[0.9rem] font-medium text-site-ink min-[64rem]:text-[0.98rem]" data-track-progress-status>
+          {copy.startHere.progressLabel}: {copy.startHere.stepLabel} 1 {ofLabel} {items.length}
+        </p>
+        <div class="h-2 overflow-hidden rounded-full bg-[color:color-mix(in_srgb,var(--site-bg)_72%,transparent)]">
+          <div
+            class="h-full w-0 rounded-full bg-[linear-gradient(90deg,color-mix(in_srgb,var(--site-link-hover)_70%,white_30%)_0%,var(--site-link-hover)_100%)] transition-[width,background,box-shadow] duration-200"
+            data-track-progress-bar
+          />
+        </div>
+      </div>
+    </div>
+
+    <a
+      class="group inline-flex w-fit items-center gap-2 rounded-[var(--radius-sm)] border border-site-line bg-site-card px-3.5 py-2 text-[0.82rem] font-medium text-site-ink transition-colors duration-150 hover:border-site-line-strong hover:bg-site-hover hover:text-site-link-hover focus-visible:border-site-line-strong focus-visible:bg-site-hover focus-visible:text-site-link-hover focus-visible:outline-none min-[64rem]:px-4 min-[64rem]:py-2.5 min-[64rem]:text-[0.9rem]"
+      data-track-progress-cta
+      href={initialHref}
+    >
+      <span data-track-progress-cta-label>{copy.startHere.continueWhereLeftOff}</span>
+      <ArrowRightIcon className="size-[0.92rem]" />
+    </a>
+
+    <div class="grid gap-2 border-t border-site-line pt-4">
+      <p class="m-0 text-[0.72rem] font-bold uppercase tracking-[0.18em] text-site-line-strong min-[64rem]:text-[0.78rem]">
+        {copy.startHere.exploreFurther}
+      </p>
+      <div class="flex flex-wrap gap-2.5">
+        {supportLinks.map((link) => (
+          <a
+            class="inline-flex items-center rounded-full border border-site-line bg-site-card px-3 py-1.5 text-[0.76rem] font-medium text-site-ink transition-colors duration-150 hover:border-site-line-strong hover:bg-site-hover hover:text-site-link-hover focus-visible:border-site-line-strong focus-visible:bg-site-hover focus-visible:text-site-link-hover focus-visible:outline-none min-[64rem]:px-3.5 min-[64rem]:text-[0.84rem]"
+            href={link.href}
+          >
+            {link.title}
+          </a>
+        ))}
+      </div>
+    </div>
+
+    <div class="hidden" aria-hidden="true">
+      {items.map((item) => (
+        <a data-track-progress-item data-track-href={item.href} data-track-item={item.guideId} href={item.href}>
+          {item.title}
+        </a>
+      ))}
+    </div>
+  </div>
+</section>
+
+<script>
+  import { completedGuidesChangedEvent, readCompletedGuides } from '@/lib/completed-guides'
+  import { siteStorageKeys } from '@/lib/storage-keys'
+
+  const roots = document.querySelectorAll('[data-track-progress-root]')
+
+  for (const root of roots) {
+    if (!(root instanceof HTMLElement)) {
+      continue
+    }
+
+    const progressStatus = root.querySelector('[data-track-progress-status]')
+    const progressBar = root.querySelector('[data-track-progress-bar]')
+    const cta = root.querySelector('[data-track-progress-cta]')
+    const ctaLabel = root.querySelector('[data-track-progress-cta-label]')
+    const itemLinks = [...root.querySelectorAll('[data-track-progress-item]')]
+    const totalSteps = itemLinks.length
+    const progressLabel = root.dataset.progressLabel ?? 'Progress'
+    const stepLabel = root.dataset.stepLabel ?? 'Step'
+    const ofLabel = root.dataset.ofLabel ?? 'of'
+    const continueLabel = ctaLabel?.textContent ?? 'Continue'
+    const reviewLabel = root.dataset.reviewLabel ?? 'Review'
+    const completedLabel = root.dataset.trackCompletedLabel ?? 'Completed'
+
+    const syncTrackProgress = () => {
+      const completedGuideIds = new Set(readCompletedGuides())
+      let completedCount = 0
+      let firstUnreadHref = ''
+      let firstUnreadStep = totalSteps
+
+      itemLinks.forEach((item, index) => {
+        if (!(item instanceof HTMLElement)) {
+          return
+        }
+
+        const guideId = item.dataset.trackItem ?? ''
+        const isComplete = Boolean(guideId && completedGuideIds.has(guideId))
+
+        if (isComplete) {
+          completedCount += 1
+          return
+        }
+
+        if (!firstUnreadHref) {
+          firstUnreadHref = item.dataset.trackHref ?? ''
+          firstUnreadStep = index + 1
+        }
+      })
+
+      const isComplete = totalSteps > 0 && completedCount >= totalSteps
+      const percent = totalSteps > 0 ? Math.round((completedCount / totalSteps) * 100) : 0
+
+      root.classList.toggle('is-complete', isComplete)
+
+      if (progressBar instanceof HTMLElement) {
+        progressBar.style.width = `${percent}%`
+      }
+
+      if (progressStatus instanceof HTMLElement) {
+        progressStatus.textContent = isComplete
+          ? completedLabel
+          : `${progressLabel}: ${stepLabel} ${firstUnreadStep} ${ofLabel} ${totalSteps}`
+      }
+
+      if (cta instanceof HTMLAnchorElement) {
+        cta.href = isComplete ? itemLinks[0]?.getAttribute('href') ?? '#' : firstUnreadHref || '#'
+      }
+
+      if (ctaLabel instanceof HTMLElement) {
+        ctaLabel.textContent = isComplete ? reviewLabel : continueLabel
+      }
+    }
+
+    syncTrackProgress()
+    window.addEventListener(completedGuidesChangedEvent, syncTrackProgress)
+    window.addEventListener('storage', (event) => {
+      if (event.key === siteStorageKeys.completedGuides) {
+        syncTrackProgress()
+      }
+    })
+  }
+</script>

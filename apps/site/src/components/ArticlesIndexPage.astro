@@ -30,7 +30,7 @@ const items = posts.map((post) => {
 
   return {
     badgeLabel: post.data.kind === 'article' ? (locale === 'pt-br' ? 'Nota' : 'Journal') : undefined,
-    completionId: post.data.kind === 'guide' ? post.data.guideId : undefined,
+    completionId: post.data.guideId,
     contentKind: post.data.kind,
     ctaLabel: locale === 'pt-br' ? 'Ler mais' : 'Learn more',
     description: post.data.description,

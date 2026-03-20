@@ -23,6 +23,7 @@ type TocHeading = {
 
 type Props = {
   className?: string
+  completionId?: string | null
   headings: TocHeading[]
   categoryLabel?: string
   levelLabel?: string
@@ -38,6 +39,7 @@ type Props = {
 
 const {
   className = '',
+  completionId = null,
   headings,
   categoryLabel = '',
   levelLabel = '',
@@ -66,6 +68,7 @@ const linkedinHref = shareUrl ? `https://www.linkedin.com/sharing/share-offsite/
     )}
     data-copy-link-error={copy.article.copyLinkError}
     data-copy-link-success={copy.article.copyLinkSuccess}
+    data-completion-id={completionId ?? ''}
     data-share-url={shareUrl}
     data-toc-root
   >
@@ -228,7 +231,9 @@ const linkedinHref = shareUrl ? `https://www.linkedin.com/sharing/share-offsite/
   </section>
 </aside>
 
-<script is:inline>
+<script>
+  import { markGuideCompleted, markGuideUnread, readCompletedGuides } from '@/lib/completed-guides';
+
   const tocRoots = document.querySelectorAll('[data-toc-root]');
 
   for (const root of tocRoots) {
@@ -247,6 +252,7 @@ const linkedinHref = shareUrl ? `https://www.linkedin.com/sharing/share-offsite/
     const tocSection = root.querySelector('[data-toc-section]');
     const readingContent = document.querySelector('[data-article-reading-content]');
     const readingEnd = document.querySelector('[data-article-reading-end]');
+    const completionId = root.dataset.completionId ?? '';
 
     const headingElements = links.map((link) => {
       const slug = link.dataset.tocSlug;
@@ -276,6 +282,9 @@ const linkedinHref = shareUrl ? `https://www.linkedin.com/sharing/share-offsite/
         isResettingToUnread = true;
         resetUntil = window.performance.now() + 700;
         hasCompletedReading = false;
+        if (completionId) {
+          markGuideUnread(completionId);
+        }
         progressSection?.classList.remove('is-complete');
         if (progressBar instanceof HTMLElement) {
           progressBar.style.width = '0%';
@@ -368,6 +377,9 @@ const linkedinHref = shareUrl ? `https://www.linkedin.com/sharing/share-offsite/
         };
         const markComplete = () => {
           hasCompletedReading = true;
+          if (completionId) {
+            markGuideCompleted(completionId);
+          }
           progressBar.style.width = '100%';
           progressValue.textContent = '100%';
           progressSection?.classList.add('is-complete');
@@ -434,6 +446,10 @@ const linkedinHref = shareUrl ? `https://www.linkedin.com/sharing/share-offsite/
     window.addEventListener('scroll', schedule, { passive: true });
     window.addEventListener('resize', schedule);
     window.addEventListener('hashchange', schedule);
+
+    if (completionId && readCompletedGuides().includes(completionId)) {
+      hasCompletedReading = true;
+    }
 
     schedule();
   }

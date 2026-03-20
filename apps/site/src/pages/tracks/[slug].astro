@@ -1,7 +1,7 @@
 ---
 import { getCollection } from 'astro:content'
 
-import StartHerePage from '@/components/StartHerePage.astro'
+import TrackPage from '@/components/TrackPage.astro'
 import { resolveEditorialRoadmaps } from '@/lib/editorial-roadmaps'
 
 export async function getStaticPaths() {
@@ -17,4 +17,4 @@ export async function getStaticPaths() {
 const { roadmap } = Astro.props
 ---
 
-<StartHerePage locale="en" roadmap={roadmap} />
+<TrackPage locale="en" roadmap={roadmap} />

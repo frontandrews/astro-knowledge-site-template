@@ -84,7 +84,7 @@ export const linkCardHeaderVariants = cva('', {
   },
 })
 
-export const articleCardArticleVariants = cva('group h-full bg-transparent', {
+export const articleCardArticleVariants = cva('group relative h-full bg-transparent', {
   variants: {
     variant: {
       linear: 'border-t border-site-line',

@@ -235,6 +235,7 @@ const articleUrl = new URL(Astro.url.pathname, Astro.site ?? Astro.url).toString
       <div class="hidden xl:col-start-3 xl:block xl:h-fit xl:w-72 xl:justify-self-end xl:translate-x-38 xl:sticky xl:top-28">
         <ArticleStickyMeta
           categoryLabel={categoryLabel}
+          completionId={post.data.guideId}
           headings={displayHeadings}
           levelLabel={levelLabel}
           locale={locale}

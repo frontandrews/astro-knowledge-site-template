@@ -2,7 +2,7 @@
   import { onMount, tick } from 'svelte'
   import ArrowRightIcon from '@/components/ui/icons/ArrowRightIcon.svelte'
   import { cn } from '@/lib/cn'
-  import { readLocalStorageJson } from '@/lib/local-storage'
+  import { readCompletedGuides, completedGuidesChangedEvent } from '@/lib/completed-guides'
   import { ui } from '@/lib/ui'
   import { directoryLinkVariants, directoryListVariants, filterChipVariants } from '@/lib/ui-variants'
 
@@ -13,6 +13,7 @@
 
   type DirectoryItem = {
     badgeLabel?: string
+    completedCtaLabel?: string
     completionId?: string
     contentKind?: 'article' | 'guide'
     ctaLabel?: string
@@ -57,7 +58,7 @@
   let activeType: 'all' | 'article' | 'guide' = 'all'
   let showAllFilters = false
   let visibleCategoryCount = 0
-  let completedItemIds = new Set<string>()
+  let completedItemIds = new Set<string>(typeof window === 'undefined' ? [] : readCompletedGuides())
   let filterMeasureContainer: HTMLDivElement | null = null
   let resizeObserver: ResizeObserver | null = null
   let measureRun = 0
@@ -181,6 +182,14 @@
     return Boolean(item.completionId && completedItemIds.has(item.completionId))
   }
 
+  function getCompletedCtaLabel(item: DirectoryItem) {
+    if (item.completedCtaLabel) {
+      return item.completedCtaLabel
+    }
+
+    return item.ctaLabel === 'Ler mais' ? 'Ler novamente' : 'Read again'
+  }
+
   function syncFilterFromQuery() {
     if (typeof window === 'undefined' || !filterQueryKey) {
       return
@@ -194,13 +203,34 @@
   }
 
   onMount(() => {
+    const cleanup: Array<() => void> = []
+    const syncCompletedItems = () => {
+      completedItemIds = new Set(readCompletedGuides())
+    }
+
     if (completionStorageKey) {
-      completedItemIds = new Set(readLocalStorageJson<string[]>(completionStorageKey, []))
+      syncCompletedItems()
+
+      const handleCompletedItemsChanged = () => {
+        syncCompletedItems()
+      }
+
+      const handleStorage = (event: StorageEvent) => {
+        if (event.key === completionStorageKey) {
+          syncCompletedItems()
+        }
+      }
+
+      window.addEventListener(completedGuidesChangedEvent, handleCompletedItemsChanged)
+      window.addEventListener('storage', handleStorage)
+      cleanup.push(() => {
+        window.removeEventListener(completedGuidesChangedEvent, handleCompletedItemsChanged)
+        window.removeEventListener('storage', handleStorage)
+      })
     }
 
     syncFilterFromQuery()
     hasInitializedQueryFilter = true
-
     resizeObserver = new ResizeObserver(() => {
       void scheduleCollapsedCategoryMeasurement()
     })
@@ -212,6 +242,7 @@
     void scheduleCollapsedCategoryMeasurement()
 
     return () => {
+      cleanup.forEach((callback) => callback())
       resizeObserver?.disconnect()
     }
   })
@@ -360,7 +391,7 @@
 <div class={listClass}>
   {#each visibleItems as item}
     {#if kind === 'guide-rows'}
-      <article class={cn(guideArticleClass, isComplete(item) && 'is-complete')} data-guide-post={item.completionId}>
+      <article class={cn(guideArticleClass, 'relative', isComplete(item) && 'is-complete')} data-guide-post={item.completionId}>
         <a class={itemLinkClass} href={item.href}>
           {#if item.eyebrow || item.badgeLabel}
             <div class="flex flex-wrap items-center gap-2">
@@ -384,21 +415,52 @@
             <p class={ui.cardDescription}>{item.description}</p>
           {/if}
           {#if item.ctaLabel}
-            <span class={cn(ui.inlineCta, 'md:hidden')}>
-              <span>{item.ctaLabel}</span>
-              <ArrowRightIcon className="size-[0.88rem]" />
-            </span>
-            <span
-              class="pointer-events-none absolute right-4 top-1/2 hidden -translate-y-1/2 items-center gap-1.5 text-[0.76rem] font-medium tracking-[0.04em] text-site-ink-muted opacity-0 transition-all duration-150 group-hover:translate-x-0 group-hover:opacity-100 group-hover:text-site-link-hover group-focus-within:translate-x-0 group-focus-within:opacity-100 group-focus-within:text-site-link-hover min-[64rem]:gap-2 min-[64rem]:text-[0.84rem] md:inline-flex"
-            >
-              <span>{item.ctaLabel}</span>
-              <ArrowRightIcon className="size-[0.88rem]" />
-            </span>
+            {#if isComplete(item)}
+              <span class={cn(ui.inlineCta, 'md:hidden')}>
+                <span>{getCompletedCtaLabel(item)}</span>
+                <ArrowRightIcon className="size-[0.88rem]" />
+              </span>
+              <span
+                class="pointer-events-none absolute right-4 top-1/2 hidden min-w-[9.25rem] -translate-y-1/2 items-center justify-end min-[64rem]:inline-flex"
+              >
+                <span
+                  aria-hidden="true"
+                  class="inline-flex size-8 items-center justify-center rounded-full border border-[color:color-mix(in_srgb,var(--site-success)_55%,transparent)] bg-[color:color-mix(in_srgb,var(--site-success)_20%,var(--site-surface))] text-[0.98rem] font-semibold text-[color:color-mix(in_srgb,var(--site-success)_78%,black_22%)] transition-all duration-150 group-hover:scale-90 group-hover:opacity-0 group-focus-within:scale-90 group-focus-within:opacity-0 min-[64rem]:size-9 min-[64rem]:text-[1.08rem]"
+                  data-guide-post-complete-badge
+                >
+                  ✓
+                </span>
+                <span class="absolute right-0 inline-flex translate-x-1 items-center gap-1.5 text-[0.76rem] font-medium tracking-[0.04em] text-site-ink-muted opacity-0 transition-all duration-150 group-hover:translate-x-0 group-hover:opacity-100 group-hover:text-site-link-hover group-focus-within:translate-x-0 group-focus-within:opacity-100 group-focus-within:text-site-link-hover min-[64rem]:gap-2 min-[64rem]:text-[0.84rem]">
+                  <span>{getCompletedCtaLabel(item)}</span>
+                  <ArrowRightIcon className="size-[0.88rem]" />
+                </span>
+              </span>
+            {:else}
+              <span class={cn(ui.inlineCta, 'md:hidden')}>
+                <span>{item.ctaLabel}</span>
+                <ArrowRightIcon className="size-[0.88rem]" />
+              </span>
+              <span
+                class="pointer-events-none absolute right-4 top-1/2 hidden -translate-y-1/2 items-center gap-1.5 text-[0.76rem] font-medium tracking-[0.04em] text-site-ink-muted opacity-0 transition-all duration-150 group-hover:translate-x-0 group-hover:opacity-100 group-hover:text-site-link-hover group-focus-within:translate-x-0 group-focus-within:opacity-100 group-focus-within:text-site-link-hover min-[64rem]:gap-2 min-[64rem]:text-[0.84rem] md:inline-flex"
+              >
+                <span>{item.ctaLabel}</span>
+                <ArrowRightIcon className="size-[0.88rem]" />
+              </span>
+            {/if}
           {/if}
         </a>
       </article>
     {:else}
-      <a class={itemLinkClass} href={item.href}>
+      <a class={cn(itemLinkClass, 'relative', isComplete(item) && 'is-complete')} data-guide-post={item.completionId} href={item.href}>
+        {#if item.completionId}
+          <span
+            aria-hidden="true"
+            class="pointer-events-none absolute right-4 top-4 hidden size-8 items-center justify-center rounded-full border border-[color:color-mix(in_srgb,var(--site-success)_55%,transparent)] bg-[color:color-mix(in_srgb,var(--site-success)_20%,var(--site-surface))] text-[0.98rem] font-semibold text-[color:color-mix(in_srgb,var(--site-success)_78%,black_22%)] min-[64rem]:size-9 min-[64rem]:text-[1.08rem]"
+            data-guide-post-complete-badge
+          >
+            ✓
+          </span>
+        {/if}
         <div class="grid gap-2">
           <div class="flex items-center justify-between gap-4">
             <h2 class={ui.linkCardTitle}>{item.title}</h2>
