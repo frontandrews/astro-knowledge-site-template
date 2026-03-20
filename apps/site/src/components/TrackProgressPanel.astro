@@ -58,7 +58,7 @@ const copyLabels =
 >
   <div class="grid gap-5 border-y border-site-line bg-transparent px-[0.45rem] py-5 lg:gap-6 lg:px-[0.55rem] lg:py-6">
     <div class="grid gap-2.5">
-      <p class="m-0 text-[0.82rem] font-medium tracking-[0.03em] text-site-ink-soft lg:text-[0.9rem]">
+      <p class={ui.progressMeta}>
         {metaLine}
       </p>
       <div class="grid gap-2">
@@ -70,9 +70,9 @@ const copyLabels =
             0%
           </p>
         </div>
-        <div class="h-2 overflow-hidden rounded-full bg-[color:color-mix(in_srgb,var(--site-bg)_72%,transparent)]">
+        <div class={ui.progressTrackStrong}>
           <div
-            class="h-full w-0 rounded-full bg-[linear-gradient(90deg,color-mix(in_srgb,var(--site-link-hover)_70%,white_30%)_0%,var(--site-link-hover)_100%)] transition-[width,background,box-shadow] duration-200"
+            class={ui.progressBar}
             data-track-progress-bar
           />
         </div>
@@ -89,7 +89,7 @@ const copyLabels =
     </a>
 
     <div class="grid gap-3 border-t border-site-line pt-4">
-      <p class="m-0 flex items-center gap-2 text-[0.88rem] font-semibold leading-6 text-site-ink lg:text-[0.96rem]" data-track-overall-status>
+      <p class={cn(ui.progressStatus, 'flex items-center gap-2')} data-track-overall-status>
         <span aria-hidden="true" class="text-site-ink-muted" data-track-overall-icon>→</span>
         <span data-track-overall-text>{copyLabels.continueTrack}</span>
       </p>

@@ -59,7 +59,7 @@
 {:else}
   <section class={cn(ui.articleSection, 'flex justify-center')} data-article-reading-end>
     <button
-      class={cn(ui.controlButton, 'px-4 py-3 text-[0.88rem] font-medium lg:px-[1.125rem] lg:py-3.5 lg:text-[0.96rem]')}
+      class={cn(ui.controlButton, 'px-4 py-3 text-[0.88rem] font-medium lg:px-4.5 lg:py-3.5 lg:text-[0.96rem]')}
       on:click={openComments}
       type="button"
     >

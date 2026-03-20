@@ -40,15 +40,14 @@
   export let filterQueryKey: string | null = null
 
   const filterTones = [
-    { dark: '#24364f', light: '#dbeafe' },
-    { dark: '#2d3358', light: '#dbe4ff' },
-    { dark: '#334155', light: '#e2e8f0' },
-    { dark: '#1f4556', light: '#e0f2fe' },
-    { dark: '#41305a', light: '#ede9fe' },
-    { dark: '#274737', light: '#e2f2ea' },
+    { dark: 'var(--site-filter-tone-1-dark)', light: 'var(--site-filter-tone-1-light)' },
+    { dark: 'var(--site-filter-tone-2-dark)', light: 'var(--site-filter-tone-2-light)' },
+    { dark: 'var(--site-filter-tone-3-dark)', light: 'var(--site-filter-tone-3-light)' },
+    { dark: 'var(--site-filter-tone-4-dark)', light: 'var(--site-filter-tone-4-light)' },
+    { dark: 'var(--site-filter-tone-5-dark)', light: 'var(--site-filter-tone-5-light)' },
+    { dark: 'var(--site-filter-tone-6-dark)', light: 'var(--site-filter-tone-6-light)' },
   ]
-  const filterLabelClass =
-    'm-0 mb-2 text-[0.72rem] font-bold uppercase tracking-[0.22em] text-site-ink-subtle lg:text-[0.8rem]'
+  const filterLabelClass = ui.filterLabel
   const itemEyebrowClass = ui.metaQuiet
   const listClass = directoryListVariants({ kind })
   const guideArticleClass = ui.linearRow
@@ -403,7 +402,7 @@
           {#if item.completionId}
             <span
               aria-hidden="true"
-              class="pointer-events-none absolute right-3 top-3.5 inline-flex size-7 items-center justify-center rounded-full border border-[color:color-mix(in_srgb,var(--site-success)_55%,transparent)] bg-[color:color-mix(in_srgb,var(--site-success)_20%,var(--site-surface))] text-[0.92rem] font-semibold text-[color:color-mix(in_srgb,var(--site-success)_78%,black_22%)] transition-all duration-150 lg:right-4 lg:top-1/2 lg:size-9 lg:-translate-y-1/2 lg:text-[1.08rem]"
+              class={ui.completionBadgeLinear}
               data-guide-post-complete-badge
             >
               ✓
@@ -436,10 +435,8 @@
                 <span>{getCompletedCtaLabel(item)}</span>
                 <ArrowRightIcon className="size-[0.88rem]" />
               </span>
-              <span
-                class="pointer-events-none absolute right-4 top-1/2 hidden min-w-[9.25rem] -translate-y-1/2 items-center justify-end lg:inline-flex"
-              >
-                <span class="absolute right-0 inline-flex translate-x-1 items-center gap-1.5 text-[0.76rem] font-medium tracking-[0.04em] text-site-ink-muted opacity-0 transition-all duration-150 group-hover:translate-x-0 group-hover:opacity-100 group-hover:text-site-link-hover group-focus-within:translate-x-0 group-focus-within:opacity-100 group-focus-within:text-site-link-hover lg:gap-2 lg:text-[0.84rem]" data-guide-post-complete-text>
+              <span class={ui.completionRailLg}>
+                <span class={ui.completionDesktopCtaInteractive} data-guide-post-complete-text>
                   <span>{getCompletedCtaLabel(item)}</span>
                   <ArrowRightIcon className="size-[0.88rem]" />
                 </span>
@@ -449,11 +446,11 @@
                 <span>{item.ctaLabel}</span>
                 <ArrowRightIcon className="size-[0.88rem]" />
               </span>
-              <span
-                class="pointer-events-none absolute right-4 top-1/2 hidden -translate-y-1/2 items-center gap-1.5 text-[0.76rem] font-medium tracking-[0.04em] text-site-ink-muted opacity-0 transition-all duration-150 group-hover:translate-x-0 group-hover:opacity-100 group-hover:text-site-link-hover group-focus-within:translate-x-0 group-focus-within:opacity-100 group-focus-within:text-site-link-hover lg:gap-2 lg:text-[0.84rem] md:inline-flex"
-              >
-                <span>{item.ctaLabel}</span>
-                <ArrowRightIcon className="size-[0.88rem]" />
+              <span class={ui.completionRailInlineMd}>
+                <span class={ui.completionDesktopCtaInteractive}>
+                  <span>{item.ctaLabel}</span>
+                  <ArrowRightIcon className="size-[0.88rem]" />
+                </span>
               </span>
             {/if}
           {/if}
@@ -464,7 +461,7 @@
         {#if item.completionId}
           <span
             aria-hidden="true"
-            class="pointer-events-none absolute right-4 top-4 inline-flex size-8 items-center justify-center rounded-full border border-[color:color-mix(in_srgb,var(--site-success)_55%,transparent)] bg-[color:color-mix(in_srgb,var(--site-success)_20%,var(--site-surface))] text-[0.98rem] font-semibold text-[color:color-mix(in_srgb,var(--site-success)_78%,black_22%)] transition-all duration-150 lg:size-9 lg:text-[1.08rem]"
+            class={ui.completionBadgeCard}
             data-guide-post-complete-badge
           >
             ✓

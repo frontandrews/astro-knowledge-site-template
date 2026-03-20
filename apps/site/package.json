@@ -7,7 +7,10 @@
     "build": "astro build && node ./scripts/build-search-index.mjs",
     "check": "astro check",
     "dev": "astro dev",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "style:guard": "node ./scripts/style-guard.mjs",
+    "tailwind:canonical": "node ./scripts/tailwind-canonical.mjs",
+    "tailwind:canonical:fix": "node ./scripts/tailwind-canonical.mjs --write"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.12",

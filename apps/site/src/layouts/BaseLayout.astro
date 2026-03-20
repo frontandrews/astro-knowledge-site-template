@@ -73,34 +73,29 @@ const newsletterFormAction = configuredNewsletterAction && configuredNewsletterA
   ? configuredNewsletterAction
   : null
 const brandLinkClass =
-  'inline-flex min-h-10 items-center gap-3 text-site-ink lg:min-h-11 lg:gap-3.5 max-[56rem]:min-h-8 max-[56rem]:gap-2'
-const brandIconWrapClass = 'inline-flex size-8 items-center justify-center lg:size-9 max-[56rem]:size-[1.6rem]'
-const brandIconClass = 'size-7 lg:size-[1.85rem] max-[56rem]:size-[1.3rem]'
+  'inline-flex min-h-8 items-center gap-2 text-site-ink nav:min-h-10 nav:gap-3 lg:min-h-11 lg:gap-3.5'
+const brandIconWrapClass = 'inline-flex size-[1.6rem] items-center justify-center nav:size-8 lg:size-9'
+const brandIconClass = 'size-[1.3rem] nav:size-7 lg:size-[1.85rem]'
 const brandLabelClass =
-  'font-head text-[clamp(1.45rem,3vw,2rem)] leading-none tracking-[-0.04em] lg:text-[clamp(1.6rem,2.4vw,2.2rem)] max-[56rem]:text-[1.2rem]'
-const mobileNavLinkClass =
-  'block rounded-[var(--radius-xs)] px-3 py-3 text-[0.98rem] font-medium text-site-ink transition-colors duration-150 hover:bg-site-hover hover:text-site-link-hover focus-visible:bg-site-hover focus-visible:text-site-link-hover focus-visible:outline-none lg:px-3.5 lg:py-3.5 lg:text-[1.02rem]'
+  'font-head text-[1.2rem] leading-none tracking-[-0.04em] nav:text-[clamp(1.45rem,3vw,2rem)] lg:text-[clamp(1.6rem,2.4vw,2.2rem)]'
+const mobileNavLinkClass = ui.navMenuLink
 const mobileNavActiveClass = 'bg-site-hover text-site-link-hover'
 const localeSwitchClass =
   'inline-flex items-center rounded-full border border-site-line bg-site-panel p-1'
 const localeOptionActiveClass = 'bg-site-hover text-site-link-hover'
 const mobileLocaleOptionClass =
   'inline-flex min-h-9 min-w-12 items-center justify-center rounded-full px-3 py-1.5 text-[0.76rem] font-semibold tracking-[0.08em] text-site-ink transition-colors duration-150 hover:text-site-link-hover focus-visible:text-site-link-hover focus-visible:outline-none'
-const desktopDropdownTriggerClass =
-  'inline-flex min-h-9 cursor-pointer list-none items-center justify-center gap-1.5 rounded-full px-1 py-2 text-[0.92rem] font-medium text-site-ink transition-colors duration-150 hover:text-site-link-hover focus-visible:text-site-link-hover focus-visible:outline-none lg:min-h-10 lg:px-2 lg:text-[1rem] [&::-webkit-details-marker]:hidden'
+const desktopDropdownTriggerClass = ui.dropdownTrigger
 const desktopDropdownMenuClass =
-  'absolute right-0 top-[calc(100%+0.6rem)] z-30 grid min-w-[13rem] gap-1 rounded-[var(--radius)] border border-site-line bg-site-panel p-2 shadow-[0_18px_60px_rgba(5,10,20,0.2)] lg:min-w-[14rem]'
-const desktopExploreLinkClass =
-  'flex items-center gap-2.5 rounded-[var(--radius-xs)] px-3 py-3 text-[0.95rem] font-medium text-site-ink transition-colors duration-150 hover:bg-site-hover hover:text-site-link-hover focus-visible:bg-site-hover focus-visible:text-site-link-hover focus-visible:outline-none lg:gap-3 lg:px-3.5 lg:py-3.5 lg:text-[1.04rem]'
+  cn(ui.dropdownMenu, 'min-w-52 lg:min-w-56')
+const desktopExploreLinkClass = ui.navMenuRowLink
 const desktopLocaleTriggerClass =
   cn(ui.controlButton, 'min-h-9 cursor-pointer list-none gap-1 px-2.5 py-2 text-[0.78rem] font-semibold tracking-[0.08em] lg:min-h-10 lg:gap-1.5 lg:px-3 lg:text-[0.86rem] [&::-webkit-details-marker]:hidden')
-const desktopChallengesLinkClass =
-  'inline-flex min-h-9 items-center justify-center gap-2 rounded-full px-1 py-2 text-[0.92rem] font-medium text-site-ink transition-colors duration-150 hover:text-site-link-hover focus-visible:text-site-link-hover focus-visible:outline-none lg:min-h-10 lg:px-2 lg:text-[1rem]'
-const desktopChallengesBadgeClass =
-  'inline-flex items-center rounded-full bg-black px-2 py-[0.18rem] text-[0.54rem] font-black uppercase tracking-[0.18em] text-yellow-300'
+const desktopChallengesLinkClass = ui.navPillLink
+const desktopChallengesBadgeClass = ui.highlightBadge
 const pageShellClass =
   contentWidth === 'wide'
-    ? 'mx-auto min-h-screen max-w-[72rem] px-4 pb-16 md:px-6 lg:max-w-[80rem]'
+    ? ui.pageShellWide
     : ui.pageShell
 ---
 
@@ -128,8 +123,8 @@ const pageShellClass =
   </head>
   <body data-locale-alternate={alternateLocale} data-locale-redirect-href={localeRedirectHref}>
     <header class="sticky top-0 z-20 mb-4 border-b border-site-line bg-site-bg">
-      <div class={cn(ui.blogFrame, 'py-[0.85rem] lg:py-[1rem] max-[56rem]:py-[0.55rem]')}>
-        <div class="flex items-center justify-between gap-4 max-[56rem]:gap-3">
+      <div class={cn(ui.blogFrame, 'py-[0.55rem] nav:py-[0.85rem] lg:py-4')}>
+        <div class="flex items-center justify-between gap-3 nav:gap-4">
           <a class={brandLinkClass} href={homeHref}>
             <span class={brandIconWrapClass}>
               <BrandIcon className={brandIconClass} />
@@ -137,7 +132,7 @@ const pageShellClass =
             <span class={brandLabelClass}>{copy.header.brand}</span>
           </a>
           <div class="flex items-center gap-2">
-            <div class="hidden min-[56rem]:flex min-[56rem]:items-center min-[56rem]:gap-2">
+            <div class="hidden nav:flex nav:items-center nav:gap-2">
               <a class={cn(desktopChallengesLinkClass, isChallengesPage && 'text-site-link-hover')} href={challengesHref}>
                 <span>{copy.challengeIndex.title}</span>
                 <span class={desktopChallengesBadgeClass}>{challengesBadgeLabel}</span>
@@ -176,13 +171,13 @@ const pageShellClass =
               </details>
             </div>
             <SearchLauncher locale={guideLocale} />
-            <div class="hidden min-[56rem]:flex min-[56rem]:items-center min-[56rem]:gap-2">
+            <div class="hidden nav:flex nav:items-center nav:gap-2">
               <details class="relative">
                 <summary class={desktopLocaleTriggerClass}>
                   <span>{currentLocaleCode}</span>
                   <ChevronDownIcon class="size-4" />
                 </summary>
-                <div aria-label={copy.header.languageSwitcher} class="absolute right-0 top-[calc(100%+0.6rem)] z-30 grid min-w-[10rem] gap-1 rounded-[var(--radius)] border border-site-line bg-site-panel p-2 shadow-[0_18px_60px_rgba(5,10,20,0.2)]">
+                <div aria-label={copy.header.languageSwitcher} class={cn(ui.dropdownMenu, 'min-w-40')}>
                   <a
                     class={cn(mobileNavLinkClass, guideLocale === 'en' && mobileNavActiveClass)}
                     href={englishGuideIndexHref}
@@ -207,7 +202,7 @@ const pageShellClass =
             <button
               aria-controls="mobile-site-nav"
               aria-expanded="false"
-              class={cn(ui.controlButton, 'min-h-10 px-3 py-2 text-sm font-semibold tracking-[0.04em] min-[56rem]:hidden')}
+              class={cn(ui.controlButton, 'min-h-10 px-3 py-2 text-sm font-semibold tracking-[0.04em] nav:hidden')}
               data-label-close={copy.header.closeMenu}
               data-label-open={copy.header.menu}
               data-mobile-nav-toggle
@@ -219,8 +214,8 @@ const pageShellClass =
             </button>
           </div>
         </div>
-        <div class="hidden w-full pt-3 min-[56rem]:hidden" data-mobile-nav-panel id="mobile-site-nav">
-          <div class="grid gap-3 rounded-[var(--radius)] border border-site-line bg-site-panel p-3 shadow-[0_18px_60px_rgba(5,10,20,0.2)]">
+        <div class="hidden w-full pt-3 nav:hidden" data-mobile-nav-panel id="mobile-site-nav">
+          <div class={cn(ui.panel, 'site-dropdown-shadow grid gap-3 p-3')}>
             <nav aria-label={copy.header.primaryNav} class="grid gap-1">
               <a class={cn(mobileNavLinkClass, isArticlesPage && mobileNavActiveClass)} href={articlesHref}>
                 {copy.layout.articles}
@@ -278,25 +273,26 @@ const pageShellClass =
         <div
           class={cn(
             ui.panel,
-            'grid justify-items-center gap-4 overflow-hidden px-5 py-5 text-center md:px-6 md:py-6',
+            ui.spotlightPanel,
+            'justify-items-center overflow-hidden px-5 py-5 text-center md:px-6 md:py-6',
           )}
         >
           <div class="grid justify-items-center gap-2">
             <h2 class="m-0 text-[1.08rem] font-semibold leading-[1.3] text-site-ink lg:text-[1.22rem]">
               {copy.footer.newsletterTitle}
             </h2>
-            <p class={cn(ui.bodyCopy, 'max-w-[38rem]')}>
+            <p class={cn(ui.bodyCopy, 'max-w-152')}>
               {copy.footer.newsletterCopy}
             </p>
           </div>
           {newsletterFormAction ? (
             <form
               action={newsletterFormAction}
-              class="mx-auto w-full max-w-[32rem]"
+              class="mx-auto w-full max-w-lg"
               method="post"
             >
               <label class="sr-only" for="newsletter-email">Email</label>
-              <div class="flex h-12 w-full overflow-hidden rounded-[var(--radius-xs)] border border-site-line bg-site-bg transition-colors duration-150 focus-within:border-site-link-hover">
+              <div class="flex h-12 w-full overflow-hidden rounded-xs border border-site-line bg-site-bg transition-colors duration-150 focus-within:border-site-link-hover">
                 <div class="relative min-w-0 flex-1">
                   <MailIcon class="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-site-ink-muted" />
                   <input
@@ -343,7 +339,7 @@ const pageShellClass =
               </span>
               <span class={brandLabelClass}>{copy.header.brand}</span>
             </a>
-            <p class="m-0 max-w-[30rem] leading-7 text-site-ink-soft">{copy.footer.description}</p>
+            <p class="m-0 max-w-120 leading-7 text-site-ink-soft">{copy.footer.description}</p>
           </div>
           <div class="grid content-start gap-3">
             <div class="grid gap-[0.85rem]">
@@ -478,7 +474,7 @@ const pageShellClass =
     }
   })
 
-  const desktopNavMedia = window.matchMedia('(min-width: 896px)')
+  const desktopNavMedia = window.matchMedia('(min-width: 56rem)')
   desktopNavMedia.addEventListener('change', (event) => {
     if (event.matches) {
       setMobileNavOpen(false)

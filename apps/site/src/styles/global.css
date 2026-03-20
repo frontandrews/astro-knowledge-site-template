@@ -3,26 +3,82 @@
 
 :root {
   color-scheme: dark;
-  --site-bg: #0b1120;
-  --site-surface: #16213e;
-  --site-surface-strong: #0f3460;
+
+  /* Primitive palette and motion */
+  --site-base-bg: #0b1120;
+  --site-base-surface: #16213e;
+  --site-base-surface-strong: #0f3460;
+  --site-base-ink: #e0e0ff;
+  --site-base-ink-bright: #f5f7ff;
+  --site-base-ink-soft: rgba(224, 224, 255, 0.76);
+  --site-base-ink-muted: rgba(224, 224, 255, 0.52);
+  --site-base-line: rgba(124, 124, 255, 0.14);
+  --site-base-line-strong: rgba(124, 124, 255, 0.28);
+  --site-base-accent: #7c7cff;
+  --site-base-link: #a8b8ff;
+  --site-base-success: #52b788;
+  --site-base-highlight-bg: #000;
+  --site-base-highlight-ink: #fde047;
+  --site-shadow-dropdown: 0 18px 60px rgba(5, 10, 20, 0.2);
+  --site-shadow-overlay: 0 24px 80px rgba(0, 0, 0, 0.28);
+  --site-overlay-backdrop: color-mix(in srgb, var(--site-base-bg) 58%, transparent);
+
+  /* Semantic site tokens */
+  --site-bg: var(--site-base-bg);
+  --site-surface: var(--site-base-surface);
+  --site-surface-strong: var(--site-base-surface-strong);
   --site-panel: color-mix(in srgb, var(--site-surface) 84%, var(--site-surface-strong));
   --site-card: color-mix(in srgb, var(--site-surface) 68%, var(--site-surface-strong));
-  --site-line: rgba(124, 124, 255, 0.14);
-  --site-line-strong: rgba(124, 124, 255, 0.28);
-  --site-ink: #e0e0ff;
-  --site-ink-soft: rgba(224, 224, 255, 0.76);
-  --site-ink-muted: rgba(224, 224, 255, 0.52);
+  --site-panel-muted: color-mix(in srgb, var(--site-panel) 55%, transparent);
+  --site-panel-spotlight: color-mix(in srgb, var(--site-bg) 28%, transparent);
+  --site-panel-border: color-mix(in srgb, var(--site-line) 55%, transparent);
+  --site-line: var(--site-base-line);
+  --site-line-strong: var(--site-base-line-strong);
+  --site-ink: var(--site-base-ink);
+  --site-ink-soft: var(--site-base-ink-soft);
+  --site-ink-muted: var(--site-base-ink-muted);
   --site-ink-subtle: color-mix(in srgb, var(--site-line-strong) 52%, var(--site-link-hover));
-  --site-accent: #7c7cff;
-  --site-accent-soft: #0f3460;
-  --site-link-hover: #a8b8ff;
+  --site-accent: var(--site-base-accent);
+  --site-accent-soft: var(--site-base-surface-strong);
+  --site-link-hover: var(--site-base-link);
   --site-hover-surface: color-mix(in srgb, var(--site-surface-strong) 72%, var(--site-surface));
   --site-control-hover: color-mix(in srgb, var(--site-surface-strong) 88%, white 12%);
-  --site-success: #52b788;
+  --site-success: var(--site-base-success);
+  --site-progress-track: color-mix(in srgb, var(--site-line) 70%, transparent);
+  --site-progress-track-strong: color-mix(in srgb, var(--site-bg) 72%, transparent);
+  --site-progress-fill: color-mix(in srgb, var(--site-link-hover) 72%, transparent);
+  --site-progress-fill-gradient: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--site-link-hover) 70%, white 30%) 0%,
+    var(--site-link-hover) 100%
+  );
+  --site-progress-complete-gradient: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--site-success) 72%, white 28%) 0%,
+    var(--site-success) 100%
+  );
+  --site-progress-complete-outline: 0 0 0 1px color-mix(in srgb, var(--site-success) 40%, transparent);
+  --site-completion-badge-border: color-mix(in srgb, var(--site-success) 55%, transparent);
+  --site-completion-badge-bg: color-mix(in srgb, var(--site-success) 20%, var(--site-surface));
+  --site-completion-badge-ink: color-mix(in srgb, var(--site-success) 78%, black 22%);
+  --site-highlight-badge: var(--site-base-highlight-bg);
+  --site-highlight-badge-border: transparent;
+  --site-highlight-badge-ink: var(--site-base-highlight-ink);
   --site-scrollbar-track: color-mix(in srgb, var(--site-bg) 82%, black 18%);
   --site-scrollbar-thumb: color-mix(in srgb, var(--site-line-strong) 38%, rgba(245, 247, 255, 0.48));
   --site-scrollbar-thumb-hover: color-mix(in srgb, var(--site-link-hover) 44%, rgba(245, 247, 255, 0.58));
+  --site-filter-tone-1-dark: #24364f;
+  --site-filter-tone-1-light: #dbeafe;
+  --site-filter-tone-2-dark: #2d3358;
+  --site-filter-tone-2-light: #dbe4ff;
+  --site-filter-tone-3-dark: #334155;
+  --site-filter-tone-3-light: #e2e8f0;
+  --site-filter-tone-4-dark: #1f4556;
+  --site-filter-tone-4-light: #e0f2fe;
+  --site-filter-tone-5-dark: #41305a;
+  --site-filter-tone-5-light: #ede9fe;
+  --site-filter-tone-6-dark: #274737;
+  --site-filter-tone-6-light: #e2f2ea;
   --site-content-width: 58rem;
   --article-font-sans:
     "Helvetica Neue",
@@ -32,15 +88,21 @@
     system-ui,
     Georgia,
     serif;
-  --article-heading-color: #f5f7ff;
-  --article-copy-color: #e0e0ff;
+  --article-heading-color: var(--site-base-ink-bright);
+  --article-copy-color: var(--site-base-ink);
   --article-body-color: rgba(224, 224, 255, 0.82);
   --article-rule: rgba(124, 124, 255, 0.16);
   --article-surface: color-mix(in srgb, rgba(15, 52, 96, 0.1) 96%, #f3f5f8);
+  --article-link: color-mix(in srgb, var(--site-link-hover) 76%, var(--site-surface-strong));
+  --article-link-hover: var(--site-base-ink-bright);
   --radius-xs: 8px;
   --radius-sm: 14px;
   --radius: 16px;
   --radius-lg: 20px;
+}
+
+@theme {
+  --breakpoint-nav: 56rem;
 }
 
 @theme inline {
@@ -50,13 +112,21 @@
   --color-article-body: var(--article-body-color);
   --color-article-copy: var(--article-copy-color);
   --color-article-heading: var(--article-heading-color);
+  --color-article-link: var(--article-link);
+  --color-article-link-hover: var(--article-link-hover);
   --color-article-rule: var(--article-rule);
   --color-article-surface: var(--article-surface);
   --color-site-accent: var(--site-accent);
   --color-site-accent-soft: var(--site-accent-soft);
   --color-site-bg: var(--site-bg);
   --color-site-card: var(--site-card);
+  --color-site-completion-badge: var(--site-completion-badge-bg);
+  --color-site-completion-badge-border: var(--site-completion-badge-border);
+  --color-site-completion-badge-ink: var(--site-completion-badge-ink);
   --color-site-control-hover: var(--site-control-hover);
+  --color-site-highlight-badge: var(--site-highlight-badge);
+  --color-site-highlight-badge-border: var(--site-highlight-badge-border);
+  --color-site-highlight-badge-ink: var(--site-highlight-badge-ink);
   --color-site-hover: var(--site-hover-surface);
   --color-site-ink: var(--site-ink);
   --color-site-ink-muted: var(--site-ink-muted);
@@ -66,6 +136,12 @@
   --color-site-line-strong: var(--site-line-strong);
   --color-site-link-hover: var(--site-link-hover);
   --color-site-panel: var(--site-panel);
+  --color-site-panel-border: var(--site-panel-border);
+  --color-site-panel-muted: var(--site-panel-muted);
+  --color-site-panel-spotlight: var(--site-panel-spotlight);
+  --color-site-progress-fill: var(--site-progress-fill);
+  --color-site-progress-track: var(--site-progress-track);
+  --color-site-progress-track-strong: var(--site-progress-track-strong);
   --color-site-success: var(--site-success);
   --color-site-surface: var(--site-surface);
   --color-site-surface-strong: var(--site-surface-strong);
@@ -157,7 +233,7 @@ pre {
 
 @layer components {
   .article-prose {
-    @apply mx-auto max-w-[52rem] text-[1.125rem] leading-7 text-article-body;
+    @apply mx-auto max-w-208 text-[1.125rem] leading-7 text-article-body;
   }
 
   .article-prose > :first-child {
@@ -180,7 +256,7 @@ pre {
   }
 
   .article-prose p {
-    @apply mb-[1.125rem];
+    @apply mb-4.5;
   }
 
   .article-prose ul,
@@ -201,7 +277,7 @@ pre {
   }
 
   .article-prose pre {
-    @apply overflow-x-auto rounded-[var(--radius-xs)] border border-article-rule bg-article-surface p-4 text-article-heading;
+    @apply overflow-x-auto rounded-xs border border-article-rule bg-article-surface p-4 text-article-heading;
   }
 
   .article-prose code {
@@ -209,7 +285,12 @@ pre {
   }
 
   .article-prose a {
-    @apply text-[#0f5fa8] underline;
+    @apply text-article-link underline decoration-site-line-strong underline-offset-2 transition-colors duration-150;
+  }
+
+  .article-prose a:hover,
+  .article-prose a:focus-visible {
+    color: var(--article-link-hover);
   }
 
   .giscus-comments .giscus,
@@ -239,6 +320,42 @@ pre {
   .search-pagefind .pagefind-ui__search-input:focus,
   .search-pagefind .pagefind-ui__button:hover {
     background: var(--site-hover-surface);
+  }
+
+  .search-launcher-backdrop {
+    background: var(--site-overlay-backdrop);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+  }
+
+  .site-dropdown-shadow {
+    box-shadow: var(--site-shadow-dropdown);
+  }
+
+  .site-overlay-shadow {
+    box-shadow: var(--site-shadow-overlay);
+  }
+
+  .site-completion-badge {
+    border-color: var(--site-completion-badge-border);
+    background: var(--site-completion-badge-bg);
+    color: var(--site-completion-badge-ink);
+  }
+
+  .site-progress-track {
+    background: var(--site-progress-track);
+  }
+
+  .site-progress-track-strong {
+    background: var(--site-progress-track-strong);
+  }
+
+  .site-progress-bar {
+    background: var(--site-progress-fill-gradient);
+  }
+
+  .site-progress-fill {
+    background: var(--site-progress-fill);
   }
 
   [data-guide-post].is-complete {
@@ -300,12 +417,8 @@ pre {
   }
 
   [data-reading-progress].is-complete [data-reading-progress-bar] {
-    background: linear-gradient(
-      90deg,
-      color-mix(in srgb, var(--site-success) 72%, white 28%) 0%,
-      var(--site-success) 100%
-    );
-    box-shadow: 0 0 0 1px color-mix(in srgb, var(--site-success) 40%, transparent);
+    background: var(--site-progress-complete-gradient);
+    box-shadow: var(--site-progress-complete-outline);
   }
 
   [data-reading-progress].is-complete [data-reading-progress-value] {
@@ -317,12 +430,8 @@ pre {
   }
 
   [data-track-progress-root].is-complete [data-track-progress-bar] {
-    background: linear-gradient(
-      90deg,
-      color-mix(in srgb, var(--site-success) 72%, white 28%) 0%,
-      var(--site-success) 100%
-    );
-    box-shadow: 0 0 0 1px color-mix(in srgb, var(--site-success) 40%, transparent);
+    background: var(--site-progress-complete-gradient);
+    box-shadow: var(--site-progress-complete-outline);
   }
 
   [data-track-progress-root].is-complete [data-track-progress-value] {

@@ -10,8 +10,11 @@
     "dev:site": "pnpm --filter @seniorpath/site dev",
     "preview": "pnpm preview:site",
     "preview:site": "pnpm --filter @seniorpath/site preview",
+    "style:guard": "pnpm --filter @seniorpath/site style:guard",
+    "tailwind:canonical": "pnpm --filter @seniorpath/site tailwind:canonical",
+    "tailwind:canonical:fix": "pnpm --filter @seniorpath/site tailwind:canonical:fix",
     "typecheck:site": "pnpm --filter @seniorpath/site check",
     "typecheck": "pnpm typecheck:site",
-    "verify": "pnpm typecheck:site && pnpm build:site"
+    "verify": "pnpm style:guard && pnpm tailwind:canonical && pnpm typecheck:site && pnpm build:site"
   }
 }

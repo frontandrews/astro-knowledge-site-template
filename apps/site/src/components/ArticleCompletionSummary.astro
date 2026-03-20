@@ -69,10 +69,7 @@ const quietActionClass = isCompact
 {nextStep ? (
   <div class="grid gap-2">
     <p class={ui.eyebrow}>{copy.article.nextStep}</p>
-    <a
-      class="group grid gap-2 rounded-[var(--radius-xs)] border border-site-line bg-[color:color-mix(in_srgb,var(--site-panel)_55%,transparent)] px-3 py-3 text-inherit transition-colors duration-150 hover:border-site-line-strong hover:bg-site-hover hover:text-site-link-hover focus-visible:border-site-line-strong focus-visible:bg-site-hover focus-visible:text-site-link-hover focus-visible:outline-none"
-      href={nextStep.href}
-    >
+    <a class={ui.subtlePanelLink} href={nextStep.href}>
       <span class={nextStepTitleClass}>{nextStep.title}</span>
       <span class={nextStepMetaClass}>{copy.article.nextStep} →</span>
     </a>

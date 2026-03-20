@@ -32,8 +32,7 @@ const labels =
         twitter: 'Share on X',
         whatsapp: 'Share on WhatsApp',
       }
-const iconButtonClass =
-  'inline-flex size-11 items-center justify-center rounded-full border border-site-line bg-site-card text-site-ink transition-colors duration-150 hover:border-site-line-strong hover:bg-site-hover hover:text-site-link-hover focus-visible:border-site-line-strong focus-visible:bg-site-hover focus-visible:text-site-link-hover focus-visible:outline-none lg:size-12'
+const iconButtonClass = ui.iconButton
 ---
 
 <section
@@ -47,7 +46,7 @@ const iconButtonClass =
   data-share-url={url}
 >
   <div class="grid justify-items-center gap-3 py-3 text-center lg:gap-4 lg:py-4">
-    <p class="m-0 text-[0.8rem] font-medium uppercase tracking-[0.22em] text-site-ink-soft lg:text-[0.88rem]">
+    <p class={ui.shareLabel}>
       {copy.article.shareTitle}
     </p>
 

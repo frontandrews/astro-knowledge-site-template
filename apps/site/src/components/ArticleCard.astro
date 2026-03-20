@@ -49,8 +49,8 @@ const completedCtaLabel = copy.directory.readAgain
     <span
       aria-hidden="true"
       class={cn(
-        'pointer-events-none absolute right-4 top-4 inline-flex size-8 items-center justify-center rounded-full border border-[color:color-mix(in_srgb,var(--site-success)_55%,transparent)] bg-[color:color-mix(in_srgb,var(--site-success)_20%,var(--site-surface))] text-[0.98rem] font-semibold text-[color:color-mix(in_srgb,var(--site-success)_78%,black_22%)] transition-all duration-150 lg:size-9 lg:text-[1.08rem]',
-        variant === 'linear' && 'right-3 top-3.5 lg:right-4 lg:top-1/2 lg:-translate-y-1/2',
+        ui.completionBadgeCard,
+        variant === 'linear' && ui.completionBadgeLinear,
       )}
       data-guide-post-complete-badge
     >
@@ -70,12 +70,12 @@ const completedCtaLabel = copy.directory.readAgain
     {variant === 'linear' ? (
       <>
         <InlineArrowCta className="md:hidden" label={ctaLabel} />
-        <span class="pointer-events-none absolute right-4 top-1/2 hidden min-w-[9.25rem] -translate-y-1/2 items-center justify-end md:inline-flex">
-          <span class="absolute right-0 inline-flex translate-x-1 items-center gap-1.5 text-[0.76rem] font-medium tracking-[0.04em] text-site-ink-muted opacity-0 transition-all duration-150 lg:gap-2 lg:text-[0.84rem]" data-guide-post-complete-text>
+        <span class={ui.completionRailMd}>
+          <span class={ui.completionDesktopCta} data-guide-post-complete-text>
             <span>{completedCtaLabel}</span>
             <ArrowRightIcon className="size-[0.88rem]" />
           </span>
-          <span class="absolute right-0 inline-flex translate-x-1 items-center gap-1.5 text-[0.76rem] font-medium tracking-[0.04em] text-site-ink-muted opacity-0 transition-all duration-150 group-hover:translate-x-0 group-hover:opacity-100 group-hover:text-site-link-hover group-focus-within:translate-x-0 group-focus-within:opacity-100 group-focus-within:text-site-link-hover lg:gap-2 lg:text-[0.84rem]" data-guide-post-default-cta>
+          <span class={ui.completionDesktopCtaInteractive} data-guide-post-default-cta>
             <span>{ctaLabel}</span>
             <ArrowRightIcon className="size-[0.88rem]" />
           </span>

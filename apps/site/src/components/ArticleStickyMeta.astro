@@ -59,7 +59,8 @@ const copy = getSiteCopy(locale)
   <section
     class={cn(
       ui.panel,
-      'grid gap-4 border-[color:color-mix(in_srgb,var(--site-line)_55%,transparent)] bg-[color:color-mix(in_srgb,var(--site-bg)_28%,transparent)] px-4 py-4 lg:px-5 lg:py-5 xl:max-h-[calc(100vh-8.5rem)] xl:overflow-y-auto',
+      ui.spotlightPanel,
+      'xl:max-h-[calc(100vh-8.5rem)] xl:overflow-y-auto',
     )}
     data-completion-id={completionId ?? ''}
     data-show-completion-in-place={showCompletionInPlace ? 'true' : 'false'}
@@ -90,7 +91,7 @@ const copy = getSiteCopy(locale)
               {headings.map((heading) => (
                 <a
                   class={cn(
-                    'rounded-[var(--radius-xs)] px-2 py-1.5 text-sm leading-6 text-site-ink-soft transition-colors duration-150 hover:bg-site-hover hover:text-site-link-hover focus-visible:bg-site-hover focus-visible:text-site-link-hover focus-visible:outline-none lg:text-[0.96rem]',
+                    'rounded-xs px-2 py-1.5 text-sm leading-6 text-site-ink-soft transition-colors duration-150 hover:bg-site-hover hover:text-site-link-hover focus-visible:bg-site-hover focus-visible:text-site-link-hover focus-visible:outline-none lg:text-[0.96rem]',
                     heading.depth > 2 && 'ml-3 text-[0.82rem] text-site-ink-muted lg:text-[0.9rem]',
                   )}
                   data-toc-link
@@ -108,13 +109,13 @@ const copy = getSiteCopy(locale)
 
     <div class="grid gap-2 border-t border-site-line pt-4" data-reading-progress>
       <div class="flex items-center gap-3">
-        <div class="min-w-0 flex-1 h-1.5 overflow-hidden rounded-full bg-[color:color-mix(in_srgb,var(--site-line)_70%,transparent)]">
+        <div class={cn('min-w-0 flex-1', ui.progressTrack)}>
           <div
-            class="h-full w-0 rounded-full bg-[color:color-mix(in_srgb,var(--site-link-hover)_72%,transparent)] transition-[width] duration-150 ease-out"
+            class={ui.progressBarSolid}
             data-reading-progress-bar
           />
         </div>
-        <p class="m-0 shrink-0 text-[0.82rem] font-medium text-site-ink-soft lg:text-[0.88rem]" data-reading-progress-value>
+        <p class={cn(ui.progressMeta, 'shrink-0 lg:text-[0.88rem]')} data-reading-progress-value>
           0%
         </p>
       </div>
@@ -177,12 +178,16 @@ const copy = getSiteCopy(locale)
       if (tocSection instanceof HTMLElement) {
         tocSection.classList.add('hidden');
       }
+      if (progressSection instanceof HTMLElement) {
+        progressSection.style.borderTopColor = 'transparent';
+        progressSection.style.paddingTop = '0.25rem';
+      }
       if (stickyDirection instanceof HTMLElement) {
         stickyDirection.style.maxHeight = '100rem';
         stickyDirection.style.opacity = '1';
         stickyDirection.style.transform = 'translateY(0)';
-        stickyDirection.style.paddingTop = '1rem';
-        stickyDirection.style.borderTopColor = 'var(--site-line)';
+        stickyDirection.style.paddingTop = '0.25rem';
+        stickyDirection.style.borderTopColor = 'transparent';
         stickyDirection.style.pointerEvents = 'auto';
       }
     };
@@ -196,6 +201,10 @@ const copy = getSiteCopy(locale)
       }
       if (tocSection instanceof HTMLElement) {
         tocSection.classList.remove('hidden');
+      }
+      if (progressSection instanceof HTMLElement) {
+        progressSection.style.borderTopColor = 'var(--site-line)';
+        progressSection.style.paddingTop = '1rem';
       }
       if (!(stickyDirection instanceof HTMLElement)) return;
       stickyDirection.style.maxHeight = '0';

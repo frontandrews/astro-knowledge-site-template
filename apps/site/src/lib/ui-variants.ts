@@ -4,7 +4,7 @@ import { cn } from '@/lib/cn'
 import { ui } from '@/lib/ui'
 
 export const navLinkVariants = cva(
-  'inline-flex min-h-9 items-center justify-center rounded-full px-3 py-2 text-[0.92rem] font-medium text-site-ink transition-colors duration-150 hover:bg-site-hover hover:text-site-link-hover lg:min-h-10 lg:px-3.5 lg:text-[1rem] max-[56rem]:min-h-8 max-[56rem]:px-[0.45rem] max-[56rem]:py-[0.3rem] max-[56rem]:text-[0.8rem]',
+  'inline-flex min-h-8 items-center justify-center rounded-full px-[0.45rem] py-[0.3rem] text-[0.8rem] font-medium text-site-ink transition-colors duration-150 hover:bg-site-hover hover:text-site-link-hover nav:min-h-9 nav:px-3 nav:py-2 nav:text-[0.92rem] lg:min-h-10 lg:px-3.5 lg:text-[1rem]',
   {
     variants: {
       active: {
@@ -19,7 +19,7 @@ export const navLinkVariants = cva(
 )
 
 export const filterChipVariants = cva(
-  'inline-flex min-h-[2.05rem] cursor-pointer items-center justify-center rounded-full border border-site-line bg-[color:color-mix(in_srgb,var(--chip-accent-dark,var(--site-surface-strong))_34%,transparent)] px-3 py-1.5 text-[0.72rem] font-semibold tracking-[0.01em] text-site-ink transition-colors duration-150 lg:min-h-[2.3rem] lg:px-3.5 lg:text-[0.8rem]',
+  'inline-flex min-h-[2.05rem] cursor-pointer items-center justify-center rounded-full border border-site-line bg-[color-mix(in_srgb,var(--chip-accent-dark,var(--site-surface-strong))_34%,transparent)] px-3 py-1.5 text-[0.72rem] font-semibold tracking-[0.01em] text-site-ink transition-colors duration-150 lg:min-h-[2.3rem] lg:px-3.5 lg:text-[0.8rem]',
   {
     variants: {
       active: {
@@ -61,9 +61,9 @@ export const linkCardVariants = cva('', {
   variants: {
     variant: {
       compact:
-        'group grid gap-2 rounded-[var(--radius-xs)] px-3 py-2 text-inherit transition-colors duration-150 hover:bg-site-hover hover:text-site-link-hover focus-visible:bg-site-hover focus-visible:text-site-link-hover focus-visible:outline-none',
+        'group grid gap-2 rounded-xs px-3 py-2 text-inherit transition-colors duration-150 hover:bg-site-hover hover:text-site-link-hover focus-visible:bg-site-hover focus-visible:text-site-link-hover focus-visible:outline-none',
       ghost:
-        'group block rounded-[var(--radius-xs)] p-3 text-inherit transition-colors duration-150 hover:bg-site-hover hover:text-site-link-hover focus-visible:bg-site-hover focus-visible:text-site-link-hover focus-visible:outline-none',
+        'group block rounded-xs p-3 text-inherit transition-colors duration-150 hover:bg-site-hover hover:text-site-link-hover focus-visible:bg-site-hover focus-visible:text-site-link-hover focus-visible:outline-none',
       panel: ui.titleCardLink,
     },
   },
@@ -103,8 +103,8 @@ export const articleCardLinkVariants = cva(
     variants: {
       variant: {
         linear: ui.linearCardInteractive,
-        minimal: 'block rounded-[var(--radius-xs)] p-3',
-        rich: 'grid min-h-[8.8rem] gap-1.5 rounded-[var(--radius)] bg-site-card p-4',
+        minimal: 'block rounded-xs p-3',
+        rich: 'grid min-h-[8.8rem] gap-1.5 rounded-(--radius) bg-site-card p-4',
       },
     },
     defaultVariants: {
