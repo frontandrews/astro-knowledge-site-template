@@ -7,8 +7,8 @@ locale: pt-br
 status: active
 pillarId: execution-and-communication
 branchId: estimation-and-risk
-pubDate: 2026-02-18
-updatedDate: 2026-02-22
+pubDate: 2026-01-26
+updatedDate: 2026-01-29
 category: Execucao e comunicacao
 topic: Estimativa e risco
 path:

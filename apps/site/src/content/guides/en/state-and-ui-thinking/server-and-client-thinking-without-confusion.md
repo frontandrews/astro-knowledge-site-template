@@ -7,8 +7,8 @@ locale: en
 status: active
 pillarId: state-and-ui-thinking
 branchId: server-and-client-thinking
-pubDate: 2026-03-09
-updatedDate: 2026-03-13
+pubDate: 2026-03-01
+updatedDate: 2026-03-03
 category: State & UI Thinking
 topic: Server and Client Thinking
 path:

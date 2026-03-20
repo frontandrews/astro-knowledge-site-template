@@ -7,8 +7,8 @@ locale: pt-br
 status: active
 pillarId: execution-and-communication
 branchId: communication-in-work-and-interviews
-pubDate: 2026-02-14
-updatedDate: 2026-02-18
+pubDate: 2026-01-19
+updatedDate: 2026-01-22
 category: Execucao e comunicacao
 topic: Comunicacao no trabalho e em entrevistas
 path:

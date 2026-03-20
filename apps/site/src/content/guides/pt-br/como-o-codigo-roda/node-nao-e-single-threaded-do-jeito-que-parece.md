@@ -7,8 +7,8 @@ locale: pt-br
 status: active
 pillarId: runtime-and-execution
 branchId: concurrency-and-parallelism
-pubDate: 2026-02-25
-updatedDate: 2026-03-01
+pubDate: 2026-02-08
+updatedDate: 2026-02-10
 category: Como o codigo roda
 topic: Node
 path:

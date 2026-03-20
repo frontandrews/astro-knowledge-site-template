@@ -7,8 +7,8 @@ locale: en
 status: active
 pillarId: system-thinking
 branchId: ai-systems-and-retrieval
-pubDate: 2026-02-27
-updatedDate: 2026-03-03
+pubDate: 2026-02-11
+updatedDate: 2026-02-15
 category: System Thinking
 topic: AI Systems and Retrieval
 path:

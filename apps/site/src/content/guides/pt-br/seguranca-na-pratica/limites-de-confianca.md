@@ -7,8 +7,8 @@ locale: pt-br
 status: active
 pillarId: security-thinking
 branchId: trust-boundaries
-pubDate: 2026-03-17
-updatedDate: 2026-03-19
+pubDate: 2026-03-15
+updatedDate: 2026-03-17
 category: Seguranca na pratica
 topic: Limites de confianca
 path:

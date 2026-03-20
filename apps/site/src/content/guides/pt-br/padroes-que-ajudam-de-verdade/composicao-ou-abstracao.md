@@ -7,8 +7,8 @@ locale: pt-br
 status: active
 pillarId: patterns-that-actually-matter
 branchId: composition-vs-abstraction
-pubDate: 2026-02-15
-updatedDate: 2026-02-19
+pubDate: 2026-01-21
+updatedDate: 2026-01-25
 category: Padroes que ajudam de verdade
 topic: Composicao ou abstracao
 path:

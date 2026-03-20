@@ -7,8 +7,8 @@ locale: en
 status: active
 pillarId: real-world-scenarios
 branchId: scalable-api-scenarios
-pubDate: 2026-03-06
-updatedDate: 2026-03-10
+pubDate: 2026-02-24
+updatedDate: 2026-02-27
 category: Real-World Scenarios
 topic: Scalable API Scenarios
 path:

@@ -7,8 +7,8 @@ locale: en
 status: active
 pillarId: state-and-ui-thinking
 branchId: effects-and-side-effects
-pubDate: 2026-02-17
-updatedDate: 2026-02-21
+pubDate: 2026-01-24
+updatedDate: 2026-01-26
 category: State & UI Thinking
 topic: Effects and Side Effects
 path:

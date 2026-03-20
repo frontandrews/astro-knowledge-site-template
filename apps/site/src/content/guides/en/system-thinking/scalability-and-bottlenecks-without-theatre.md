@@ -7,8 +7,8 @@ locale: en
 status: active
 pillarId: system-thinking
 branchId: scalability-and-bottlenecks
-pubDate: 2026-03-05
-updatedDate: 2026-03-09
+pubDate: 2026-02-22
+updatedDate: 2026-02-24
 category: System Thinking
 topic: Scalability and Bottlenecks
 path:

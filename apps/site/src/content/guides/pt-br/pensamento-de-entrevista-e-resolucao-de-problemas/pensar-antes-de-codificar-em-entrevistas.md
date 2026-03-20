@@ -7,8 +7,8 @@ locale: pt-br
 status: active
 pillarId: problem-solving-and-interview-thinking
 branchId: approach-and-framing
-pubDate: 2026-03-14
-updatedDate: 2026-03-18
+pubDate: 2026-03-10
+updatedDate: 2026-03-13
 category: Resolução de Problemas & Pensamento de Entrevista
 topic: Entrevistas de Código
 path:

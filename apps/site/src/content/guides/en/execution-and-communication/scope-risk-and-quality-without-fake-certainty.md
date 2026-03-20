@@ -5,8 +5,8 @@ summary: Make the tradeoff explicit early and cut scope before you quietly cut q
 guideId: scope-risk-and-quality
 locale: en
 status: archived
-pubDate: 2026-03-07
-updatedDate: 2026-03-11
+pubDate: 2026-02-26
+updatedDate: 2026-03-02
 category: Execution & Communication
 topic: Delivery
 path:

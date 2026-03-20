@@ -151,24 +151,24 @@ const articleUrl = new URL(Astro.url.pathname, Astro.site ?? Astro.url).toString
 
     {previousPost || nextPost ? (
       <section class={cn(ui.articleSection, 'grid gap-4 md:grid-cols-2 md:items-stretch')}>
-        {previousPost ? (
-          <a class="flex h-full items-center gap-3 rounded-[0.95rem] px-3 py-2 text-left text-inherit transition-colors duration-150 hover:bg-site-hover hover:text-site-link-hover focus-visible:bg-site-hover focus-visible:text-site-link-hover focus-visible:outline-none" href={getGuideHrefFromEntry(previousPost)}>
-            <ChevronLeft aria-hidden="true" class="size-6 shrink-0 text-article-body" />
-            <span class="grid gap-1 content-start">
-              <span class={ui.eyebrowSentence}>{copy.startHere.previousArticle}</span>
-              <span class={ui.linkCardTitle}>{previousPost.data.title}</span>
-            </span>
-          </a>
-        ) : <div />}
         {nextPost ? (
-          <a class="flex h-full items-center justify-between gap-3 rounded-[0.95rem] px-3 py-2 text-inherit transition-colors duration-150 hover:bg-site-hover hover:text-site-link-hover focus-visible:bg-site-hover focus-visible:text-site-link-hover focus-visible:outline-none" href={getGuideHrefFromEntry(nextPost)}>
+          <a class="flex h-full items-center justify-between gap-3 rounded-[0.95rem] px-3 py-2 text-inherit transition-colors duration-150 hover:bg-site-hover hover:text-site-link-hover focus-visible:bg-site-hover focus-visible:text-site-link-hover focus-visible:outline-none md:order-3" href={getGuideHrefFromEntry(nextPost)}>
             <span class="ml-auto grid gap-1 content-start justify-items-end text-right">
               <span class={ui.eyebrowSentence}>{copy.startHere.nextArticle}</span>
               <span class={ui.linkCardTitle}>{nextPost.data.title}</span>
             </span>
             <ChevronRight aria-hidden="true" class="size-6 shrink-0 text-article-body" />
           </a>
-        ) : <div />}
+        ) : <div class="md:order-3" />}
+        {previousPost ? (
+          <a class="flex h-full items-center gap-3 rounded-[0.95rem] px-3 py-2 text-left text-inherit transition-colors duration-150 hover:bg-site-hover hover:text-site-link-hover focus-visible:bg-site-hover focus-visible:text-site-link-hover focus-visible:outline-none md:order-1" href={getGuideHrefFromEntry(previousPost)}>
+            <ChevronLeft aria-hidden="true" class="size-6 shrink-0 text-article-body" />
+            <span class="grid gap-1 content-start">
+              <span class={ui.eyebrowSentence}>{copy.startHere.previousArticle}</span>
+              <span class={ui.linkCardTitle}>{previousPost.data.title}</span>
+            </span>
+          </a>
+        ) : <div class="md:order-1" />}
       </section>
     ) : null}
 

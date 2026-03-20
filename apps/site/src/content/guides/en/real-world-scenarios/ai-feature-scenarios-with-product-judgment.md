@@ -7,8 +7,8 @@ locale: en
 status: active
 pillarId: real-world-scenarios
 branchId: ai-feature-scenarios
-pubDate: 2026-02-06
-updatedDate: 2026-02-10
+pubDate: 2026-01-05
+updatedDate: 2026-01-08
 category: Real-World Scenarios
 topic: AI Feature Scenarios
 path:

@@ -7,8 +7,8 @@ locale: pt-br
 status: active
 pillarId: debugging-and-production-thinking
 branchId: logs-and-observability
-pubDate: 2026-02-22
-updatedDate: 2026-02-26
+pubDate: 2026-02-02
+updatedDate: 2026-02-05
 category: Debug e producao
 topic: Logs e observabilidade
 path:

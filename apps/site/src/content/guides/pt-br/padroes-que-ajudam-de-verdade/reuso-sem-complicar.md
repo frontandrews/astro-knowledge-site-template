@@ -7,8 +7,8 @@ locale: pt-br
 status: active
 pillarId: patterns-that-actually-matter
 branchId: reuse-vs-complexity
-pubDate: 2026-03-03
-updatedDate: 2026-03-07
+pubDate: 2026-02-18
+updatedDate: 2026-02-22
 category: Padroes que ajudam de verdade
 topic: Reuso sem complicar
 path:

@@ -7,7 +7,7 @@ locale: en
 status: active
 pillarId: thinking-like-a-senior
 branchId: code-for-humans
-pubDate: 2026-03-18
+pubDate: 2026-03-17
 updatedDate: 2026-03-19
 category: Thinking Like a Senior
 topic: Code for Humans

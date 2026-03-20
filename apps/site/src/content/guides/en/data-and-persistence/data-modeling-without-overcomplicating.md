@@ -7,8 +7,8 @@ locale: en
 status: active
 pillarId: data-and-persistence
 branchId: data-modeling
-pubDate: 2026-02-16
-updatedDate: 2026-02-20
+pubDate: 2026-01-23
+updatedDate: 2026-01-28
 category: Data & Persistence
 topic: Data Modeling
 path:

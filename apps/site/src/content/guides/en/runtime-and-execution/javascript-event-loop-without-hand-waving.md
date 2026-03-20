@@ -7,8 +7,8 @@ locale: en
 status: active
 pillarId: runtime-and-execution
 branchId: event-loop-and-order
-pubDate: 2026-03-13
-updatedDate: 2026-03-17
+pubDate: 2026-03-08
+updatedDate: 2026-03-10
 category: Runtime & Execution
 topic: Event Loop and Execution Order
 path:

@@ -2,6 +2,7 @@
 export async function getStaticPaths() {
   return [{ params: { locale: 'pt-br' } }]
 }
-
-return Astro.redirect('/pt-br/artigos', 301)
+import ArticlesIndexPage from '@/components/ArticlesIndexPage.astro'
 ---
+
+<ArticlesIndexPage locale="pt-br" />

@@ -5,8 +5,8 @@ summary: A cleaner mental model for derived state questions in React interviews.
 guideId: react-derived-state
 locale: en
 status: archived
-pubDate: 2026-02-28
-updatedDate: 2026-03-04
+pubDate: 2026-02-13
+updatedDate: 2026-02-18
 category: State & UI Thinking
 topic: React
 path:

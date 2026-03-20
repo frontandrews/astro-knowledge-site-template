@@ -7,8 +7,8 @@ locale: en
 status: active
 pillarId: debugging-and-production-thinking
 branchId: async-and-race-bugs
-pubDate: 2026-02-08
-updatedDate: 2026-02-12
+pubDate: 2026-01-08
+updatedDate: 2026-01-13
 category: Debugging & Production Thinking
 topic: Async and Race Bugs
 path:

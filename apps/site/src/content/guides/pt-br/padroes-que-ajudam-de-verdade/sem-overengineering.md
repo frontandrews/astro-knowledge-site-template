@@ -7,8 +7,8 @@ locale: pt-br
 status: active
 pillarId: patterns-that-actually-matter
 branchId: avoiding-overengineering
-pubDate: 2026-02-10
-updatedDate: 2026-02-14
+pubDate: 2026-01-12
+updatedDate: 2026-01-15
 category: Padroes que ajudam de verdade
 topic: Sem overengineering
 path:

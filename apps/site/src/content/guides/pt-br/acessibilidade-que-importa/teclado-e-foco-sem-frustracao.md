@@ -7,8 +7,8 @@ locale: pt-br
 status: active
 pillarId: accessibility-that-actually-matters
 branchId: keyboard-and-focus
-pubDate: 2026-02-21
-updatedDate: 2026-02-25
+pubDate: 2026-02-01
+updatedDate: 2026-02-03
 category: Acessibilidade que importa
 topic: Teclado e foco
 path:

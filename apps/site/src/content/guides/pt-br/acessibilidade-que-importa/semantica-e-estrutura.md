@@ -7,8 +7,8 @@ locale: pt-br
 status: active
 pillarId: accessibility-that-actually-matters
 branchId: semantics-and-structure
-pubDate: 2026-03-08
-updatedDate: 2026-03-12
+pubDate: 2026-02-27
+updatedDate: 2026-03-04
 category: Acessibilidade que importa
 topic: Semantica e estrutura
 path:

@@ -7,8 +7,8 @@ locale: pt-br
 status: active
 pillarId: performance-that-makes-sense
 branchId: measurement-before-optimization
-pubDate: 2026-02-23
-updatedDate: 2026-02-27
+pubDate: 2026-02-04
+updatedDate: 2026-02-08
 category: Performance sem achismo
 topic: Medir antes de otimizar
 path:
