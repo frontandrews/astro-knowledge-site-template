@@ -22,6 +22,9 @@ tags:
   - systems
   - incidents
   - resilience
+topicIds:
+  - system-design
+  - debugging-production
 relatedDeckIds: []
 ---
 

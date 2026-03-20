@@ -21,6 +21,8 @@ tags:
   - senior-thinking
   - readability
   - code-quality
+topicIds:
+  - delivery
 relatedDeckIds: []
 ---
 

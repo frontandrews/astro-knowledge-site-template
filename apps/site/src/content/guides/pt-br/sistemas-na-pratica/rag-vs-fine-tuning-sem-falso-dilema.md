@@ -21,6 +21,9 @@ tags:
   - ai
   - rag
   - fine-tuning
+topicIds:
+  - system-design
+  - ai-engineering
 relatedDeckIds:
   - ai-engineering-rag-evals-core
 ---

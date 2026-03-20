@@ -22,6 +22,9 @@ tags:
   - rag
   - fine-tuning
   - llm
+topicIds:
+  - system-design
+  - ai-engineering
 relatedDeckIds:
   - ai-engineering-rag-evals-core
 ---

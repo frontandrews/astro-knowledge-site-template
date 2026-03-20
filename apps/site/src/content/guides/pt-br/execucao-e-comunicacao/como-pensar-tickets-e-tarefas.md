@@ -21,6 +21,8 @@ tags:
   - execution
   - delivery
   - communication
+topicIds:
+  - delivery
 relatedDeckIds: []
 ---
 

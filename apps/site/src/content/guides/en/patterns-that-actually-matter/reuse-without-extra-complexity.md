@@ -22,6 +22,8 @@ tags:
   - patterns
   - reuse
   - complexity
+topicIds:
+  - architecture-patterns
 relatedDeckIds: []
 ---
 

@@ -19,6 +19,8 @@ tags:
   - react
   - state
   - rendering
+topicIds:
+  - react
 relatedDeckIds:
   - react-rendering-core
 ---

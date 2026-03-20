@@ -22,6 +22,9 @@ tags:
   - systems
   - resilience
   - recovery
+topicIds:
+  - system-design
+  - debugging-production
 relatedDeckIds: []
 ---
 

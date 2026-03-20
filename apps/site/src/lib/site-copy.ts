@@ -2,12 +2,16 @@ export type SiteLocale = 'en' | 'pt-br'
 
 type SiteCopy = {
   article: {
+    chatShare: string
     comments: string
     completed: string
     confirmBody: string
     confirmCancel: string
     confirmConfirm: string
     confirmTitle: string
+    copyLink: string
+    copyLinkError: string
+    copyLinkSuccess: string
     markCompleted: string
     nextReads: string
     practice: string
@@ -17,6 +21,10 @@ type SiteCopy = {
     practiceInAppTitle: string
     quickSummary: string
     quickSummaryTitle: string
+    share: string
+    shareDescription: string
+    shareFallback: string
+    shareTitle: string
     updatedPrefix: string
   }
   footer: {
@@ -36,9 +44,12 @@ type SiteCopy = {
     topics: string
   }
   guideIndex: {
+    allItems: string
+    articleItems: string
     comingSoon: string
     copy: string
     filterLabel: string
+    guideItems: string
     title: string
   }
   challengeIndex: {
@@ -51,6 +62,10 @@ type SiteCopy = {
   }
   header: {
     brand: string
+    closeMenu: string
+    menu: string
+    primaryNav: string
+    languageSwitcher: string
   }
   startHere: {
     articleLabel: string
@@ -96,6 +111,7 @@ type SiteCopy = {
 const siteCopy: Record<SiteLocale, SiteCopy> = {
   en: {
     article: {
+      chatShare: 'Share in chat',
       comments: 'Comments',
       completed: 'Completed',
       confirmBody:
@@ -103,6 +119,9 @@ const siteCopy: Record<SiteLocale, SiteCopy> = {
       confirmCancel: 'Cancel',
       confirmConfirm: 'Yes, continue',
       confirmTitle: 'Mark this guide as completed?',
+      copyLink: 'Copy link',
+      copyLinkError: 'This browser could not copy the link.',
+      copyLinkSuccess: 'Link copied. You can paste it into any chat.',
       markCompleted: 'Mark as completed',
       nextReads: 'Next reads',
       practice: 'Practice',
@@ -112,6 +131,10 @@ const siteCopy: Record<SiteLocale, SiteCopy> = {
       practiceInAppTitle: 'Turn this idea into reps',
       quickSummary: 'Quick summary',
       quickSummaryTitle: 'What to keep in your head',
+      share: 'Share',
+      shareDescription: 'Share this article directly from the site, open it in chat, or copy the link.',
+      shareFallback: 'This browser could not open the share menu. Use copy link instead.',
+      shareTitle: 'Share this article',
       updatedPrefix: 'Updated',
     },
     footer: {
@@ -132,6 +155,10 @@ const siteCopy: Record<SiteLocale, SiteCopy> = {
     },
     header: {
       brand: 'SeniorPath',
+      closeMenu: 'Close menu',
+      menu: 'Menu',
+      primaryNav: 'Primary',
+      languageSwitcher: 'Language switcher',
     },
     startHere: {
       articleLabel: 'Article',
@@ -153,9 +180,12 @@ const siteCopy: Record<SiteLocale, SiteCopy> = {
       topics: 'Explore topics',
     },
     guideIndex: {
+      allItems: 'All',
+      articleItems: 'Articles',
       comingSoon: 'Coming soon',
       copy: 'Direct explanations so you can actually understand the idea, without extra jargon.',
       filterLabel: 'Pick a topic',
+      guideItems: 'Guides',
       title: 'Articles without the fluff',
     },
     challengeIndex: {
@@ -190,6 +220,7 @@ const siteCopy: Record<SiteLocale, SiteCopy> = {
   },
   'pt-br': {
     article: {
+      chatShare: 'Compartilhar no chat',
       comments: 'Comentarios',
       completed: 'Concluido',
       confirmBody:
@@ -197,6 +228,9 @@ const siteCopy: Record<SiteLocale, SiteCopy> = {
       confirmCancel: 'Cancelar',
       confirmConfirm: 'Sim, continuar',
       confirmTitle: 'Marcar este guia como concluido?',
+      copyLink: 'Copiar link',
+      copyLinkError: 'Este navegador nao conseguiu copiar o link.',
+      copyLinkSuccess: 'Link copiado. Agora voce pode colar em qualquer chat.',
       markCompleted: 'Marcar como concluido',
       nextReads: 'Proximas leituras',
       practice: 'Praticar',
@@ -206,6 +240,10 @@ const siteCopy: Record<SiteLocale, SiteCopy> = {
       practiceInAppTitle: 'Transforme esta ideia em repeticoes',
       quickSummary: 'Resumo rapido',
       quickSummaryTitle: 'O que vale manter na cabeca',
+      share: 'Compartilhar',
+      shareDescription: 'Compartilhe este artigo direto do site, abra no chat ou copie o link.',
+      shareFallback: 'Este navegador nao conseguiu abrir o menu de compartilhamento. Use copiar link.',
+      shareTitle: 'Compartilhar este artigo',
       updatedPrefix: 'Atualizado',
     },
     footer: {
@@ -226,6 +264,10 @@ const siteCopy: Record<SiteLocale, SiteCopy> = {
     },
     header: {
       brand: 'SeniorPath',
+      closeMenu: 'Fechar menu',
+      menu: 'Menu',
+      primaryNav: 'Principal',
+      languageSwitcher: 'Alternar idioma',
     },
     startHere: {
       articleLabel: 'Artigo',
@@ -247,9 +289,12 @@ const siteCopy: Record<SiteLocale, SiteCopy> = {
       topics: 'Explorar topicos',
     },
     guideIndex: {
+      allItems: 'Tudo',
+      articleItems: 'Artigos',
       comingSoon: 'Em breve',
       copy: 'Explicacoes diretas para entender de verdade, sem jargao desnecessario.',
       filterLabel: 'Escolha um tema',
+      guideItems: 'Guias',
       title: 'Artigos sem enrolação',
     },
     challengeIndex: {

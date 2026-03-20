@@ -1,6 +1,8 @@
 ---
 import '@/styles/global.css'
 
+import MenuIcon from '@lucide/astro/icons/menu'
+import XIcon from '@lucide/astro/icons/x'
 import BrandIcon from '@/components/ui/icons/BrandIcon.astro'
 import { cn } from '@/lib/cn'
 import { getConceptsHref } from '@/lib/concepts-links'
@@ -48,13 +50,23 @@ const alternateLocale = guideLocale === 'pt-br' ? 'en' : 'pt-br'
 const localeRedirectHref = guideLocale === 'pt-br' ? englishGuideIndexHref : portugueseGuideIndexHref
 const isTracksPage = pathname === tracksHref || pathname.startsWith(`${tracksHref}/`)
 const isConceptsPage = pathname === conceptsHref || pathname.startsWith(`${conceptsHref}/`)
+const isTopicsPage = pathname === topicsHref || pathname.startsWith(`${topicsHref}/`)
 const isGlossaryPage = pathname === glossaryHref || pathname.startsWith(`${glossaryHref}/`)
-const isLearnPage = pathname === learnHref || pathname.startsWith(`${learnHref}/`)
 const isSearchPage = pathname === searchHref
 const brandLinkClass = 'inline-flex min-h-10 items-center gap-3 text-site-ink max-[56rem]:min-h-8 max-[56rem]:gap-2'
 const brandIconWrapClass = 'inline-flex size-8 items-center justify-center max-[56rem]:size-[1.6rem]'
 const brandIconClass = 'size-7 max-[56rem]:size-[1.3rem]'
 const brandLabelClass = 'font-head text-[clamp(1.45rem,3vw,2rem)] leading-none tracking-[-0.04em] max-[56rem]:text-[1.2rem]'
+const mobileNavLinkClass =
+  'block rounded-[0.95rem] px-3 py-3 text-[0.98rem] font-medium text-site-ink transition-colors duration-150 hover:bg-site-hover hover:text-site-link-hover focus-visible:bg-site-hover focus-visible:text-site-link-hover focus-visible:outline-none'
+const mobileNavActiveClass = 'bg-site-hover text-site-link-hover'
+const localeSwitchClass =
+  'inline-flex items-center rounded-full border border-site-line bg-site-panel p-1'
+const localeOptionClass =
+  'inline-flex min-h-8 min-w-11 items-center justify-center rounded-full px-2.5 py-1 text-[0.72rem] font-semibold tracking-[0.08em] text-site-ink transition-colors duration-150 hover:text-site-link-hover focus-visible:text-site-link-hover focus-visible:outline-none'
+const localeOptionActiveClass = 'bg-site-hover text-site-link-hover'
+const mobileLocaleOptionClass =
+  'inline-flex min-h-9 min-w-12 items-center justify-center rounded-full px-3 py-1.5 text-[0.76rem] font-semibold tracking-[0.08em] text-site-ink transition-colors duration-150 hover:text-site-link-hover focus-visible:text-site-link-hover focus-visible:outline-none'
 ---
 
 <!doctype html>
@@ -81,7 +93,7 @@ const brandLabelClass = 'font-head text-[clamp(1.45rem,3vw,2rem)] leading-none t
   </head>
   <body data-locale-alternate={alternateLocale} data-locale-redirect-href={localeRedirectHref}>
     <header class="sticky top-0 z-20 mb-4 border-b border-site-line bg-[color:color-mix(in_srgb,var(--site-bg)_68%,transparent)] backdrop-blur-[14px]">
-      <div class={cn(ui.frame, 'flex flex-wrap items-center justify-between gap-4 py-[0.85rem] max-[56rem]:gap-3 max-[56rem]:py-[0.55rem]')}>
+      <div class={cn(ui.blogFrame, 'flex flex-wrap items-center justify-between gap-4 py-[0.85rem] max-[56rem]:gap-3 max-[56rem]:py-[0.55rem]')}>
           <a class={brandLinkClass} href={homeHref}>
             <span class={brandIconWrapClass}>
               <BrandIcon className={brandIconClass} />
@@ -89,17 +101,17 @@ const brandLabelClass = 'font-head text-[clamp(1.45rem,3vw,2rem)] leading-none t
             <span class={brandLabelClass}>{copy.header.brand}</span>
           </a>
           <nav
-            aria-label="Primary"
-            class="flex flex-wrap justify-center gap-1 max-[56rem]:order-3 max-[56rem]:w-full max-[56rem]:justify-start"
+            aria-label={copy.header.primaryNav}
+            class="hidden min-[56rem]:flex min-[56rem]:flex-1 min-[56rem]:flex-wrap min-[56rem]:justify-center min-[56rem]:gap-1"
           >
-            <a class={navLinkVariants({ active: isLearnPage })} href={learnHref}>
-              {copy.learn}
-            </a>
             <a class={navLinkVariants({ active: isGlossaryPage })} href={glossaryHref}>
               {copy.layout.glossary}
             </a>
             <a class={navLinkVariants({ active: isConceptsPage })} href={conceptsHref}>
               {copy.layout.concepts}
+            </a>
+            <a class={navLinkVariants({ active: isTopicsPage })} href={topicsHref}>
+              {copy.layout.topics}
             </a>
             <a class={navLinkVariants({ active: isTracksPage })} href={tracksHref}>
               {copy.layout.tracks}
@@ -108,10 +120,10 @@ const brandLabelClass = 'font-head text-[clamp(1.45rem,3vw,2rem)] leading-none t
               {copy.layout.search}
             </a>
           </nav>
-          <div class="flex items-center gap-2 max-[56rem]:ml-auto max-[56rem]:justify-end">
-            <div aria-label="Language switcher" class="inline-flex gap-1 max-[56rem]:gap-[0.2rem]">
+          <div class="hidden min-[56rem]:flex min-[56rem]:items-center min-[56rem]:gap-2">
+            <div aria-label={copy.header.languageSwitcher} class={localeSwitchClass}>
               <a
-                class={navLinkVariants({ active: guideLocale === 'en' })}
+                class={cn(localeOptionClass, guideLocale === 'en' && localeOptionActiveClass)}
                 href={englishGuideIndexHref}
                 hreflang="en"
                 lang="en"
@@ -120,7 +132,7 @@ const brandLabelClass = 'font-head text-[clamp(1.45rem,3vw,2rem)] leading-none t
                 EN
               </a>
               <a
-                class={navLinkVariants({ active: guideLocale === 'pt-br' })}
+                class={cn(localeOptionClass, guideLocale === 'pt-br' && localeOptionActiveClass)}
                 href={portugueseGuideIndexHref}
                 hreflang="pt-BR"
                 lang="pt-BR"
@@ -130,13 +142,72 @@ const brandLabelClass = 'font-head text-[clamp(1.45rem,3vw,2rem)] leading-none t
               </a>
             </div>
           </div>
+          <button
+            aria-controls="mobile-site-nav"
+            aria-expanded="false"
+            class="ml-auto inline-flex min-h-10 items-center gap-2 rounded-[0.9rem] border border-site-line bg-site-panel px-3 py-2 text-sm font-semibold tracking-[0.04em] text-site-ink transition-colors duration-150 hover:bg-site-hover hover:text-site-link-hover focus-visible:bg-site-hover focus-visible:text-site-link-hover focus-visible:outline-none min-[56rem]:hidden"
+            data-label-close={copy.header.closeMenu}
+            data-label-open={copy.header.menu}
+            data-mobile-nav-toggle
+            type="button"
+          >
+            <MenuIcon class="size-4" data-mobile-nav-open-icon />
+            <XIcon class="hidden size-4" data-mobile-nav-close-icon />
+            <span data-mobile-nav-toggle-label>{copy.header.menu}</span>
+          </button>
+          <div class="hidden w-full order-3 min-[56rem]:hidden" data-mobile-nav-panel id="mobile-site-nav">
+            <div class="grid gap-3 rounded-[1rem] border border-site-line bg-site-panel p-3 shadow-[0_18px_60px_rgba(5,10,20,0.2)]">
+              <nav aria-label={copy.header.primaryNav} class="grid gap-1">
+                <a class={cn(mobileNavLinkClass, isGlossaryPage && mobileNavActiveClass)} href={glossaryHref}>
+                  {copy.layout.glossary}
+                </a>
+                <a class={cn(mobileNavLinkClass, isConceptsPage && mobileNavActiveClass)} href={conceptsHref}>
+                  {copy.layout.concepts}
+                </a>
+                <a class={cn(mobileNavLinkClass, isTopicsPage && mobileNavActiveClass)} href={topicsHref}>
+                  {copy.layout.topics}
+                </a>
+                <a class={cn(mobileNavLinkClass, isTracksPage && mobileNavActiveClass)} href={tracksHref}>
+                  {copy.layout.tracks}
+                </a>
+                <a class={cn(mobileNavLinkClass, isSearchPage && mobileNavActiveClass)} href={searchHref}>
+                  {copy.layout.search}
+                </a>
+              </nav>
+              <div class="grid gap-2 border-t border-site-line pt-3">
+                <p class="m-0 text-[0.72rem] font-bold uppercase tracking-[0.18em] text-site-line-strong">
+                  {copy.header.languageSwitcher}
+                </p>
+                <div class={cn(localeSwitchClass, 'w-fit')}>
+                  <a
+                    class={cn(mobileLocaleOptionClass, guideLocale === 'en' && localeOptionActiveClass)}
+                    href={englishGuideIndexHref}
+                    hreflang="en"
+                    lang="en"
+                    data-locale-choice="en"
+                  >
+                    EN
+                  </a>
+                  <a
+                    class={cn(mobileLocaleOptionClass, guideLocale === 'pt-br' && localeOptionActiveClass)}
+                    href={portugueseGuideIndexHref}
+                    hreflang="pt-BR"
+                    lang="pt-BR"
+                    data-locale-choice="pt-br"
+                  >
+                    PT
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
       </div>
     </header>
     <main class={ui.pageShell} data-pagefind-body>
       <slot />
     </main>
     <footer class="mt-12 border-t-2 border-site-line-strong bg-site-surface">
-      <div class={cn(ui.frame, 'grid gap-8 py-10 md:grid-cols-[minmax(0,1.5fr)_minmax(12rem,1fr)_minmax(12rem,1fr)]')}>
+      <div class={cn(ui.blogFrame, 'grid gap-8 py-10 md:grid-cols-[minmax(0,1.5fr)_minmax(12rem,1fr)_minmax(12rem,1fr)]')}>
           <div class="grid content-start gap-3">
             <a class={brandLinkClass} href={homeHref}>
               <span class={brandIconWrapClass}>
@@ -148,16 +219,16 @@ const brandLabelClass = 'font-head text-[clamp(1.45rem,3vw,2rem)] leading-none t
           </div>
           <div class="grid content-start gap-3">
             <div class="grid gap-[0.85rem]">
-              <a class={ui.footerLink} href={tracksHref}>{copy.footer.tracks}</a>
-              <a class={ui.footerLink} href={learnHref}>{copy.footer.learn}</a>
+              <a class={ui.footerLink} href={topicsHref}>{copy.footer.topics}</a>
+              <a class={ui.footerLink} href={glossaryHref}>{copy.footer.glossary}</a>
               <a class={ui.footerLink} href={conceptsHref}>{copy.layout.concepts}</a>
-              <a class={ui.footerLink} href={searchHref}>{copy.footer.search}</a>
+              <a class={ui.footerLink} href={tracksHref}>{copy.footer.tracks}</a>
             </div>
           </div>
           <div class="grid content-start gap-3">
             <div class="grid gap-[0.85rem]">
-              <a class={ui.footerLink} href={topicsHref}>{copy.footer.topics}</a>
-              <a class={ui.footerLink} href={glossaryHref}>{copy.footer.glossary}</a>
+              <a class={ui.footerLink} href={learnHref}>{copy.footer.learn}</a>
+              <a class={ui.footerLink} href={searchHref}>{copy.footer.search}</a>
               <a class={ui.footerLink} href={termsHref}>{copy.footer.terms}</a>
               <a class={ui.footerLink} href={rssHref}>{copy.footer.rss}</a>
               <a class={ui.footerLink} href="/privacy">{copy.footer.privacy}</a>
@@ -165,7 +236,7 @@ const brandLabelClass = 'font-head text-[clamp(1.45rem,3vw,2rem)] leading-none t
           </div>
       </div>
       <div class="border-t-2 border-site-line-strong bg-site-surface text-center">
-        <div class={cn(ui.frame, 'py-4')}>
+        <div class={cn(ui.blogFrame, 'py-4')}>
           <p class="m-0 text-sm leading-[1.3] text-site-ink">© {currentYear} {copy.footer.title}. {copy.footer.rights}</p>
         </div>
       </div>
@@ -178,6 +249,12 @@ const brandLabelClass = 'font-head text-[clamp(1.45rem,3vw,2rem)] leading-none t
   import { siteStorageKeys } from '@/lib/storage-keys'
 
   const localeChoiceLinks = [...document.querySelectorAll('[data-locale-choice]')]
+  const mobileNavToggle = document.querySelector('[data-mobile-nav-toggle]')
+  const mobileNavPanel = document.querySelector('[data-mobile-nav-panel]')
+  const mobileNavOpenIcon = document.querySelector('[data-mobile-nav-open-icon]')
+  const mobileNavCloseIcon = document.querySelector('[data-mobile-nav-close-icon]')
+  const mobileNavToggleLabel = document.querySelector('[data-mobile-nav-toggle-label]')
+  const mobileNavLinks = [...document.querySelectorAll('#mobile-site-nav a')]
 
   localeChoiceLinks.forEach((link) => {
     link.addEventListener('click', () => {
@@ -187,6 +264,42 @@ const brandLabelClass = 'font-head text-[clamp(1.45rem,3vw,2rem)] leading-none t
       }
 
       writeLocalStorageString(siteStorageKeys.localePreference, value)
+    })
+  })
+
+  // @ts-expect-error Astro inline scripts do not preserve local type annotations here.
+  const setMobileNavOpen = (isOpen) => {
+    if (!(mobileNavToggle instanceof HTMLButtonElement) || !(mobileNavPanel instanceof HTMLElement)) {
+      return
+    }
+
+    mobileNavToggle.setAttribute('aria-expanded', String(isOpen))
+    mobileNavPanel.classList.toggle('hidden', !isOpen)
+    mobileNavOpenIcon?.classList.toggle('hidden', isOpen)
+    mobileNavCloseIcon?.classList.toggle('hidden', !isOpen)
+
+    if (mobileNavToggleLabel instanceof HTMLElement) {
+      const nextLabel = isOpen
+        ? mobileNavToggle.getAttribute('data-label-close')
+        : mobileNavToggle.getAttribute('data-label-open')
+
+      if (nextLabel) {
+        mobileNavToggleLabel.textContent = nextLabel
+      }
+    }
+  }
+
+  if (mobileNavToggle instanceof HTMLButtonElement) {
+    setMobileNavOpen(false)
+    mobileNavToggle.addEventListener('click', () => {
+      const isOpen = mobileNavToggle.getAttribute('aria-expanded') === 'true'
+      setMobileNavOpen(!isOpen)
+    })
+  }
+
+  mobileNavLinks.forEach((link) => {
+    link.addEventListener('click', () => {
+      setMobileNavOpen(false)
     })
   })
 
@@ -202,4 +315,11 @@ const brandLabelClass = 'font-head text-[clamp(1.45rem,3vw,2rem)] leading-none t
   if (!savedLocalePreference && preferredLocale !== currentLocale && alternateHref && alternateLocale === preferredLocale) {
     window.location.replace(alternateHref)
   }
+
+  const desktopNavMedia = window.matchMedia('(min-width: 896px)')
+  desktopNavMedia.addEventListener('change', (event) => {
+    if (event.matches) {
+      setMobileNavOpen(false)
+    }
+  })
 </script>

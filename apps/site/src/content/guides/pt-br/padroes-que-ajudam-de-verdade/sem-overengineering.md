@@ -21,6 +21,8 @@ tags:
   - patterns
   - architecture
   - overengineering
+topicIds:
+  - architecture-patterns
 relatedDeckIds: []
 ---
 

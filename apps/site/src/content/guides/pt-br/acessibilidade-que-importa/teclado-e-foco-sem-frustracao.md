@@ -22,6 +22,8 @@ tags:
   - accessibility
   - keyboard
   - focus
+topicIds:
+  - accessibility
 relatedDeckIds: []
 ---
 

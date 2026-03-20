@@ -21,6 +21,8 @@ tags:
   - patterns
   - composition
   - abstraction
+topicIds:
+  - architecture-patterns
 relatedDeckIds: []
 ---
 

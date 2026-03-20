@@ -3,6 +3,7 @@ export const uiLayout = {
   articleSection: 'mx-auto mt-8 max-w-[52rem] border-t border-article-rule pt-8',
   articleShell: 'mx-auto mt-5 w-full max-w-[52rem] pb-11',
   articleTagList: 'mx-auto mt-4 flex max-w-[52rem] flex-wrap gap-2.5 border-t border-article-rule pt-4',
+  blogFrame: 'mx-auto w-[min(52rem,calc(100vw-2rem))] md:w-[min(52rem,calc(100vw-3rem))]',
   cardsGrid: 'grid gap-4 md:grid-cols-2',
   compactSection: 'mx-auto mt-4 w-full max-w-[52rem]',
   frame: 'mx-auto w-[min(72rem,calc(100vw-2rem))] md:w-[min(72rem,calc(100vw-3rem))]',

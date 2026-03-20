@@ -21,6 +21,8 @@ tags:
   - javascript
   - memory
   - runtime
+topicIds:
+  - javascript
 relatedDeckIds: []
 ---
 

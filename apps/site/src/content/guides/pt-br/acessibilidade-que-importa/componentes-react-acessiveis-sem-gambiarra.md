@@ -21,6 +21,9 @@ tags:
   - accessibility
   - react
   - components
+topicIds:
+  - accessibility
+  - react
 relatedDeckIds: []
 ---
 

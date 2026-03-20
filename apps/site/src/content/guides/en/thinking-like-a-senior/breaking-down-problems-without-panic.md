@@ -22,6 +22,8 @@ tags:
   - senior-thinking
   - problem-solving
   - interviews
+topicIds:
+  - delivery
 relatedDeckIds:
   - coding-arrays-hashmaps-basics
 ---

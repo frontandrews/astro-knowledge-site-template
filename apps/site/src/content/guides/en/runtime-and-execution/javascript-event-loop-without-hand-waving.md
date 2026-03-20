@@ -21,6 +21,8 @@ tags:
   - javascript
   - event loop
   - async
+topicIds:
+  - javascript
 relatedDeckIds:
   - javascript-runtime-core
 ---

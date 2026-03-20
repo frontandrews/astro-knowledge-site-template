@@ -22,6 +22,8 @@ tags:
   - react
   - state
   - ui
+topicIds:
+  - react
 relatedDeckIds:
   - react-rendering-core
 ---

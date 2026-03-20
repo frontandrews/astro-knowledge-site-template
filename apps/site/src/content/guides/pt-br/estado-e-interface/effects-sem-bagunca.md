@@ -22,6 +22,8 @@ tags:
   - react
   - effects
   - ui
+topicIds:
+  - react
 relatedDeckIds: []
 ---
 

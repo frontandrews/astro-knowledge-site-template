@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "build": "astro build && pagefind --site dist",
+    "build": "astro build && node ./scripts/build-search-index.mjs",
     "check": "astro check",
     "dev": "astro dev",
     "preview": "astro preview"

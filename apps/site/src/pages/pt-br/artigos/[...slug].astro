@@ -17,6 +17,10 @@ export async function getStaticPaths() {
         return true
       }
 
+      if (post.data.kind === 'article') {
+        return true
+      }
+
       return getGuideLegacyHrefFromEntryId(post.id) !== getGuideHrefFromEntry(post)
     })
     .map((post) => ({

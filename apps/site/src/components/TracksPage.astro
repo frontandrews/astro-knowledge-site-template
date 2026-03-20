@@ -45,9 +45,11 @@ const items = roadmaps.map((roadmap) => ({
   <CompactSection>
     <FilterableDirectory
       filterLabel={copy.filterLabel}
+      fewerFiltersLabel={locale === 'pt-br' ? 'Mostrar menos' : 'Show less'}
       items={items}
       client:load
       kind="title-cards"
+      moreFiltersLabel={locale === 'pt-br' ? 'mais' : 'more'}
     />
   </CompactSection>
 </BaseLayout>

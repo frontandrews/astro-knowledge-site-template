@@ -1,26 +1,48 @@
 ---
 import type { CollectionEntry } from 'astro:content'
+import type { TopicDefinition } from '@seniorpath/content'
 
-import ArticleCard from '@/components/ArticleCard.astro'
+import FilterableDirectory from '@/components/FilterableDirectory.svelte'
 import BaseLayout from '@/layouts/BaseLayout.astro'
+import CompactSection from '@/components/ui/CompactSection.astro'
 import PageHeader from '@/components/ui/PageHeader.astro'
 import SectionBlock from '@/components/ui/SectionBlock.astro'
+import { formatEditorialDate } from '@/lib/format-date'
+import { getGuideHrefFromEntry } from '@/lib/guide-links'
 import { getLocalizedTopicLabel, getLocalizedTopicSummary, getTopicBreadcrumb } from '@/lib/topic-taxonomy'
 import { getTopicHref } from '@/lib/topic-links'
 import type { SiteLocale } from '@/lib/site-copy'
-import { ui } from '@/lib/ui'
+import { siteStorageKeys } from '@/lib/storage-keys'
 
 type Props = {
+  childTopics?: TopicDefinition[]
   locale: SiteLocale
   posts: CollectionEntry<'guides'>[]
   topicId: string
 }
 
-const { locale, posts, topicId } = Astro.props
+const { childTopics = [], locale, posts, topicId } = Astro.props
 const title = getLocalizedTopicLabel(topicId, locale)
 const description = getLocalizedTopicSummary(topicId, locale)
 const breadcrumbItems = getTopicBreadcrumb(topicId, locale)
-const selectionLabel = locale === 'pt-br' ? 'Escolha um guia' : 'Select a guide'
+const dateLocale = locale === 'pt-br' ? 'pt-BR' : 'en-US'
+const childTopicItems = childTopics.map((topic) => ({
+  description: getLocalizedTopicSummary(topic.id, locale),
+  href: getTopicHref(topic.id, locale),
+  tags: [],
+  title: getLocalizedTopicLabel(topic.id, locale),
+}))
+const items = posts.map((post) => ({
+  badgeLabel: post.data.kind === 'article' ? (locale === 'pt-br' ? 'Artigo' : 'Article') : undefined,
+  completionId: post.data.kind === 'guide' ? post.data.guideId : undefined,
+  contentKind: post.data.kind,
+  ctaLabel: locale === 'pt-br' ? 'Ler mais' : 'Learn more',
+  description: post.data.description,
+  eyebrow: formatEditorialDate(post.data.pubDate, dateLocale),
+  href: getGuideHrefFromEntry(post),
+  tags: [],
+  title: post.data.title,
+}))
 ---
 
 <BaseLayout
@@ -31,9 +53,35 @@ const selectionLabel = locale === 'pt-br' ? 'Escolha um guia' : 'Select a guide'
 >
   <PageHeader breadcrumbs={breadcrumbItems} description={description} title={title} />
 
-  <SectionBlock bodyClass={ui.cardsGrid} eyebrow={selectionLabel}>
-      {posts.map((post) => (
-        <ArticleCard post={post} />
-      ))}
-  </SectionBlock>
+  {childTopicItems.length > 0 ? (
+    <SectionBlock
+      description={
+        locale === 'pt-br'
+          ? 'Subtopicos para navegar com mais precisao dentro dessa area.'
+          : 'Subtopics to navigate this area with a bit more precision.'
+      }
+      title={locale === 'pt-br' ? 'Subtopicos' : 'Subtopics'}
+    >
+      <FilterableDirectory
+        items={childTopicItems}
+        kind="title-cards"
+      />
+    </SectionBlock>
+  ) : null}
+
+  {items.length > 0 ? (
+    <CompactSection>
+      <FilterableDirectory
+        allItemsLabel={locale === 'pt-br' ? 'Tudo' : 'All'}
+        articleItemsLabel={locale === 'pt-br' ? 'Artigos' : 'Articles'}
+        completionStorageKey={siteStorageKeys.completedGuides}
+        fewerFiltersLabel={locale === 'pt-br' ? 'Mostrar menos' : 'Show less'}
+        guideItemsLabel={locale === 'pt-br' ? 'Guias' : 'Guides'}
+        items={items}
+        kind="guide-rows"
+        moreFiltersLabel={locale === 'pt-br' ? 'mais' : 'more'}
+        client:load
+      />
+    </CompactSection>
+  ) : null}
 </BaseLayout>

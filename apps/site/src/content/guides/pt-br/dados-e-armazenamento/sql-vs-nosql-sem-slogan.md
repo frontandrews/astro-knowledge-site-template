@@ -22,6 +22,8 @@ tags:
   - data
   - sql
   - nosql
+topicIds:
+  - data-storage
 relatedDeckIds: []
 ---
 

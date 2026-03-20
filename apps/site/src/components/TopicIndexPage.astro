@@ -1,28 +1,29 @@
 ---
-import type { TopicDefinition } from '@seniorpath/content'
-
+import FilterableDirectory from '@/components/FilterableDirectory.svelte'
 import BaseLayout from '@/layouts/BaseLayout.astro'
+import CompactSection from '@/components/ui/CompactSection.astro'
 import PageHeader from '@/components/ui/PageHeader.astro'
-import SectionBlock from '@/components/ui/SectionBlock.astro'
-import LinkCard from '@/components/ui/LinkCard.astro'
-import { getTopicHref, getTopicIndexHref } from '@/lib/topic-links'
-import { getLocalizedTopicLabel } from '@/lib/topic-taxonomy'
+import { getTopicGroupHref, getTopicIndexHref } from '@/lib/topic-links'
+import { getLocalizedTopicGroupLabel } from '@/lib/topic-taxonomy'
 import { getSiteCopy, type SiteLocale } from '@/lib/site-copy'
-import { ui } from '@/lib/ui'
 
-type TopicWithCount = {
+type TopicGroupWithCount = {
   count: number
-  topic: TopicDefinition
+  groupId: string
 }
 
 type Props = {
   locale: SiteLocale
-  topics: TopicWithCount[]
+  groups: TopicGroupWithCount[]
 }
 
-const { locale, topics } = Astro.props
+const { locale, groups } = Astro.props
 const copy = getSiteCopy(locale)
-const selectionLabel = locale === 'pt-br' ? 'Escolha um topico' : 'Select a topic'
+const items = groups.map(({ groupId }) => ({
+  href: getTopicGroupHref(groupId, locale),
+  tags: [],
+  title: getLocalizedTopicGroupLabel(groupId, locale),
+}))
 ---
 
 <BaseLayout
@@ -33,18 +34,10 @@ const selectionLabel = locale === 'pt-br' ? 'Escolha um topico' : 'Select a topi
 >
   <PageHeader description={copy.topicIndex.copy} title={copy.topicIndex.title} />
 
-  <SectionBlock bodyClass={ui.cardsGrid} eyebrow={selectionLabel}>
-      {topics.map(({ topic }) => (
-        <article class="group h-full">
-          <LinkCard
-            href={getTopicHref(topic.id, locale)}
-            showArrow={false}
-            title={getLocalizedTopicLabel(topic.id, locale)}
-            titleClass="m-0 text-base font-semibold leading-[1.32]"
-            titleTag="h3"
-            variant="ghost"
-          />
-        </article>
-      ))}
-  </SectionBlock>
+  <CompactSection>
+    <FilterableDirectory
+      items={items}
+      kind="title-cards"
+    />
+  </CompactSection>
 </BaseLayout>

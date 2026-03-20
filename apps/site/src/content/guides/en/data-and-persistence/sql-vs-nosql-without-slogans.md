@@ -23,6 +23,8 @@ tags:
   - sql
   - nosql
   - trade-offs
+topicIds:
+  - data-storage
 relatedDeckIds: []
 ---
 

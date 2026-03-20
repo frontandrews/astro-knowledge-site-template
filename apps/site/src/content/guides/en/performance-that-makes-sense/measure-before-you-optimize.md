@@ -21,6 +21,8 @@ tags:
   - performance
   - measurement
   - profiling
+topicIds:
+  - performance
 relatedDeckIds: []
 ---
 

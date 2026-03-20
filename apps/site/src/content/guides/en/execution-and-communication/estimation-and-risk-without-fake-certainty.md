@@ -22,6 +22,9 @@ tags:
   - execution
   - risk
   - delivery
+topicIds:
+  - delivery
+  - leadership
 relatedDeckIds: []
 ---
 

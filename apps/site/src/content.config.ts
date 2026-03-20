@@ -1,6 +1,9 @@
 import { defineCollection } from 'astro:content'
 import { glob } from 'astro/loaders'
 import { z } from 'astro/zod'
+import { TOPIC_DEFINITIONS } from '@seniorpath/content'
+
+const topicIdSchema = z.enum(TOPIC_DEFINITIONS.map((topic) => topic.id) as [string, ...string[]])
 
 const guides = defineCollection({
   loader: glob({
@@ -27,6 +30,7 @@ const guides = defineCollection({
     tags: z.array(z.string()).default([]),
     title: z.string().min(1),
     topic: z.string().optional(),
+    topicIds: z.array(topicIdSchema).min(1),
     trackEligible: z.boolean().default(true),
     updatedDate: z.coerce.date().optional(),
   }),

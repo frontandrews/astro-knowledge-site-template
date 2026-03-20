@@ -22,6 +22,8 @@ tags:
   - interviews
   - problem-solving
   - patterns
+topicIds:
+  - coding-interview
 relatedDeckIds: []
 ---
 

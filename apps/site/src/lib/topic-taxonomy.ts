@@ -1,8 +1,19 @@
 import type { CollectionEntry } from 'astro:content'
-import { getPathPillarById, getTopicById, getTopicLabel, getTopicSummary, TOPIC_DEFINITIONS } from '@seniorpath/content'
+import {
+  getTopicAncestorIds,
+  getTopicById,
+  getTopicChildren,
+  getTopicGroupLabel,
+  getTopicGroupSummary,
+  getTopicLabel,
+  getTopicRootGroupId,
+  getTopicSummary,
+  TOPIC_GROUP_DEFINITIONS,
+  TOPIC_DEFINITIONS,
+} from '@seniorpath/content'
 
 import { getSiteLocale, type SiteLocale } from '@/lib/site-copy'
-import { getTopicHref, getTopicIndexHref } from '@/lib/topic-links'
+import { getTopicGroupHref, getTopicHref, getTopicIndexHref } from '@/lib/topic-links'
 import { sortGuides } from '@/lib/guide-tree'
 
 type GuideEntry = CollectionEntry<'guides'>
@@ -16,26 +27,20 @@ export function getLocalizedTopicLabel(topicId: string, locale: SiteLocale) {
   return getTopicLabel(topicId, locale)
 }
 
+export function getLocalizedTopicGroupLabel(groupId: string, locale: SiteLocale) {
+  return getTopicGroupLabel(groupId, locale)
+}
+
 export function getLocalizedTopicSummary(topicId: string, locale: SiteLocale) {
   return getTopicSummary(topicId, locale)
 }
 
+export function getLocalizedTopicGroupSummary(groupId: string, locale: SiteLocale) {
+  return getTopicGroupSummary(groupId, locale)
+}
+
 export function getGuideTopicIds(post: GuideEntry) {
-  const topicIds = new Set<string>()
-
-  if (post.data.pillarId) {
-    const pillar = getPathPillarById(post.data.pillarId)
-
-    pillar?.legacyTopics.forEach((topicId) => topicIds.add(topicId))
-  }
-
-  post.data.tags.forEach((tag) => {
-    if (getTopicById(tag)) {
-      topicIds.add(tag)
-    }
-  })
-
-  return [...topicIds]
+  return [...new Set(post.data.topicIds.filter((topicId) => Boolean(getTopicById(topicId))))]
 }
 
 export function getLocalizedGuideTopics(post: GuideEntry) {
@@ -49,6 +54,34 @@ export function getLocalizedGuideTopics(post: GuideEntry) {
 }
 
 export function getTopicBreadcrumb(topicId: string, locale: SiteLocale): TopicBreadcrumbItem[] {
+  const groupId = getTopicRootGroupId(topicId)
+  const ancestorIds = getTopicAncestorIds(topicId)
+
+  return [
+    {
+      href: getTopicIndexHref(locale),
+      label: locale === 'pt-br' ? 'Topicos' : 'Topics',
+    },
+    ...(groupId
+      ? [
+          {
+            href: getTopicGroupHref(groupId, locale),
+            label: getLocalizedTopicGroupLabel(groupId, locale),
+          },
+        ]
+      : []),
+    ...ancestorIds.map((ancestorId) => ({
+      href: getTopicHref(ancestorId, locale),
+      label: getLocalizedTopicLabel(ancestorId, locale),
+    })),
+    {
+      href: null,
+      label: getLocalizedTopicLabel(topicId, locale),
+    },
+  ]
+}
+
+export function getTopicGroupBreadcrumb(groupId: string, locale: SiteLocale): TopicBreadcrumbItem[] {
   return [
     {
       href: getTopicIndexHref(locale),
@@ -56,7 +89,7 @@ export function getTopicBreadcrumb(topicId: string, locale: SiteLocale): TopicBr
     },
     {
       href: null,
-      label: getLocalizedTopicLabel(topicId, locale),
+      label: getLocalizedTopicGroupLabel(groupId, locale),
     },
   ]
 }
@@ -70,10 +103,18 @@ export function getTopicGuides(posts: GuideEntry[], topicId: string, locale: Sit
   )
 }
 
-export function getAvailableTopics(posts: GuideEntry[], locale: SiteLocale) {
-  return TOPIC_DEFINITIONS.filter((topic) =>
-    posts.some(
-      (post) => post.data.locale === locale && post.data.status !== 'archived' && getGuideTopicIds(post).includes(topic.id),
-    ),
-  )
+function hasGuidesInTopicTree(posts: GuideEntry[], parentId: string, locale: SiteLocale): boolean {
+  if (TOPIC_DEFINITIONS.some((topic) => topic.id === parentId) && getTopicGuides(posts, parentId, locale).length > 0) {
+    return true
+  }
+
+  return getTopicChildren(parentId).some((topic) => hasGuidesInTopicTree(posts, topic.id, locale))
+}
+
+export function getAvailableTopicGroups(posts: GuideEntry[], locale: SiteLocale) {
+  return TOPIC_GROUP_DEFINITIONS.filter((group) => hasGuidesInTopicTree(posts, group.id, locale))
+}
+
+export function getAvailableChildTopics(posts: GuideEntry[], parentId: string, locale: SiteLocale) {
+  return getTopicChildren(parentId).filter((topic) => hasGuidesInTopicTree(posts, topic.id, locale))
 }

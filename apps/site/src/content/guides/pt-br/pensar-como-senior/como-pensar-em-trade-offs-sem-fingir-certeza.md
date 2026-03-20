@@ -22,6 +22,8 @@ tags:
   - senior-thinking
   - trade-offs
   - constraints
+topicIds:
+  - delivery
 relatedDeckIds: []
 ---
 

@@ -13,8 +13,6 @@ export type PathBranch = {
 export type PathPillar = {
   branches: PathBranch[]
   id: string
-  legacyTopics: string[]
-  legacyTracks: string[]
   order: number
   routeSegment: PathRouteSegment
   summary: string
@@ -40,8 +38,6 @@ export const PATH_TO_SENIOR_PILLARS: PathPillar[] = [
     title: 'Thinking Like a Senior',
     summary:
       'The mental foundation: trade-offs, constraints, clarity, and the habit of writing code for humans instead of only for compilers.',
-    legacyTopics: [],
-    legacyTracks: [],
     branches: [
       {
         id: 'problem-breakdown',
@@ -73,8 +69,6 @@ export const PATH_TO_SENIOR_PILLARS: PathPillar[] = [
     title: 'Runtime & Execution',
     summary:
       'What the platform is really doing: event loop, scheduling, memory, async behavior, and execution order without hand-waving.',
-    legacyTopics: ['javascript', 'node'],
-    legacyTracks: [],
     branches: [
       {
         id: 'event-loop-and-order',
@@ -109,8 +103,6 @@ export const PATH_TO_SENIOR_PILLARS: PathPillar[] = [
     title: 'Problem Solving & Interview Thinking',
     summary:
       'How to approach coding interviews without cargo-culting patterns: think first, explain clearly, then improve the solution.',
-    legacyTopics: ['coding-interview'],
-    legacyTracks: [],
     branches: [
       {
         id: 'approach-and-framing',
@@ -142,8 +134,6 @@ export const PATH_TO_SENIOR_PILLARS: PathPillar[] = [
     title: 'State & UI Thinking',
     summary:
       'Frontend reasoning without mental bugs: state, rendering, effects, boundaries, and data fetching decisions.',
-    legacyTopics: ['react'],
-    legacyTracks: [],
     branches: [
       {
         id: 'state-ownership',
@@ -175,8 +165,6 @@ export const PATH_TO_SENIOR_PILLARS: PathPillar[] = [
     title: 'Data & Persistence',
     summary:
       'How to model data, choose storage, reason about indexing, and balance consistency with practicality.',
-    legacyTopics: [],
-    legacyTracks: [],
     branches: [
       {
         id: 'data-modeling',
@@ -208,8 +196,6 @@ export const PATH_TO_SENIOR_PILLARS: PathPillar[] = [
     title: 'System Thinking',
     summary:
       'Architecture and scale without diagram theater: bottlenecks, failure modes, queues, APIs, and resilient system choices.',
-    legacyTopics: ['system-design', 'ai-engineering'],
-    legacyTracks: ['systems', 'ai-engineering'],
     branches: [
       {
         id: 'scalability-and-bottlenecks',
@@ -241,8 +227,6 @@ export const PATH_TO_SENIOR_PILLARS: PathPillar[] = [
     title: 'Debugging & Production Thinking',
     summary:
       'The layer where senior engineers stand out: reproducing issues, reading signals, and handling failure in real environments.',
-    legacyTopics: [],
-    legacyTracks: [],
     branches: [
       {
         id: 'production-failures',
@@ -274,8 +258,6 @@ export const PATH_TO_SENIOR_PILLARS: PathPillar[] = [
     title: 'Patterns That Actually Matter',
     summary:
       'Patterns as tools, not trophies: composition, abstraction, reuse, and the discipline to avoid overengineering.',
-    legacyTopics: [],
-    legacyTracks: [],
     branches: [
       {
         id: 'composition-vs-abstraction',
@@ -307,8 +289,6 @@ export const PATH_TO_SENIOR_PILLARS: PathPillar[] = [
     title: 'Performance That Makes Sense',
     summary:
       'Performance decisions grounded in measurement and user impact instead of folklore and premature optimization.',
-    legacyTopics: [],
-    legacyTracks: [],
     branches: [
       {
         id: 'bottleneck-detection',
@@ -340,8 +320,6 @@ export const PATH_TO_SENIOR_PILLARS: PathPillar[] = [
     title: 'Security Thinking',
     summary:
       'Practical security for product engineers: trust boundaries, input handling, auth mistakes, and safer defaults.',
-    legacyTopics: [],
-    legacyTracks: [],
     branches: [
       {
         id: 'trust-boundaries',
@@ -373,8 +351,6 @@ export const PATH_TO_SENIOR_PILLARS: PathPillar[] = [
     title: 'Accessibility That Actually Matters',
     summary:
       'Accessibility as a product quality layer: keyboard use, semantics, assistive tech, and inclusive interaction patterns.',
-    legacyTopics: [],
-    legacyTracks: [],
     branches: [
       {
         id: 'semantics-and-structure',
@@ -406,8 +382,6 @@ export const PATH_TO_SENIOR_PILLARS: PathPillar[] = [
     title: 'Execution & Communication',
     summary:
       'How senior engineers work in real teams: scoping, ticket handling, estimation, performance triage, and clear communication.',
-    legacyTopics: ['delivery', 'leadership', 'tech-english'],
-    legacyTracks: ['english-for-tech', 'leadership-and-delivery'],
     branches: [
       {
         id: 'ticket-and-task-thinking',
@@ -439,8 +413,6 @@ export const PATH_TO_SENIOR_PILLARS: PathPillar[] = [
     title: 'Real-World Scenarios',
     summary:
       'Applied scenarios that connect the whole system: scale, failure, AI features, slow apps, and messy production decisions.',
-    legacyTopics: [],
-    legacyTracks: [],
     branches: [
       {
         id: 'scalable-api-scenarios',
@@ -466,26 +438,6 @@ export const PATH_TO_SENIOR_PILLARS: PathPillar[] = [
     ],
   },
 ]
-
-export const LEGACY_TRACK_TO_PATH_PILLAR: Record<string, string> = {
-  'ai-engineering': 'system-thinking',
-  'english-for-tech': 'execution-and-communication',
-  'leadership-and-delivery': 'execution-and-communication',
-  programming: 'problem-solving-and-interview-thinking',
-  systems: 'system-thinking',
-}
-
-export const LEGACY_TOPIC_TO_PATH_PILLAR: Record<string, string> = {
-  'ai-engineering': 'system-thinking',
-  'coding-interview': 'problem-solving-and-interview-thinking',
-  delivery: 'execution-and-communication',
-  javascript: 'runtime-and-execution',
-  leadership: 'execution-and-communication',
-  node: 'runtime-and-execution',
-  react: 'state-and-ui-thinking',
-  'system-design': 'system-thinking',
-  'tech-english': 'execution-and-communication',
-}
 
 export function getPathPillarById(pillarId: string) {
   return PATH_TO_SENIOR_PILLARS.find((pillar) => pillar.id === pillarId)

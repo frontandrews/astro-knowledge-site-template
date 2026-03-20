@@ -21,6 +21,9 @@ tags:
   - communication
   - interviews
   - work
+topicIds:
+  - leadership
+  - tech-english
 relatedDeckIds: []
 ---
 

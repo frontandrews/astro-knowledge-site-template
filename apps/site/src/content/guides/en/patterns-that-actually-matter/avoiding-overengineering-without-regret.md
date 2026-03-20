@@ -21,6 +21,8 @@ tags:
   - patterns
   - simplicity
   - engineering-judgment
+topicIds:
+  - architecture-patterns
 relatedDeckIds: []
 ---
 

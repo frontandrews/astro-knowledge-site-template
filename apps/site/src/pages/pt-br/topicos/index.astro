@@ -2,13 +2,13 @@
 import { getCollection } from 'astro:content'
 
 import TopicIndexPage from '@/components/TopicIndexPage.astro'
-import { getAvailableTopics, getTopicGuides } from '@/lib/topic-taxonomy'
+import { getAvailableTopicGroups } from '@/lib/topic-taxonomy'
 
 const posts = await getCollection('guides')
-const topics = getAvailableTopics(posts, 'pt-br').map((topic) => ({
-  count: getTopicGuides(posts, topic.id, 'pt-br').length,
-  topic,
+const groups = getAvailableTopicGroups(posts, 'pt-br').map((group) => ({
+  count: 0,
+  groupId: group.id,
 }))
 ---
 
-<TopicIndexPage locale="pt-br" topics={topics} />
+<TopicIndexPage groups={groups} locale="pt-br" />

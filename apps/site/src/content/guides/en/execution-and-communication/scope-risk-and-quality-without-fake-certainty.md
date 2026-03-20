@@ -20,6 +20,9 @@ tags:
   - scope
   - risk
   - leadership
+topicIds:
+  - delivery
+  - leadership
 relatedDeckIds:
   - delivery-scope-risk-core
   - leadership-ownership-core

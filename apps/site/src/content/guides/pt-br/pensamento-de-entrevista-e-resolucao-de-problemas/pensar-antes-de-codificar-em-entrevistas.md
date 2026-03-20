@@ -22,6 +22,8 @@ tags:
   - interviews
   - coding
   - framing
+topicIds:
+  - coding-interview
 relatedDeckIds:
   - coding-arrays-hashmaps-basics
 ---

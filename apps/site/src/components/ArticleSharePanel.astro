@@ -1,0 +1,132 @@
+---
+import { getSiteCopy, type SiteLocale } from '@/lib/site-copy'
+import { cn } from '@/lib/cn'
+import { ui } from '@/lib/ui'
+
+type Props = {
+  description: string
+  locale: SiteLocale
+  title: string
+  url: string
+}
+
+const { description, locale, title, url } = Astro.props
+const copy = getSiteCopy(locale)
+const shareText = `${title}\n\n${description}\n\n${url}`
+const chatHref = `https://wa.me/?text=${encodeURIComponent(shareText)}`
+---
+
+<section
+  class={cn(ui.articleSection, ui.panel, 'grid gap-4 px-5 py-5')}
+  data-article-share
+  data-copy-link-error={copy.article.copyLinkError}
+  data-copy-link-success={copy.article.copyLinkSuccess}
+  data-share-description={description}
+  data-share-fallback={copy.article.shareFallback}
+  data-share-title={title}
+  data-share-url={url}
+>
+  <div class="grid gap-1">
+    <p class={ui.eyebrow}>{copy.article.shareTitle}</p>
+    <p class={ui.bodyCopy}>{copy.article.shareDescription}</p>
+  </div>
+
+  <div class="flex flex-wrap gap-3">
+    <button
+      class={cn(ui.actionLink, 'border border-site-line bg-site-card')}
+      data-share-native
+      type="button"
+    >
+      {copy.article.share}
+    </button>
+    <a
+      class={cn(ui.actionLink, 'border border-site-line bg-site-card')}
+      href={chatHref}
+      rel="noreferrer"
+      target="_blank"
+    >
+      {copy.article.chatShare}
+    </a>
+    <button
+      class={cn(ui.actionLink, 'border border-site-line bg-site-card')}
+      data-share-copy
+      type="button"
+    >
+      {copy.article.copyLink}
+    </button>
+  </div>
+
+  <p
+    aria-live="polite"
+    class="hidden text-sm leading-6 text-site-ink-soft"
+    data-share-feedback
+  />
+</section>
+
+<script>
+  const shareRoots = document.querySelectorAll('[data-article-share]')
+
+  for (const root of shareRoots) {
+    if (!(root instanceof HTMLElement)) continue
+
+    const nativeButton = root.querySelector('[data-share-native]')
+    const copyButton = root.querySelector('[data-share-copy]')
+    const feedback = root.querySelector('[data-share-feedback]')
+
+    if (
+      !(nativeButton instanceof HTMLButtonElement) ||
+      !(copyButton instanceof HTMLButtonElement) ||
+      !(feedback instanceof HTMLElement)
+    ) {
+      continue
+    }
+
+    const shareTitle = root.dataset.shareTitle ?? document.title
+    const shareDescription = root.dataset.shareDescription ?? ''
+    const shareUrl = root.dataset.shareUrl ?? window.location.href
+    const shareFallback = root.dataset.shareFallback ?? 'Share is unavailable.'
+    const copyLinkSuccess = root.dataset.copyLinkSuccess ?? 'Link copied.'
+    const copyLinkError = root.dataset.copyLinkError ?? 'Unable to copy the link.'
+
+    const setFeedback = (message: string) => {
+      feedback.textContent = message
+      feedback.classList.remove('hidden')
+    }
+
+    const copyLink = async () => {
+      if (typeof navigator.clipboard?.writeText !== 'function') {
+        setFeedback(copyLinkError)
+        return false
+      }
+
+      await navigator.clipboard.writeText(shareUrl)
+      setFeedback(copyLinkSuccess)
+      return true
+    }
+
+    nativeButton.addEventListener('click', async () => {
+      if (typeof navigator.share !== 'function') {
+        setFeedback(shareFallback)
+        return
+      }
+
+      try {
+        await navigator.share({
+          text: shareDescription,
+          title: shareTitle,
+          url: shareUrl,
+        })
+      } catch (error) {
+        if (error instanceof DOMException && error.name === 'AbortError') {
+          return
+        }
+
+        setFeedback(shareFallback)
+      }
+    })
+
+    copyButton.addEventListener('click', () => {
+      void copyLink()
+    })
+  }
+</script>

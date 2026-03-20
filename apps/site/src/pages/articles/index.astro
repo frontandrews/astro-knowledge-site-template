@@ -7,26 +7,28 @@ import CompactSection from '@/components/ui/CompactSection.astro'
 import PageHeader from '@/components/ui/PageHeader.astro'
 import { formatEditorialDate } from '@/lib/format-date'
 import { getGuideHrefFromEntry, getGuideIndexHref } from '@/lib/guide-links'
-import { getGuideTaxonomy, getLocalizedPillarLabel } from '@/lib/guide-taxonomy'
 import { sortGuidesByRecency } from '@/lib/guide-tree'
 import { getSiteCopy } from '@/lib/site-copy'
 import { siteStorageKeys } from '@/lib/storage-keys'
+import { getTopicIndexHref } from '@/lib/topic-links'
+import { getLocalizedGuideTopics } from '@/lib/topic-taxonomy'
 
 const posts = sortGuidesByRecency((await getCollection('guides')).filter(
   (post) => post.data.status !== 'archived' && post.data.locale === 'en',
 ))
 const copy = getSiteCopy('en')
 const items = posts.map((post) => {
-  const { pillar } = getGuideTaxonomy(post)
+  const topics = getLocalizedGuideTopics(post)
 
   return {
     badgeLabel: post.data.kind === 'article' ? 'Article' : undefined,
     completionId: post.data.kind === 'guide' ? post.data.guideId : undefined,
+    contentKind: post.data.kind,
     ctaLabel: 'Learn more',
     description: post.data.description,
     eyebrow: formatEditorialDate(post.data.pubDate, 'en-US'),
     href: getGuideHrefFromEntry(post),
-    tags: [{ id: pillar?.id ?? 'other', label: pillar ? getLocalizedPillarLabel(pillar, 'en') : 'Other' }],
+    tags: topics.map(({ id, label }) => ({ id, label })),
     title: post.data.title,
   }
 })
@@ -41,11 +43,17 @@ const items = posts.map((post) => {
 
   <CompactSection>
     <FilterableDirectory
+      allItemsLabel={copy.guideIndex.allItems}
+      articleItemsLabel={copy.guideIndex.articleItems}
       completionStorageKey={siteStorageKeys.completedGuides}
       filterLabel={copy.guideIndex.filterLabel}
+      fewerFiltersLabel="Show less"
+      guideItemsLabel={copy.guideIndex.guideItems}
       items={items}
       client:load
       kind="guide-rows"
+      moreFiltersHref={getTopicIndexHref('en')}
+      moreFiltersLabel="more"
     />
   </CompactSection>
 </BaseLayout>

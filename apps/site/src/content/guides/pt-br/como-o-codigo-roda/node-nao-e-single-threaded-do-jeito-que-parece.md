@@ -22,6 +22,9 @@ tags:
   - node
   - concurrency
   - runtime
+topicIds:
+  - node
+  - javascript
 relatedDeckIds:
   - node-runtime-core
 ---

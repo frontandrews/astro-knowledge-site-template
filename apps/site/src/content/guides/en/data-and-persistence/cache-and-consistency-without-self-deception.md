@@ -21,6 +21,8 @@ tags:
   - cache
   - consistency
   - data
+topicIds:
+  - data-storage
 relatedDeckIds: []
 ---
 

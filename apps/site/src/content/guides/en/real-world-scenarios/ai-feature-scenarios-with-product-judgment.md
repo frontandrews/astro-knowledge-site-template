@@ -21,6 +21,9 @@ tags:
   - ai
   - product
   - systems
+topicIds:
+  - system-design
+  - ai-engineering
 relatedDeckIds: []
 ---
 

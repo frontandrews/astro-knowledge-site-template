@@ -20,6 +20,9 @@ tags:
   - communication
   - standup
   - meetings
+topicIds:
+  - tech-english
+  - leadership
 relatedDeckIds:
   - english-tech-communication-core
 ---

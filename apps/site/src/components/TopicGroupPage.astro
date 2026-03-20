@@ -1,0 +1,49 @@
+---
+import type { TopicDefinition } from '@seniorpath/content'
+
+import FilterableDirectory from '@/components/FilterableDirectory.svelte'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import CompactSection from '@/components/ui/CompactSection.astro'
+import PageHeader from '@/components/ui/PageHeader.astro'
+import { getTopicGroupHref, getTopicHref } from '@/lib/topic-links'
+import {
+  getLocalizedTopicGroupLabel,
+  getLocalizedTopicGroupSummary,
+  getLocalizedTopicLabel,
+  getLocalizedTopicSummary,
+  getTopicGroupBreadcrumb,
+} from '@/lib/topic-taxonomy'
+import type { SiteLocale } from '@/lib/site-copy'
+
+type Props = {
+  groupId: string
+  locale: SiteLocale
+  topics: TopicDefinition[]
+}
+
+const { groupId, locale, topics } = Astro.props
+const title = getLocalizedTopicGroupLabel(groupId, locale)
+const description = getLocalizedTopicGroupSummary(groupId, locale)
+const items = topics.map((topic) => ({
+  description: getLocalizedTopicSummary(topic.id, locale),
+  href: getTopicHref(topic.id, locale),
+  tags: [],
+  title: getLocalizedTopicLabel(topic.id, locale),
+}))
+---
+
+<BaseLayout
+  description={description}
+  englishHref={getTopicGroupHref(groupId, 'en')}
+  portugueseHref={getTopicGroupHref(groupId, 'pt-br')}
+  title={title}
+>
+  <PageHeader breadcrumbs={getTopicGroupBreadcrumb(groupId, locale)} description={description} title={title} />
+
+  <CompactSection>
+    <FilterableDirectory
+      items={items}
+      kind="title-cards"
+    />
+  </CompactSection>
+</BaseLayout>

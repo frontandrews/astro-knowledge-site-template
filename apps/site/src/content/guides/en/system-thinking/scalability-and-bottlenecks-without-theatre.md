@@ -21,6 +21,9 @@ tags:
   - systems
   - scalability
   - performance
+topicIds:
+  - performance
+  - system-design
 relatedDeckIds: []
 ---
 

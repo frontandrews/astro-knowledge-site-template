@@ -21,6 +21,8 @@ tags:
   - interviews
   - communication
   - problem-solving
+topicIds:
+  - coding-interview
 relatedDeckIds: []
 ---
 
