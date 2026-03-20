@@ -2,6 +2,7 @@
 import type { CollectionEntry } from 'astro:content'
 import { getGuideHrefFromEntry } from '@/lib/guide-links'
 import { cn } from '@/lib/cn'
+import { getSiteCopy } from '@/lib/site-copy'
 import { ui } from '@/lib/ui'
 import {
   articleCardArticleVariants,
@@ -34,8 +35,9 @@ const {
   variant = 'minimal',
 } = Astro.props
 const href = getGuideHrefFromEntry(post)
-const ctaLabel = post.data.locale === 'pt-br' ? 'Ler mais' : 'Learn more'
-const completedCtaLabel = post.data.locale === 'pt-br' ? 'Ler novamente' : 'Read again'
+const copy = getSiteCopy(post.data.locale === 'pt-br' ? 'pt-br' : 'en')
+const ctaLabel = copy.directory.readMore
+const completedCtaLabel = copy.directory.readAgain
 ---
 
 <article
@@ -46,7 +48,10 @@ const completedCtaLabel = post.data.locale === 'pt-br' ? 'Ler novamente' : 'Read
   <a class={articleCardLinkVariants({ variant })} href={href}>
     <span
       aria-hidden="true"
-      class="pointer-events-none absolute right-4 top-4 hidden size-8 items-center justify-center rounded-full border border-[color:color-mix(in_srgb,var(--site-success)_55%,transparent)] bg-[color:color-mix(in_srgb,var(--site-success)_20%,var(--site-surface))] text-[0.98rem] font-semibold text-[color:color-mix(in_srgb,var(--site-success)_78%,black_22%)] min-[64rem]:size-9 min-[64rem]:text-[1.08rem]"
+      class={cn(
+        'pointer-events-none absolute right-4 top-4 inline-flex size-8 items-center justify-center rounded-full border border-[color:color-mix(in_srgb,var(--site-success)_55%,transparent)] bg-[color:color-mix(in_srgb,var(--site-success)_20%,var(--site-surface))] text-[0.98rem] font-semibold text-[color:color-mix(in_srgb,var(--site-success)_78%,black_22%)] transition-all duration-150 lg:size-9 lg:text-[1.08rem]',
+        variant === 'linear' && 'right-3 top-3.5 lg:right-4 lg:top-1/2 lg:-translate-y-1/2',
+      )}
       data-guide-post-complete-badge
     >
       ✓
@@ -66,18 +71,11 @@ const completedCtaLabel = post.data.locale === 'pt-br' ? 'Ler novamente' : 'Read
       <>
         <InlineArrowCta className="md:hidden" label={ctaLabel} />
         <span class="pointer-events-none absolute right-4 top-1/2 hidden min-w-[9.25rem] -translate-y-1/2 items-center justify-end md:inline-flex">
-          <span
-            aria-hidden="true"
-            class="inline-flex size-8 items-center justify-center rounded-full border border-[color:color-mix(in_srgb,var(--site-success)_55%,transparent)] bg-[color:color-mix(in_srgb,var(--site-success)_20%,var(--site-surface))] text-[0.98rem] font-semibold text-[color:color-mix(in_srgb,var(--site-success)_78%,black_22%)] opacity-0 transition-all duration-150 min-[64rem]:size-9 min-[64rem]:text-[1.08rem]"
-            data-guide-post-complete-badge
-          >
-            ✓
-          </span>
-          <span class="absolute right-0 inline-flex translate-x-1 items-center gap-1.5 text-[0.76rem] font-medium tracking-[0.04em] text-site-ink-muted opacity-0 transition-all duration-150 min-[64rem]:gap-2 min-[64rem]:text-[0.84rem]" data-guide-post-complete-text>
+          <span class="absolute right-0 inline-flex translate-x-1 items-center gap-1.5 text-[0.76rem] font-medium tracking-[0.04em] text-site-ink-muted opacity-0 transition-all duration-150 lg:gap-2 lg:text-[0.84rem]" data-guide-post-complete-text>
             <span>{completedCtaLabel}</span>
             <ArrowRightIcon className="size-[0.88rem]" />
           </span>
-          <span class="absolute right-0 inline-flex translate-x-1 items-center gap-1.5 text-[0.76rem] font-medium tracking-[0.04em] text-site-ink-muted opacity-0 transition-all duration-150 group-hover:translate-x-0 group-hover:opacity-100 group-hover:text-site-link-hover group-focus-within:translate-x-0 group-focus-within:opacity-100 group-focus-within:text-site-link-hover min-[64rem]:gap-2 min-[64rem]:text-[0.84rem]" data-guide-post-default-cta>
+          <span class="absolute right-0 inline-flex translate-x-1 items-center gap-1.5 text-[0.76rem] font-medium tracking-[0.04em] text-site-ink-muted opacity-0 transition-all duration-150 group-hover:translate-x-0 group-hover:opacity-100 group-hover:text-site-link-hover group-focus-within:translate-x-0 group-focus-within:opacity-100 group-focus-within:text-site-link-hover lg:gap-2 lg:text-[0.84rem]" data-guide-post-default-cta>
             <span>{ctaLabel}</span>
             <ArrowRightIcon className="size-[0.88rem]" />
           </span>

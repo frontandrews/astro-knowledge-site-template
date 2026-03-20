@@ -1,0 +1,123 @@
+---
+import ArticleCompletionSummary from '@/components/ArticleCompletionSummary.astro'
+import { cn } from '@/lib/cn'
+import type { SiteLocale } from '@/lib/site-copy'
+import { ui } from '@/lib/ui'
+
+type CompletionLink = {
+  href: string
+  title: string
+}
+
+type TrackSummary = {
+  href: string
+  stepIndex: number
+  title: string
+  totalSteps: number
+}
+
+type Props = {
+  className?: string
+  completionId?: string | null
+  locale: SiteLocale
+  nextStep?: CompletionLink | null
+  relatedItems?: CompletionLink[]
+  track?: TrackSummary | null
+}
+
+const {
+  className = '',
+  completionId = null,
+  locale,
+  nextStep = null,
+  relatedItems = [],
+  track = null,
+} = Astro.props
+---
+
+<div
+  class={cn('overflow-hidden xl:hidden', className)}
+  data-article-completion-panel
+  data-completion-id={completionId ?? ''}
+  style="max-height: 0; opacity: 0; transform: translateY(0.5rem); pointer-events: none; transition: max-height 300ms ease, opacity 220ms ease, transform 300ms ease;"
+>
+  <section
+    class={cn(
+      ui.panel,
+      'grid gap-4 border-[color:color-mix(in_srgb,var(--site-line)_55%,transparent)] bg-[color:color-mix(in_srgb,var(--site-bg)_28%,transparent)] px-4 py-4 lg:px-5 lg:py-5',
+    )}
+  >
+    <ArticleCompletionSummary
+      locale={locale}
+      nextStep={nextStep}
+      relatedItems={relatedItems}
+      track={track}
+      variant="default"
+    />
+  </section>
+</div>
+
+<script>
+  import {
+    completedGuidesChangedEvent,
+    markGuideUnread,
+    readCompletedGuides,
+  } from '@/lib/completed-guides';
+  import { siteStorageKeys } from '@/lib/storage-keys';
+
+  const readingResetEvent = 'seniorpath:article-reading-reset';
+  const completionPanels = document.querySelectorAll('[data-article-completion-panel]');
+
+  for (const panel of completionPanels) {
+    if (!(panel instanceof HTMLElement)) continue;
+
+    const completionId = panel.dataset.completionId ?? '';
+    const markUnreadButton = panel.querySelector('[data-completion-mark-unread]');
+
+    const showPanel = () => {
+      panel.style.maxHeight = `${panel.scrollHeight}px`;
+      panel.style.opacity = '1';
+      panel.style.transform = 'translateY(0)';
+      panel.style.pointerEvents = 'auto';
+    };
+
+    const hidePanel = () => {
+      panel.style.maxHeight = '0';
+      panel.style.opacity = '0';
+      panel.style.transform = 'translateY(0.5rem)';
+      panel.style.pointerEvents = 'none';
+    };
+
+    const sync = () => {
+      const isComplete = Boolean(completionId && readCompletedGuides().includes(completionId));
+
+      if (isComplete) {
+        showPanel();
+        return;
+      }
+
+      hidePanel();
+    };
+
+    if (markUnreadButton instanceof HTMLButtonElement) {
+      markUnreadButton.addEventListener('click', () => {
+        if (!completionId) {
+          return;
+        }
+
+        markGuideUnread(completionId);
+        window.dispatchEvent(new CustomEvent(readingResetEvent, { detail: completionId }));
+      });
+    }
+
+    window.addEventListener(completedGuidesChangedEvent, sync);
+    window.addEventListener('resize', sync);
+    window.addEventListener('storage', (event) => {
+      if (event.key === siteStorageKeys.completedGuides) {
+        sync();
+      }
+    });
+
+    sync();
+  }
+</script>

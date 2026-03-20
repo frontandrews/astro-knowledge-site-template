@@ -48,12 +48,12 @@ const items = sortedTerms.map((term) => ({
   title={copy.glossaryIndex.title}
 >
   <FilterableDirectory
-    allItemsLabel={locale === 'pt-br' ? 'Tudo' : 'All'}
+    allItemsLabel={copy.directory.allItems}
     availableFilters={tagEntries}
-    articleItemsLabel={locale === 'pt-br' ? 'Artigos' : 'Articles'}
-    filterLabel={locale === 'pt-br' ? 'Filtrar por tema' : 'Filter by topic'}
+    articleItemsLabel={copy.directory.articleItems}
+    filterLabel={copy.directory.filterByTopic}
     filterQueryKey="tag"
-    guideItemsLabel={locale === 'pt-br' ? 'Guias' : 'Guides'}
+    guideItemsLabel={copy.directory.guideItems}
     items={items}
     client:load
     kind="title-cards"

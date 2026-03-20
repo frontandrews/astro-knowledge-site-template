@@ -29,8 +29,8 @@ const dateLocale = term.data.locale === 'pt-br' ? 'pt-BR' : 'en-US'
 const locale = term.data.locale === 'pt-br' ? 'pt-br' : 'en'
 const formattedPubDate = formatEditorialDate(term.data.pubDate, dateLocale)
 const formattedUpdatedDate = term.data.updatedDate
-  ? formatEditorialDate(term.data.updatedDate, 'en-US', {
-      month: 'short',
+  ? formatEditorialDate(term.data.updatedDate, dateLocale, {
+      month: 'long',
     })
   : null
 const articleUrl = new URL(Astro.url.pathname, Astro.site ?? Astro.url).toString()

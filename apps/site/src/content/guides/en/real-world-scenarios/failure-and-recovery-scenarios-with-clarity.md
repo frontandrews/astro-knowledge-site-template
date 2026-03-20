@@ -1,7 +1,7 @@
 ---
-title: Failure and Recovery Scenarios With Clarity
-description: How to reason about degraded states, partial outages, and recovery paths without pretending resilience is only about uptime.
-summary: Strong resilience thinking starts by deciding how the system should fail, recover, and stay usable when the ideal path breaks.
+title: Failure and Recovery Scenarios
+description: How to think about a real system when some part breaks, without treating resilience as a slogan.
+summary: A strong system is not the one that never fails. It is the one that fails in a controlled way and can recover clearly.
 guideId: failure-and-recovery-scenarios-with-clarity
 locale: en
 status: active
@@ -20,8 +20,8 @@ relationships:
   - ai-feature-scenarios-with-product-judgment
 tags:
   - systems
+  - incidents
   - resilience
-  - recovery
 topicIds:
   - system-design
   - debugging-production
@@ -30,64 +30,72 @@ relatedDeckIds: []
 
 ## The problem
 
-Teams often talk about resilience as if the goal were only "never fail."
+Many architectures talk a lot about availability and little about behavior under failure.
 
-Real systems still fail. The real quality question is how they fail, what keeps working, and how recovery happens.
+When a dependency goes down, the response becomes improvisation: blind retry, longer timeout, restart, and hope.
+
+That may ease the moment, but it does not describe real recovery.
 
 ## Mental model
 
-Failure planning is product thinking, not only infrastructure thinking.
+Failure is part of the system, not a philosophical exception.
 
-The useful question is:
+The useful question here is usually:
 
-> If this part breaks, what experience do users get, what should degrade gracefully, and how do we return to a healthy state?
+> When this part breaks, what must stop, what can degrade, and how does the system return to normal?
 
-That makes resilience more practical.
+That changes the conversation from "avoiding failure" to "handling failure with judgment."
 
 ## Breaking it down
 
-When modeling failure and recovery, ask:
+A simple way to structure this scenario is this:
 
-1. which dependency or path can fail here?
-2. what is the user-visible impact?
-3. what degraded mode is acceptable?
-4. how will the system recover or reconcile after the failure passes?
+1. say which component fails
+2. define who depends on it
+3. choose the acceptable degradation
+4. explain recovery, retry, or compensation with a clear limit
 
-Those questions turn reliability into decisions instead of slogans.
+That turns resilience into an observable decision.
 
 ## Simple example
 
-Imagine a checkout flow depends on an external fraud service.
+Imagine an orders API that depends on a payment service.
 
-If that service times out, the system may choose to queue the review, block high-risk cases, or temporarily allow low-risk purchases with tighter monitoring.
+If payments go down, some options exist:
 
-The better answer is the one that names the degraded mode and the recovery path, not the one that only says "add retries."
+- block everything
+- accept the order and leave the payment pending
+- queue a later attempt with explicit status
+
+The best answer depends on the business, but the important thing is making the behavior clear.
 
 ## Common mistakes
 
-- treating every failure as an all-or-nothing outage
-- adding retries without deciding the product behavior
-- forgetting the recovery or reconciliation path
-- optimizing for uptime metrics while users still get confusing outcomes
+- talking about retry with no limit
+- treating fallback as if it were always safe
+- forgetting consistency after recovery
+- describing high availability without explaining what happens when failure actually arrives
 
 ## How a senior thinks
 
-A senior engineer wants the degraded state to be intentional:
+A strong senior does not stop at the word resilience.
 
-> I want to know what should keep working, what should stop, and how the system gets back to a trustworthy state after the failure.
+They define concrete behavior.
 
-That is what makes resilience usable.
+That usually sounds like this:
+
+> If this component fails, I do not want the system to pretend normality. I want an explicit degraded mode and a recovery that does not duplicate work or hide inconsistent state.
 
 ## What the interviewer wants to see
 
-Interviewers usually want to know:
+In interviews, this usually shows maturity quickly:
 
-- you can think beyond pure uptime
-- you understand degraded behavior and recovery
-- you connect resilience to user impact, not just infrastructure
+- you think about failure as part of the system flow
+- you know how to define acceptable degradation
+- you consider recovery and consistency together
 
-That is stronger than generic reliability language.
+People who do this well look like someone prepared for a real environment, not only for a well-explained happy path.
 
-> Strong resilience design includes the failure path and the recovery path, not only the happy path.
+> A mature system does not ignore failure. It decides how to fail.
 
-> If the system fails gracefully but cannot recover cleanly, the story is still incomplete.
+> If recovery is not clear, the architecture is still too optimistic.

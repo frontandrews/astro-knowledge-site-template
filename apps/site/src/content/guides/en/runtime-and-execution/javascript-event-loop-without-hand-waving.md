@@ -1,7 +1,7 @@
 ---
-title: The JavaScript Event Loop Without Hand-Waving
-description: A simple way to explain stack, microtasks, and macrotasks without turning the topic into folklore.
-summary: The event loop gets easier when you think in execution order instead of mystical queue names.
+title: Event Loop Without Hand-Waving
+description: A direct way to understand stack, microtasks, and macrotasks without memorizing vague phrases.
+summary: The event loop gets simpler when you think about execution order, not mystery.
 guideId: javascript-event-loop
 locale: en
 status: active
@@ -10,7 +10,7 @@ branchId: event-loop-and-order
 pubDate: 2026-03-08
 updatedDate: 2026-03-10
 category: Runtime & Execution
-topic: Event Loop and Execution Order
+topic: Event Loop
 path:
   - Runtime & Execution
   - Event Loop and Execution Order
@@ -29,32 +29,35 @@ relatedDeckIds:
 
 ## The problem
 
-The event loop often gets explained in a way that sounds technical but does not help you reason about real code.
+Many explanations about the event loop sound correct, but do not really help.
 
-People memorize the words "microtask" and "macrotask" and still do not know why the output order surprised them.
+You hear terms like stack, microtask, and macrotask, but the actual order of execution stays blurry.
+
+When that happens, any simple example starts to feel like a trick.
 
 ## Mental model
 
-The useful model is short:
+The useful model is much smaller than it seems:
 
-1. run the current call stack
-2. drain microtasks
-3. move to the next macrotask
+1. finish what is on the current stack
+2. drain the microtasks
+3. take the next macrotask
 
-That already explains most of the behavior people call weird.
+If you remember that, a lot of things stop looking magical.
 
 ## Breaking it down
 
-When async code confuses you, ask:
+When you want to explain the event loop, focus on three questions:
 
-1. what is still running on the current stack?
-2. which callback becomes a microtask?
-3. which callback becomes a macrotask?
-4. could chained microtasks delay other work?
+1. what runs now
+2. what gets scheduled for later
+3. which queue gets served first when the stack becomes empty
 
-Those questions are usually more useful than reciting queue names from memory.
+That is much more useful than reciting loose definitions.
 
 ## Simple example
+
+Look at this code:
 
 ```js
 console.log('start')
@@ -79,33 +82,41 @@ promise
 timeout
 ```
 
-That happens because the current stack finishes first, then the promise callback runs as a microtask, and only after that does the timeout callback run as the next macrotask.
+Why?
+
+- `start` runs on the current stack
+- `setTimeout` schedules a macrotask
+- `Promise.then` schedules a microtask
+- `end` still runs on the current stack
+- when the stack ends, microtasks run before the next macrotask
 
 ## Common mistakes
 
-- treating zero-delay `setTimeout` as immediate execution
-- mixing up the call stack with queued callbacks
-- thinking the queue names matter more than the execution order
-- forgetting that too many chained microtasks can hurt responsiveness
+- saying `Promise` is "faster" without explaining the order
+- memorizing the queue name without understanding when it gets served
+- forgetting that too many microtasks can also hurt the feeling of responsiveness
+- treating `setTimeout(..., 0)` as if it meant "run immediately"
 
 ## How a senior thinks
 
-A senior engineer does not explain the event loop like trivia.
+A strong senior reduces this to mechanism, not folklore.
 
-They explain it like execution order:
+That usually sounds like this:
 
-> Finish the current stack, drain microtasks, then move to the next macrotask. That is the part that actually helps me predict the output.
+> JavaScript finishes the current stack first. Then it runs microtasks, such as promise callbacks, and only then moves to the next macrotask, such as a timeout.
+
+That answer works because it explains the order, not only the names.
 
 ## What the interviewer wants to see
 
-Interviewers usually want to know:
+Here, the interviewer usually looks for very simple signals:
 
-- you understand ordering, not just vocabulary
-- you can connect promises and timeouts to the right queues
-- you can explain why that ordering matters in real code
+- you understand execution order
+- you can explain it without hand-waving
+- you know how to connect it to a concrete example
 
-That is stronger than repeating a rehearsed definition.
+If you do that well, the topic stops sounding memorized and starts sounding understood.
 
-> The event loop gets simpler when you think in execution order instead of buzzwords.
+> The event loop gets much simpler when you think in terms of "what runs now and what waits."
 
-> If you can predict the output and explain why, you already know the important part.
+> Do not say that promises are faster. Say which queue each thing enters and what runs first.

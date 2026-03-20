@@ -1,4 +1,5 @@
 ---
+import ArticleCompletionSummary from '@/components/ArticleCompletionSummary.astro'
 import { cn } from '@/lib/cn'
 import { getSiteCopy, type SiteLocale } from '@/lib/site-copy'
 import { ui } from '@/lib/ui'
@@ -31,8 +32,7 @@ type Props = {
   nextStep?: CompletionLink | null
   readingTimeMinutes?: number | null
   relatedItems?: CompletionLink[]
-  shareTitle?: string
-  shareUrl?: string
+  showCompletionInPlace?: boolean
   track?: TrackSummary | null
   updatedMeta?: string | null
 }
@@ -47,41 +47,34 @@ const {
   nextStep = null,
   readingTimeMinutes = null,
   relatedItems = [],
-  shareTitle = '',
-  shareUrl = '',
+  showCompletionInPlace = true,
   track = null,
   updatedMeta = null,
 } = Astro.props
 
 const copy = getSiteCopy(locale)
-const twitterHref = shareUrl
-  ? `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareTitle)}&url=${encodeURIComponent(shareUrl)}`
-  : null
-const linkedinHref = shareUrl ? `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}` : null
 ---
 
 <aside class={cn('grid gap-4', className)}>
   <section
     class={cn(
       ui.panel,
-      'grid gap-4 border-[color:color-mix(in_srgb,var(--site-line)_55%,transparent)] bg-[color:color-mix(in_srgb,var(--site-bg)_28%,transparent)] px-4 py-4 min-[64rem]:px-5 min-[64rem]:py-5 xl:max-h-[calc(100vh-8.5rem)] xl:overflow-y-auto',
+      'grid gap-4 border-[color:color-mix(in_srgb,var(--site-line)_55%,transparent)] bg-[color:color-mix(in_srgb,var(--site-bg)_28%,transparent)] px-4 py-4 lg:px-5 lg:py-5 xl:max-h-[calc(100vh-8.5rem)] xl:overflow-y-auto',
     )}
-    data-copy-link-error={copy.article.copyLinkError}
-    data-copy-link-success={copy.article.copyLinkSuccess}
     data-completion-id={completionId ?? ''}
-    data-share-url={shareUrl}
+    data-show-completion-in-place={showCompletionInPlace ? 'true' : 'false'}
     data-toc-root
   >
     {updatedMeta || (readingTimeMinutes && levelLabel && categoryLabel) || headings.length > 0 ? (
       <div class="grid gap-3" data-toc-section>
         {updatedMeta ? (
-          <div class="grid gap-1 text-[0.8rem] leading-6 text-site-ink-soft min-[64rem]:text-[0.88rem]">
+          <div class={cn(ui.metaQuiet, 'grid gap-1')}>
             {updatedMeta ? <p class="m-0">{copy.article.updatedPrefix} {updatedMeta}</p> : null}
           </div>
         ) : null}
 
         {readingTimeMinutes && levelLabel && categoryLabel ? (
-          <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.8rem] leading-6 text-site-ink-soft min-[64rem]:text-[0.88rem]">
+          <div class={cn(ui.metaQuiet, 'flex flex-wrap items-center gap-x-2 gap-y-1')}>
             <span>{readingTimeMinutes} min</span>
             <span aria-hidden="true" class="text-site-ink-muted">•</span>
             <span>{levelLabel}</span>
@@ -97,8 +90,8 @@ const linkedinHref = shareUrl ? `https://www.linkedin.com/sharing/share-offsite/
               {headings.map((heading) => (
                 <a
                   class={cn(
-                    'rounded-[var(--radius-sm)] px-2 py-1.5 text-sm leading-6 text-site-ink-soft transition-colors duration-150 hover:bg-site-hover hover:text-site-link-hover focus-visible:bg-site-hover focus-visible:text-site-link-hover focus-visible:outline-none min-[64rem]:text-[0.96rem]',
-                    heading.depth > 2 && 'ml-3 text-[0.82rem] text-site-ink-muted min-[64rem]:text-[0.9rem]',
+                    'rounded-[var(--radius-xs)] px-2 py-1.5 text-sm leading-6 text-site-ink-soft transition-colors duration-150 hover:bg-site-hover hover:text-site-link-hover focus-visible:bg-site-hover focus-visible:text-site-link-hover focus-visible:outline-none lg:text-[0.96rem]',
+                    heading.depth > 2 && 'ml-3 text-[0.82rem] text-site-ink-muted lg:text-[0.9rem]',
                   )}
                   data-toc-link
                   data-toc-slug={heading.slug}
@@ -121,113 +114,27 @@ const linkedinHref = shareUrl ? `https://www.linkedin.com/sharing/share-offsite/
             data-reading-progress-bar
           />
         </div>
-        <p class="m-0 shrink-0 text-[0.82rem] font-medium text-site-ink-soft min-[64rem]:text-[0.88rem]" data-reading-progress-value>
+        <p class="m-0 shrink-0 text-[0.82rem] font-medium text-site-ink-soft lg:text-[0.88rem]" data-reading-progress-value>
           0%
         </p>
       </div>
     </div>
 
-    <div
-      class="grid gap-3 overflow-hidden border-t border-site-line"
-      data-sticky-direction
-      style="max-height: 0; opacity: 0; transform: translateY(0.5rem); padding-top: 0; border-top-color: transparent; pointer-events: none; transition: max-height 300ms ease, opacity 220ms ease, transform 300ms ease, padding-top 300ms ease, border-top-color 220ms ease;"
-    >
-      <div class="grid gap-2">
-        <p class="m-0 flex items-center gap-2 text-[0.88rem] font-semibold leading-6 text-site-ink min-[64rem]:text-[0.96rem]" data-sticky-completion-heading>
-          <span aria-hidden="true" class="text-site-success">✓</span>
-          <span>{copy.article.finishedArticle}</span>
-        </p>
-        {track ? (
-          <p class="m-0 text-[0.78rem] leading-6 text-site-ink-soft min-[64rem]:text-[0.86rem]">
-            {copy.article.partOfTrack}:{' '}
-            <a class="font-medium text-site-ink transition-colors duration-150 hover:text-site-link-hover focus-visible:text-site-link-hover focus-visible:outline-none" href={track.href}>
-              {track.title}
-            </a>{' '}
-            ({track.stepIndex}/{track.totalSteps})
-          </p>
-        ) : null}
-      </div>
-
-      {nextStep ? (
-        <div class="grid gap-2">
-          <p class={ui.eyebrow}>{copy.article.nextStep}</p>
-          <a
-            class="group grid gap-2 rounded-[var(--radius-sm)] border border-site-line bg-[color:color-mix(in_srgb,var(--site-panel)_55%,transparent)] px-3 py-3 text-inherit transition-colors duration-150 hover:border-site-line-strong hover:bg-site-hover hover:text-site-link-hover focus-visible:border-site-line-strong focus-visible:bg-site-hover focus-visible:text-site-link-hover focus-visible:outline-none"
-            href={nextStep.href}
-          >
-            <span class="text-[0.88rem] font-semibold leading-6 text-site-ink transition-colors duration-150 group-hover:text-site-link-hover group-focus-visible:text-site-link-hover min-[64rem]:text-[0.96rem]">
-              {nextStep.title}
-            </span>
-            <span class="text-[0.76rem] font-medium text-site-ink-soft min-[64rem]:text-[0.84rem]">{copy.article.nextStep} →</span>
-          </a>
-        </div>
-      ) : null}
-
-      {relatedItems.length > 0 ? (
-        <div class="grid gap-2.5">
-          <p class={ui.eyebrow}>{copy.article.exploreRelated}</p>
-          <div class="flex flex-wrap gap-2">
-            {relatedItems.map((item) => (
-              <a class={cn(ui.badge, ui.badgeLink, 'min-h-0 px-3 py-1.5 normal-case tracking-[0.02em] text-site-ink-soft')} href={item.href}>
-                {item.title}
-              </a>
-            ))}
-          </div>
-        </div>
-      ) : null}
-
-      {(twitterHref || linkedinHref || shareUrl) ? (
-        <div class="grid gap-2.5 border-t border-site-line pt-4">
-          <p class={ui.eyebrow}>{copy.article.shareArticleTitle}</p>
-          <div class="flex flex-wrap gap-2">
-            {twitterHref ? (
-              <a
-                aria-label="Share on X"
-                class="inline-flex min-h-9 items-center justify-center rounded-full border border-site-line bg-site-card px-3 py-1.5 text-[0.78rem] font-semibold tracking-[0.04em] text-site-ink transition-colors duration-150 hover:border-site-line-strong hover:bg-site-hover hover:text-site-link-hover focus-visible:border-site-line-strong focus-visible:bg-site-hover focus-visible:text-site-link-hover focus-visible:outline-none min-[64rem]:min-h-10 min-[64rem]:text-[0.84rem]"
-                href={twitterHref}
-                rel="noreferrer"
-                target="_blank"
-              >
-                X
-              </a>
-            ) : null}
-            {linkedinHref ? (
-              <a
-                aria-label="Share on LinkedIn"
-                class="inline-flex min-h-9 items-center justify-center rounded-full border border-site-line bg-site-card px-3 py-1.5 text-[0.78rem] font-semibold tracking-[0.04em] text-site-ink transition-colors duration-150 hover:border-site-line-strong hover:bg-site-hover hover:text-site-link-hover focus-visible:border-site-line-strong focus-visible:bg-site-hover focus-visible:text-site-link-hover focus-visible:outline-none min-[64rem]:min-h-10 min-[64rem]:text-[0.84rem]"
-                href={linkedinHref}
-                rel="noreferrer"
-                target="_blank"
-              >
-                LinkedIn
-              </a>
-            ) : null}
-            {shareUrl ? (
-              <button
-                class="inline-flex min-h-9 items-center justify-center rounded-full border border-site-line bg-site-card px-3 py-1.5 text-[0.78rem] font-semibold tracking-[0.04em] text-site-ink transition-colors duration-150 hover:border-site-line-strong hover:bg-site-hover hover:text-site-link-hover focus-visible:border-site-line-strong focus-visible:bg-site-hover focus-visible:text-site-link-hover focus-visible:outline-none min-[64rem]:min-h-10 min-[64rem]:text-[0.84rem]"
-                data-sticky-copy-link
-                type="button"
-              >
-                {copy.article.copyLink}
-              </button>
-            ) : null}
-          </div>
-          <p
-            aria-live="polite"
-            class="hidden text-[0.78rem] leading-6 text-site-ink-soft min-[64rem]:text-[0.86rem]"
-            data-sticky-copy-feedback
-          />
-        </div>
-      ) : null}
-
-      <button
-        class="w-fit text-[0.76rem] font-medium text-site-ink-muted transition-colors duration-150 hover:text-site-link-hover focus-visible:text-site-link-hover focus-visible:outline-none min-[64rem]:text-[0.84rem]"
-        data-sticky-mark-unread
-        type="button"
+    {showCompletionInPlace ? (
+      <div
+        class="grid gap-3 overflow-hidden border-t border-site-line"
+        data-sticky-direction
+        style="max-height: 0; opacity: 0; transform: translateY(0.5rem); padding-top: 0; border-top-color: transparent; pointer-events: none; transition: max-height 300ms ease, opacity 220ms ease, transform 300ms ease, padding-top 300ms ease, border-top-color 220ms ease;"
       >
-        {copy.article.markUnread}
-      </button>
-    </div>
+        <ArticleCompletionSummary
+          locale={locale}
+          nextStep={nextStep}
+          relatedItems={relatedItems}
+          track={track}
+          variant="compact"
+        />
+      </div>
+    ) : null}
   </section>
 </aside>
 
@@ -240,15 +147,14 @@ const linkedinHref = shareUrl ? `https://www.linkedin.com/sharing/share-offsite/
   for (const root of tocRoots) {
     if (!(root instanceof HTMLElement)) continue;
 
+    const shouldShowCompletionInPlace = root.dataset.showCompletionInPlace === 'true';
     const links = Array.from(root.querySelectorAll('[data-toc-link]')).filter(
       (link) => link instanceof HTMLAnchorElement,
     );
     const progressBar = root.querySelector('[data-reading-progress-bar]');
     const progressValue = root.querySelector('[data-reading-progress-value]');
     const progressSection = root.querySelector('[data-reading-progress]');
-    const copyButton = root.querySelector('[data-sticky-copy-link]');
-    const copyFeedback = root.querySelector('[data-sticky-copy-feedback]');
-    const markUnreadButton = root.querySelector('[data-sticky-mark-unread]');
+    const markUnreadButton = root.querySelector('[data-completion-mark-unread]');
     const stickyDirection = root.querySelector('[data-sticky-direction]');
     const tocSection = root.querySelector('[data-toc-section]');
     const readingContent = document.querySelector('[data-article-reading-content]');
@@ -265,6 +171,9 @@ const linkedinHref = shareUrl ? `https://www.linkedin.com/sharing/share-offsite/
     let resetUntil = 0;
 
     const showStickyDirection = () => {
+      if (!shouldShowCompletionInPlace) {
+        return;
+      }
       if (tocSection instanceof HTMLElement) {
         tocSection.classList.add('hidden');
       }
@@ -279,6 +188,12 @@ const linkedinHref = shareUrl ? `https://www.linkedin.com/sharing/share-offsite/
     };
 
     const hideStickyDirection = () => {
+      if (!shouldShowCompletionInPlace) {
+        if (tocSection instanceof HTMLElement) {
+          tocSection.classList.remove('hidden');
+        }
+        return;
+      }
       if (tocSection instanceof HTMLElement) {
         tocSection.classList.remove('hidden');
       }
@@ -325,20 +240,6 @@ const linkedinHref = shareUrl ? `https://www.linkedin.com/sharing/share-offsite/
         schedule();
       }, 720);
     };
-
-    if (copyButton instanceof HTMLButtonElement && copyFeedback instanceof HTMLElement) {
-      copyButton.addEventListener('click', async () => {
-        if (typeof navigator.clipboard?.writeText !== 'function') {
-          copyFeedback.textContent = root.dataset.copyLinkError ?? 'Unable to copy the link.';
-          copyFeedback.classList.remove('hidden');
-          return;
-        }
-
-        await navigator.clipboard.writeText(root.dataset.shareUrl ?? window.location.href);
-        copyFeedback.textContent = root.dataset.copyLinkSuccess ?? 'Link copied.';
-        copyFeedback.classList.remove('hidden');
-      });
-    }
 
     if (markUnreadButton instanceof HTMLButtonElement) {
       markUnreadButton.addEventListener('click', () => {
@@ -392,7 +293,7 @@ const linkedinHref = shareUrl ? `https://www.linkedin.com/sharing/share-offsite/
           progressSection?.classList.add('is-complete');
           showStickyDirection();
           window.requestAnimationFrame(() => {
-            if (root.scrollHeight > root.clientHeight) {
+            if (shouldShowCompletionInPlace && root.scrollHeight > root.clientHeight) {
               root.scrollTo({ top: root.scrollHeight, behavior: 'smooth' });
             }
           });

@@ -1,7 +1,7 @@
 ---
-title: Explaining Your Solution Without Losing the Thread
-description: A simple way to talk while solving a problem without turning the answer into a confusing monologue.
-summary: Explaining well is not talking more. It is making the path, the trade-off, and the decision easy to follow.
+title: How to Explain Your Solution Without Getting Lost
+description: A simple way to speak while solving, without turning it into a confusing monologue or making the interviewer guess your reasoning.
+summary: Explaining well is not talking more. It is making the path, the trade-off, and the decision clear.
 guideId: explaining-your-solution-without-losing-the-thread
 locale: en
 status: active
@@ -10,10 +10,10 @@ branchId: communicating-solutions
 pubDate: 2026-01-28
 updatedDate: 2026-02-01
 category: Problem Solving & Interview Thinking
-topic: Communicating Solutions
+topic: How to Explain Your Solution
 path:
   - Problem Solving & Interview Thinking
-  - Communicating Solutions
+  - How to Explain Your Solution
 order: 10
 relationships:
   - recognizing-patterns-without-memorizing-tricks
@@ -28,15 +28,17 @@ relatedDeckIds: []
 
 ## The problem
 
-Some people can solve the problem and still lose strength when they need to explain what they are doing.
+Some people know how to solve the problem, but lose strength when they need to explain what they are doing.
 
-They either say too little and leave gaps, or they say too much and turn the answer into noise.
+Either they say too little and leave gaps in the reasoning.
+
+Or they say so much that the answer turns into noise.
 
 ## Mental model
 
-Explaining the solution does not mean narrating every thought in your head.
+Explaining the solution is not narrating every thought that passes through your head.
 
-It means showing only what helps the other person trust the decision.
+It is making visible only what helps the other person trust your decision.
 
 In practice, that usually fits into three things:
 
@@ -46,54 +48,56 @@ In practice, that usually fits into three things:
 
 ## Breaking it down
 
-A simple structure is:
+A simple way to speak better is this:
 
-1. state the simplest version of the solution
-2. name the cost of that version
+1. say the simplest version of the solution
+2. name its cost
 3. explain why you would improve it or why you would stop there
-4. keep the explanation close to the problem, not to theory
+4. keep the answer close to the problem, not to theory
 
-That helps you avoid silence on one side and endless talking on the other.
+This avoids two bad extremes: too much silence or an explanation with no end.
 
 ## Simple example
 
-This answer says very little:
+Imagine this answer:
 
 > I would use two pointers.
 
-A stronger version is:
+That says very little.
 
-> I can sort the array and use two pointers to look for the target sum. The cost is paying for the sort and losing the original order. If I needed one pass or had to preserve order, I would move to a hash map.
+A better version would be:
 
-Now the interviewer can see path, cost, and decision criteria.
+> The first version could sort the array and use two pointers to look for the desired sum. The cost is losing the original order and paying for sorting. If I need to preserve order or answer in one pass, I would move to a hash map.
+
+Now there is a path, a cost, and a criterion.
 
 ## Common mistakes
 
-- describing technical detail before stating the main idea
-- saying the technique name as if that explained everything
-- hiding the trade-off to make the answer sound obvious
-- talking about theory for too long and never landing on a concrete decision
+- describing every technical detail without saying the main idea
+- saying the name of a technique as if that already explained everything
+- hiding the trade-off to make the answer seem obvious
+- explaining too much theory and forgetting to land on a concrete decision
 
 ## How a senior thinks
 
-A senior engineer explains to build trust, not to perform.
+A strong senior explains to create trust, not to perform.
 
-That usually sounds like:
+They make enough visible for the other person to follow without drowning in detail.
 
-> My simplest correct version is this. The cost is this. If I needed to improve it, I would go in this direction for this reason.
+That usually sounds like this:
 
-That is enough to make the path visible.
+> My simplest version would be this. The cost is this. If I had to improve it, I would go in this direction for this reason.
 
 ## What the interviewer wants to see
 
-Interviewers usually want to know:
+In interviews, this usually answers almost everything that matters:
 
-- you can structure the answer
+- you know how to structure the answer
 - you understand the cost of your own choice
-- you can communicate clearly without improvising forever
+- you can communicate without depending on improvisation
 
-That often looks more mature than trying to sound brilliant in every sentence.
+People who do this well look more mature than people trying to sound brilliant in every sentence.
 
 > Explaining well is not talking a lot. It is making clear why your decision makes sense.
 
-> If the other person cannot follow your path, the solution may be correct, but the answer is still weak.
+> If the other person cannot follow your path, the solution may even be right, but the answer is still weak.

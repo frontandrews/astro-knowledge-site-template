@@ -1,7 +1,7 @@
 ---
 title: Keyboard and Focus Without Frustration
-description: How to build interactions that remain usable without a mouse instead of treating keyboard support like a side feature.
-summary: Keyboard accessibility gets better when focus order, visible focus, and interaction rules are part of the component design.
+description: How to design keyboard navigation and focus flow without leaving the interface predictable only for people using a mouse.
+summary: When focus disappears, jumps in the wrong order, or traps the user, the interface stops being reliable even if it looks nice.
 guideId: keyboard-and-focus-without-frustration
 locale: en
 status: active
@@ -29,64 +29,78 @@ relatedDeckIds: []
 
 ## The problem
 
-Interfaces often feel fine with a mouse and break down as soon as someone depends on the keyboard.
+Many interfaces look like they work until someone tries to use a keyboard.
 
-Focus jumps unpredictably, interactive elements are skipped, or the visible focus indicator disappears completely.
+Focus disappears, enters in a strange order, gets trapped in a modal, or simply does not show up.
+
+For someone who depends on this navigation, it does not feel like a small detail. It feels like a broken flow.
 
 ## Mental model
 
-Keyboard accessibility is not an optional layer.
+Focus is how the interface answers the question:
 
-It is part of the interaction model.
+> Where am I now, and where can I go next?
 
-The useful question is:
+If that answer is not clear, the screen loses predictability.
 
-> Can someone understand where focus is, move through the flow, and activate the right control without a mouse?
+Keyboard and focus are not an extra layer. They are part of the real navigation of the product.
 
 ## Breaking it down
 
-When building keyboard support, ask:
+A simple way to review this is:
 
-1. is the tab order logical?
-2. is focus visible at every step?
-3. does the interaction follow expected keyboard behavior?
-4. where should focus go after dialogs, menus, or dynamic updates?
+1. go through the screen using only `Tab`, `Shift+Tab`, `Enter`, and `Esc`
+2. check whether focus order follows the visual logic
+3. see whether interactive elements actually receive focus
+4. validate whether opening and closing a modal returns focus to a coherent place
 
-Those questions usually reveal the weak spots quickly.
+That already reveals a lot of friction the mouse hides.
 
 ## Simple example
 
-Suppose a modal opens and focus stays behind the overlay on the page.
+Imagine a confirmation modal.
 
-Even if the modal looks correct visually, keyboard users now have a broken interaction because the active context and the visible context no longer match.
+A bad version opens the modal, but leaves focus behind it or does not allow leaving with `Esc`.
 
-Focus management is part of correctness, not just polish.
+A better version:
+
+- moves focus inside the modal when it opens
+- keeps navigation inside it while it is active
+- returns focus to the trigger when it closes
+
+Here the gain is not only accessibility.
+
+It is interaction predictability.
 
 ## Common mistakes
 
-- removing focus styles because they look ugly
-- making elements clickable but not keyboard reachable
-- ignoring focus return after closing overlays
-- testing only pointer interaction and assuming keyboard will work
+- removing focus style for aesthetics
+- creating a clickable component that does not enter keyboard order
+- forgetting to return focus after overlay, modal, or drawer
+- treating keyboard navigation as an optional test
 
 ## How a senior thinks
 
-A senior engineer designs for keyboard behavior from the start:
+A strong senior does not see focus as a visual detail.
 
-> I want the focus path to make sense before I call this interaction finished.
+They see focus as part of the flow.
 
-That mindset catches many issues earlier.
+That usually sounds like this:
+
+> If someone uses this interface without a mouse, does the path stay clear or turn into a lottery?
+
+That question greatly improves the quality of the experience.
 
 ## What the interviewer wants to see
 
-Interviewers usually want to know:
+In interviews, this usually shows maturity quickly:
 
-- you think about keyboard flow, not just click flow
-- you understand visible focus and focus management
-- you see accessibility as part of interaction quality
+- you understand focus as navigation state
+- you know how to validate interactive flow beyond the click
+- you think about modal, overlay, and focus return with judgment
 
-That is stronger than only mentioning `tabIndex`.
+People who do this well look like someone who builds more robust interfaces for real use, not only for a controlled demo.
 
-> Keyboard support is not a bonus path. It is part of the main interaction contract.
+> Focus does not exist only to highlight an element. It exists to guide navigation.
 
-> If focus becomes confusing, the UI is not finished yet.
+> If the keyboard cannot follow a clear path, the interface is not ready yet.

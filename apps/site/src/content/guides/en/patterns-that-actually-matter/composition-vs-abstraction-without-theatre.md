@@ -1,7 +1,7 @@
 ---
-title: Composition vs Abstraction Without Theatre
-description: How to keep systems flexible without turning the code into generic layers that hide the real work.
-summary: Strong abstractions reduce friction. Weak abstractions only move the complexity farther away.
+title: Composition or Abstraction?
+description: How to choose between joining simple pieces or creating a generic layer without turning flexibility into a mess.
+summary: Not every repetition asks for abstraction. Sometimes simple composition leaves the system clearer and easier to change.
 guideId: composition-vs-abstraction-without-theatre
 locale: en
 status: active
@@ -10,16 +10,16 @@ branchId: composition-vs-abstraction
 pubDate: 2026-01-21
 updatedDate: 2026-01-25
 category: Patterns That Actually Matter
-topic: Composition vs Abstraction
+topic: Composition or Abstraction
 path:
   - Patterns That Actually Matter
-  - Composition vs Abstraction
+  - Composition or Abstraction?
 order: 10
 relationships:
   - reuse-without-extra-complexity
 tags:
   - patterns
-  - composition
+  - architecture
   - abstraction
 topicIds:
   - architecture-patterns
@@ -28,64 +28,78 @@ relatedDeckIds: []
 
 ## The problem
 
-Teams often create abstractions to avoid duplication and end up hiding the main logic behind generic layers.
+Much abstraction is born too early.
 
-The code looks reusable, but simple changes suddenly require understanding a framework that only exists inside the codebase.
+The team sees two similar parts, creates a generic layer to "avoid repetition," and soon the code looks smarter than it looks clear.
+
+At first it seems elegant. Later, every change requires understanding an internal API that almost nobody wanted to have.
 
 ## Mental model
 
-Composition and abstraction are not enemies.
+Good abstraction reduces mental load.
 
-The real question is:
+Bad abstraction hides an important difference behind a pretty interface.
 
-> Does this abstraction reduce the amount of context the next change needs, or does it add another layer to decode?
+That is why, before abstracting, it is worth asking:
 
-If it adds more decoding than clarity, it is probably not helping.
+> Am I simplifying the reading or only hiding variation too early?
+
+Many times, simple composition solves it better.
 
 ## Breaking it down
 
-Before extracting an abstraction, ask:
+A simple way to decide is this:
 
-1. what repeated shape am I really seeing?
-2. are these cases stable enough to deserve one abstraction?
-3. would composition keep the behavior clearer?
-4. does the abstraction simplify change or only reduce visible duplication?
+1. see whether the parts really change together
+2. confirm whether the variation is already clear enough
+3. test whether simple composition is still readable
+4. abstract only when the new layer really reduces duplication and doubt
 
-That keeps the pattern tied to maintenance, not elegance.
+That avoids creating an internal tool for a problem that has not even matured yet.
 
 ## Simple example
 
-Suppose three pages share a layout wrapper, a data card, and a button group.
+Imagine three UI cards with small variations in title, CTA, and visual block.
 
-Composing those pieces is often enough.
+A rushed response would be to create a `SuperCard` with dozens of props to cover every case.
 
-Creating a giant "universal page orchestrator" to hide all three usually creates more work because every new variation has to fight the abstraction instead of using the smaller pieces directly.
+A better response may be:
+
+- keep a base container
+- compose smaller parts
+- leave each variant explicit where the difference really matters
+
+In this case, composition preserves clarity without forcing everyone to learn a premature abstraction.
 
 ## Common mistakes
 
-- abstracting after only one or two weak similarities
-- hiding the main line of the feature behind generic names
-- optimizing for fewer lines instead of clearer change paths
-- confusing reuse with a mandate for one big abstraction
+- abstracting at the first repetition
+- treating any duplication as a defect
+- hiding different rules behind the same interface
+- creating a generic component that accepts everything and explains little
 
 ## How a senior thinks
 
-A senior engineer wants the code to stay adaptable:
+A strong senior does not abstract to look sophisticated.
 
-> I will abstract only when the shared shape is stable enough and the result makes the next change easier to understand.
+They abstract to reduce future friction.
 
-That usually leads to cleaner systems.
+That usually sounds like this:
+
+> If this new layer does not make the intent clearer and the change cheaper, maybe it does not need to exist yet.
+
+That question usually avoids a lot of excessive design.
 
 ## What the interviewer wants to see
 
-Interviewers usually want to know:
+In interviews, this usually shows maturity quickly:
 
-- you can tell the difference between helpful reuse and generic mush
-- you understand when composition is enough
-- you can justify why an abstraction earns its place
+- you know how to distinguish acceptable repetition from bad repetition
+- you understand when simple composition is better than generalization
+- you think about readability and evolution, not only about "dry code"
 
-That is stronger than pattern vocabulary alone.
+People who do this well look like someone who uses patterns as tools, not as trophies.
 
-> A good abstraction removes context. A bad abstraction only relocates it.
+> Not every repetition asks for abstraction. Some ask for patience so the problem can show up better.
 
-> If the abstraction makes simple cases harder to see, it probably arrived too early.
+> If the new layer needs more explanation than the old code, maybe it still has not helped.

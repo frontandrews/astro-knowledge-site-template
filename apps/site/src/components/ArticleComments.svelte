@@ -1,6 +1,7 @@
 <script lang="ts">
   import { tick } from 'svelte'
 
+  import { cn } from '@/lib/cn'
   import type { GiscusConfig } from '@/lib/giscus'
   import { ui } from '@/lib/ui'
 
@@ -56,9 +57,9 @@
     <div bind:this={host} class="giscus-comments pt-1.5"></div>
   </section>
 {:else}
-  <section class={ui.articleSection} data-article-reading-end>
+  <section class={cn(ui.articleSection, 'flex justify-center')} data-article-reading-end>
     <button
-      class="inline-flex items-center rounded-[var(--radius-sm)] border border-site-line bg-site-panel px-4 py-3 text-[0.88rem] font-medium text-site-ink transition-colors duration-150 hover:bg-site-hover hover:text-site-link-hover focus-visible:bg-site-hover focus-visible:text-site-link-hover focus-visible:outline-none min-[64rem]:px-[1.125rem] min-[64rem]:py-3.5 min-[64rem]:text-[0.96rem]"
+      class={cn(ui.controlButton, 'px-4 py-3 text-[0.88rem] font-medium lg:px-[1.125rem] lg:py-3.5 lg:text-[0.96rem]')}
       on:click={openComments}
       type="button"
     >

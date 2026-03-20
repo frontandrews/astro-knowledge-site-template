@@ -1,7 +1,7 @@
 ---
 title: Rendering, Network, and CPU Without Mixing Them Up
-description: How to separate different kinds of slowness instead of calling every slow experience a rendering problem.
-summary: Better performance decisions come from naming whether the pain is in rendering, network, or CPU work first.
+description: How to separate different kinds of slowness so you do not call everything performance and attack the wrong place.
+summary: Not every slow screen suffers from the same problem. Sometimes the delay is network, sometimes rendering, sometimes CPU.
 guideId: rendering-network-and-cpu-without-mixing-them-up
 locale: en
 status: active
@@ -22,7 +22,6 @@ tags:
   - performance
   - rendering
   - network
-  - cpu
 topicIds:
   - performance
 relatedDeckIds: []
@@ -30,68 +29,74 @@ relatedDeckIds: []
 
 ## The problem
 
-People often say an experience is slow without naming what kind of slow it is.
+When a screen gets slow, it is common to call everything a "performance problem" as if it were a single category.
 
-Then rendering fixes get applied to network issues, network fixes get applied to CPU issues, and the conversation stays vague.
+But a slow network, heavy rendering, and busy CPU create similar symptoms with very different causes.
+
+If you mix those things, the chance of optimizing the wrong place rises a lot.
 
 ## Mental model
 
-Not all slowness is the same.
+A useful way to think about it is to separate three common sources of delay:
 
-Three useful buckets are:
+- network: the data takes time to arrive
+- CPU: the computational work takes time to finish
+- rendering: the browser takes time to turn state into interface
 
-- network delay
-- CPU work
-- rendering and painting cost
-
-If you name the bucket first, the fix becomes much easier to choose.
+These categories cross, but they are not the same thing.
 
 ## Breaking it down
 
-When something feels slow, ask:
+A simple way to diagnose better is this:
 
-1. am I waiting for bytes over the network?
-2. is the device doing too much computation?
-3. is the browser spending too much time rendering or repainting?
-4. what measurement separates these possibilities?
+1. see whether the wait is before or after the data arrives
+2. find out whether the browser is spending too much time computing
+3. check whether the interface is repainting or recalculating more than it should
+4. attack the right kind of slowness, not the generic name "performance"
 
-That keeps the diagnosis from collapsing into one blurry label.
+That greatly reduces the risk of cosmetic adjustments.
 
 ## Simple example
 
-Suppose a page feels sluggish after the data already arrived.
+Imagine a search page that feels slow.
 
-That points away from pure network delay.
+Three different scenarios may exist:
 
-If CPU profiling shows heavy parsing or expensive filtering, the issue is different from a case where the browser is repainting a massive list too often.
+- the API takes 2 seconds to respond
+- the response arrives quickly, but a heavy filter blocks CPU on the client
+- the data arrives and the filter is light, but the interface re-renders too many components
 
-The word "slow" is the start, not the diagnosis.
+For the user, all three cases may sound like "the screen is slow."
+
+For the person fixing it, they are three different problems.
 
 ## Common mistakes
 
-- calling every issue a rendering problem
-- optimizing payload size when the CPU is the real cost
-- focusing on the browser when the network is the true delay
-- skipping the step that separates one type of slowness from another
+- calling any delay a rendering problem
+- memoizing a component when the problem is network
+- reducing payload when the bottleneck is local computation
+- optimizing without separating which resource is actually suffering
 
 ## How a senior thinks
 
-A senior engineer wants the slowdown classified:
+A strong senior first classifies the type of slowness.
 
-> I first want to know whether I am waiting on the wire, burning CPU, or paying render cost. Different categories need different fixes.
+That usually sounds like this:
 
-That makes the next step more reliable.
+> Before deciding the optimization, I want to separate whether the wait is in the data arriving, in the work being processed, or in the interface being drawn.
+
+That classification makes the conversation much more precise.
 
 ## What the interviewer wants to see
 
-Interviewers usually want to know:
+In interviews, this usually shows maturity quickly:
 
-- you can separate major kinds of slowness
-- you understand why one optimization does not fit every case
-- you think in diagnosis before solution
+- you know that performance is not one single block
+- you can separate similar symptoms by different causes
+- you choose the technical response that best matches the affected resource
 
-That is stronger than saying "I would optimize performance."
+People who do this well look like someone who improves a product through real diagnosis, not well-intentioned guessing.
 
-> Slowness becomes actionable when you stop treating every bottleneck like the same kind of problem.
+> A slow screen is not a diagnosis. It is only a symptom.
 
-> If you cannot classify the cost, the fix is still mostly a guess.
+> If you have not separated network, CPU, and rendering, it is still too early to choose the optimization.

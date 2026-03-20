@@ -31,8 +31,8 @@
   export let completionStorageKey: string | null = null
   export let kind: 'guide-rows' | 'title-cards' = 'title-cards'
   export let allItemsLabel = 'All'
-  export let guideItemsLabel = 'Guides'
-  export let articleItemsLabel = 'Articles'
+  export let guideItemsLabel = 'Articles'
+  export let articleItemsLabel = 'Notes'
   export let moreFiltersLabel = 'more'
   export let fewerFiltersLabel = 'Show less'
   export let moreFiltersHref: string | null = null
@@ -48,9 +48,8 @@
     { dark: '#274737', light: '#e2f2ea' },
   ]
   const filterLabelClass =
-    'm-0 mb-2 text-[0.72rem] font-bold uppercase tracking-[0.22em] text-site-ink-subtle min-[64rem]:text-[0.8rem]'
-  const itemEyebrowClass =
-    'm-0 text-[0.72rem] font-light tracking-[0.08em] text-site-ink-subtle min-[64rem]:text-[0.8rem]'
+    'm-0 mb-2 text-[0.72rem] font-bold uppercase tracking-[0.22em] text-site-ink-subtle lg:text-[0.8rem]'
+  const itemEyebrowClass = ui.metaQuiet
   const listClass = directoryListVariants({ kind })
   const guideArticleClass = ui.linearRow
   const itemLinkClass = directoryLinkVariants({ kind })
@@ -187,7 +186,15 @@
       return item.completedCtaLabel
     }
 
-    return item.ctaLabel === 'Ler mais' ? 'Ler novamente' : 'Read again'
+    if (item.ctaLabel === 'Ler mais') {
+      return 'Ler novamente'
+    }
+
+    if (item.ctaLabel === 'Read more') {
+      return 'Read again'
+    }
+
+    return 'Read again'
   }
 
   function syncFilterFromQuery() {
@@ -393,6 +400,15 @@
     {#if kind === 'guide-rows'}
       <article class={cn(guideArticleClass, 'relative', isComplete(item) && 'is-complete')} data-guide-post={item.completionId}>
         <a class={itemLinkClass} href={item.href}>
+          {#if item.completionId}
+            <span
+              aria-hidden="true"
+              class="pointer-events-none absolute right-3 top-3.5 inline-flex size-7 items-center justify-center rounded-full border border-[color:color-mix(in_srgb,var(--site-success)_55%,transparent)] bg-[color:color-mix(in_srgb,var(--site-success)_20%,var(--site-surface))] text-[0.92rem] font-semibold text-[color:color-mix(in_srgb,var(--site-success)_78%,black_22%)] transition-all duration-150 lg:right-4 lg:top-1/2 lg:size-9 lg:-translate-y-1/2 lg:text-[1.08rem]"
+              data-guide-post-complete-badge
+            >
+              ✓
+            </span>
+          {/if}
           {#if item.eyebrow || item.badgeLabel}
             <div class="flex flex-wrap items-center gap-2">
               {#if item.eyebrow}
@@ -406,7 +422,7 @@
               {/if}
             </div>
           {/if}
-          <div class="grid gap-2 md:pr-20 min-[64rem]:pr-24">
+          <div class="grid gap-2 md:pr-20 lg:pr-24">
             <h3 class={cn(ui.linearItemTitle, 'transition-colors duration-150')} data-card-title>
               {item.title}
             </h3>
@@ -421,16 +437,9 @@
                 <ArrowRightIcon className="size-[0.88rem]" />
               </span>
               <span
-                class="pointer-events-none absolute right-4 top-1/2 hidden min-w-[9.25rem] -translate-y-1/2 items-center justify-end min-[64rem]:inline-flex"
+                class="pointer-events-none absolute right-4 top-1/2 hidden min-w-[9.25rem] -translate-y-1/2 items-center justify-end lg:inline-flex"
               >
-                <span
-                  aria-hidden="true"
-                  class="inline-flex size-8 items-center justify-center rounded-full border border-[color:color-mix(in_srgb,var(--site-success)_55%,transparent)] bg-[color:color-mix(in_srgb,var(--site-success)_20%,var(--site-surface))] text-[0.98rem] font-semibold text-[color:color-mix(in_srgb,var(--site-success)_78%,black_22%)] transition-all duration-150 group-hover:scale-90 group-hover:opacity-0 group-focus-within:scale-90 group-focus-within:opacity-0 min-[64rem]:size-9 min-[64rem]:text-[1.08rem]"
-                  data-guide-post-complete-badge
-                >
-                  ✓
-                </span>
-                <span class="absolute right-0 inline-flex translate-x-1 items-center gap-1.5 text-[0.76rem] font-medium tracking-[0.04em] text-site-ink-muted opacity-0 transition-all duration-150 group-hover:translate-x-0 group-hover:opacity-100 group-hover:text-site-link-hover group-focus-within:translate-x-0 group-focus-within:opacity-100 group-focus-within:text-site-link-hover min-[64rem]:gap-2 min-[64rem]:text-[0.84rem]">
+                <span class="absolute right-0 inline-flex translate-x-1 items-center gap-1.5 text-[0.76rem] font-medium tracking-[0.04em] text-site-ink-muted opacity-0 transition-all duration-150 group-hover:translate-x-0 group-hover:opacity-100 group-hover:text-site-link-hover group-focus-within:translate-x-0 group-focus-within:opacity-100 group-focus-within:text-site-link-hover lg:gap-2 lg:text-[0.84rem]" data-guide-post-complete-text>
                   <span>{getCompletedCtaLabel(item)}</span>
                   <ArrowRightIcon className="size-[0.88rem]" />
                 </span>
@@ -441,7 +450,7 @@
                 <ArrowRightIcon className="size-[0.88rem]" />
               </span>
               <span
-                class="pointer-events-none absolute right-4 top-1/2 hidden -translate-y-1/2 items-center gap-1.5 text-[0.76rem] font-medium tracking-[0.04em] text-site-ink-muted opacity-0 transition-all duration-150 group-hover:translate-x-0 group-hover:opacity-100 group-hover:text-site-link-hover group-focus-within:translate-x-0 group-focus-within:opacity-100 group-focus-within:text-site-link-hover min-[64rem]:gap-2 min-[64rem]:text-[0.84rem] md:inline-flex"
+                class="pointer-events-none absolute right-4 top-1/2 hidden -translate-y-1/2 items-center gap-1.5 text-[0.76rem] font-medium tracking-[0.04em] text-site-ink-muted opacity-0 transition-all duration-150 group-hover:translate-x-0 group-hover:opacity-100 group-hover:text-site-link-hover group-focus-within:translate-x-0 group-focus-within:opacity-100 group-focus-within:text-site-link-hover lg:gap-2 lg:text-[0.84rem] md:inline-flex"
               >
                 <span>{item.ctaLabel}</span>
                 <ArrowRightIcon className="size-[0.88rem]" />
@@ -455,7 +464,7 @@
         {#if item.completionId}
           <span
             aria-hidden="true"
-            class="pointer-events-none absolute right-4 top-4 hidden size-8 items-center justify-center rounded-full border border-[color:color-mix(in_srgb,var(--site-success)_55%,transparent)] bg-[color:color-mix(in_srgb,var(--site-success)_20%,var(--site-surface))] text-[0.98rem] font-semibold text-[color:color-mix(in_srgb,var(--site-success)_78%,black_22%)] min-[64rem]:size-9 min-[64rem]:text-[1.08rem]"
+            class="pointer-events-none absolute right-4 top-4 inline-flex size-8 items-center justify-center rounded-full border border-[color:color-mix(in_srgb,var(--site-success)_55%,transparent)] bg-[color:color-mix(in_srgb,var(--site-success)_20%,var(--site-surface))] text-[0.98rem] font-semibold text-[color:color-mix(in_srgb,var(--site-success)_78%,black_22%)] transition-all duration-150 lg:size-9 lg:text-[1.08rem]"
             data-guide-post-complete-badge
           >
             ✓

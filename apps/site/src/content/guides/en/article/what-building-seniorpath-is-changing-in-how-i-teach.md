@@ -1,7 +1,7 @@
 ---
 title: What Building Seniorpath Is Changing in How I Teach
-description: An article on what became clearer after trying to turn vague senior-level advice into something people can actually use.
-summary: Building Seniorpath keeps forcing one lesson on me. Most advice sounds smart before it has to survive structure, examples, and sequence.
+description: A note about what became clearer while trying to turn vague advice about seniority into something actually useful.
+summary: Building Seniorpath is forcing me to see one thing more clearly. Many ideas sound good before they have to become structure, example, and sequence.
 guideId: what-building-seniorpath-is-changing-in-how-i-teach
 kind: article
 trackEligible: false
@@ -27,18 +27,18 @@ relatedDeckIds: []
 
 ## Why I am writing this
 
-The more I build Seniorpath, the less I trust advice that sounds right only in abstract form.
+The more I build Seniorpath, the less I trust advice that sounds right only at the abstract level.
 
 There is a big difference between:
 
 - saying "think like a senior"
-- and turning that into pages, routes, examples, order, and decisions a reader can follow
+- and turning that into pages, routes, examples, order, and decisions that someone can actually follow
 
-The second one exposes every weak idea fast.
+The second option exposes a weak idea very quickly.
 
 ## What changed in my head
 
-I used to think the hard part was writing better explanations.
+Before, I thought the hard part was writing better explanations.
 
 Now I think the hard part is making the explanation survive contact with structure.
 
@@ -49,33 +49,33 @@ If an idea cannot become:
 - a glossary term
 - or a real step inside a track
 
-then maybe it is not clear enough yet.
+then maybe it is still not clear enough.
 
-## The pattern I keep noticing
+## The pattern I keep seeing
 
-A lot of "senior content" fails in one of these ways:
+A lot of content about "seniority" fails in one of these ways:
 
-- too vague to apply
-- too broad to sequence
-- too dependent on personal authority
-- too polished to be operational
+- it is too vague to apply
+- it is too broad to sequence
+- it depends too much on the personal authority of whoever wrote it
+- it looks polished, but it is not operational
 
-That is useful as inspiration, but not as a system someone can learn from.
+That may inspire, but it does not form a learning system.
 
 ## What I am trying to do differently
 
-I want the site to make stronger distinctions:
+I want the site to force clearer distinctions:
 
 - evergreen guide vs personal article
 - concept vs glossary
 - curated track vs general library
 
-Those distinctions are not bureaucracy. They are how the content becomes easier to trust.
+Those distinctions are not bureaucracy. They are part of how the content becomes more reliable.
 
 ## The current lesson
 
-The real test is not whether a sentence sounds smart.
+The real test is not whether the sentence sounds smart.
 
-The real test is whether it can become a reusable part of a learning system without becoming vague, bloated, or fake.
+The real test is whether it can become a reusable piece of a learning system without becoming vague, bloated, or artificial.
 
-That is the bar I want Seniorpath to keep forcing on the content.
+That is the standard I want Seniorpath to keep imposing on the content.

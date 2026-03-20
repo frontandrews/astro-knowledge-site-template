@@ -3,7 +3,8 @@ import SearchIcon from '@lucide/astro/icons/search'
 import XIcon from '@lucide/astro/icons/x'
 
 import { cn } from '@/lib/cn'
-import type { SiteLocale } from '@/lib/site-copy'
+import { getSiteCopy, type SiteLocale } from '@/lib/site-copy'
+import { ui } from '@/lib/ui'
 
 type Props = {
   locale: SiteLocale
@@ -11,24 +12,25 @@ type Props = {
 
 const { locale } = Astro.props
 const isDev = import.meta.env.DEV
+const siteCopy = getSiteCopy(locale)
 const copy =
   locale === 'pt-br'
     ? {
         close: 'Fechar busca',
-        error: 'A busca nao esta disponivel no momento.',
-        empty: 'Digite para buscar em artigos, conceitos, termos e topicos.',
+        error: 'A busca não está disponível no momento.',
+        empty: 'Digite para buscar em artigos, conceitos, termos e tópicos.',
         hint: 'Busca no site',
         loading: 'Buscando...',
         noResults: 'Nenhum resultado encontrado.',
         placeholder: 'Buscar',
         shortcut: 'Ctrl K',
         title: 'Buscar',
-        unavailable: 'A busca so fica disponivel em preview/build.',
+        unavailable: 'A busca só fica disponível em preview/build.',
       }
     : {
         close: 'Close search',
         error: 'Search is currently unavailable.',
-        empty: 'Start typing to search articles, concepts, glossary, and topics.',
+        empty: 'Type to search across articles, concepts, glossary terms, and topics.',
         hint: 'Site search',
         loading: 'Searching...',
         noResults: 'No results found.',
@@ -38,9 +40,9 @@ const copy =
         unavailable: 'Search is only available in preview/build.',
       }
 const desktopTriggerClass =
-  'hidden min-[56rem]:inline-flex min-[56rem]:h-9 min-[56rem]:w-[13.5rem] min-[56rem]:items-center min-[56rem]:justify-between min-[56rem]:gap-3 rounded-[var(--radius-sm)] border border-site-line bg-site-panel px-3 py-0 text-left text-[0.9rem] text-site-ink-muted transition-colors duration-150 hover:bg-site-hover hover:text-site-link-hover focus-visible:bg-site-hover focus-visible:text-site-link-hover focus-visible:outline-none min-[64rem]:h-10 min-[64rem]:w-[15rem] min-[64rem]:gap-3.5 min-[64rem]:px-3 min-[64rem]:text-[0.98rem]'
+  cn(ui.controlButton, 'hidden min-[56rem]:inline-flex min-[56rem]:h-9 min-[56rem]:w-[13.5rem] min-[56rem]:justify-between min-[56rem]:gap-3 px-3 py-0 text-left text-[0.9rem] text-site-ink-muted lg:h-10 lg:w-[15rem] lg:gap-3.5 lg:text-[0.98rem]')
 const mobileTriggerClass =
-  'inline-flex min-h-10 items-center justify-center rounded-[var(--radius-sm)] border border-site-line bg-site-panel px-3 py-2 text-site-ink transition-colors duration-150 hover:bg-site-hover hover:text-site-link-hover focus-visible:bg-site-hover focus-visible:text-site-link-hover focus-visible:outline-none min-[64rem]:min-h-11 min-[56rem]:hidden'
+  cn(ui.controlButton, 'min-h-10 px-3 py-2 lg:min-h-11 min-[56rem]:hidden')
 ---
 
 <Fragment slot="head">
@@ -63,7 +65,7 @@ const mobileTriggerClass =
     <SearchIcon aria-hidden="true" class="size-4" />
     <span>{copy.placeholder}</span>
   </span>
-  <span class="rounded-md border border-site-line bg-site-surface px-1.5 py-0.5 text-[0.68rem] uppercase tracking-[0.08em] text-site-ink-muted min-[64rem]:px-2 min-[64rem]:py-[0.35rem] min-[64rem]:text-[0.76rem]">
+  <span class="rounded-[var(--radius-xs)] border border-site-line bg-site-surface px-1.5 py-0.5 text-[0.68rem] uppercase tracking-[0.08em] text-site-ink-muted lg:px-2 lg:py-[0.35rem] lg:text-[0.76rem]">
     {copy.shortcut}
   </span>
 </button>
@@ -79,11 +81,11 @@ const mobileTriggerClass =
 </button>
 
 <div class="search-launcher-backdrop fixed inset-0 z-40 hidden overflow-y-auto p-4 md:p-6" data-search-overlay>
-  <div class="mx-auto my-[6vh] flex max-h-[min(84dvh,42rem)] w-full max-w-[46rem] flex-col overflow-hidden rounded-[var(--radius-lg)] border border-site-line bg-site-panel shadow-[0_24px_80px_rgba(0,0,0,0.28)] min-[64rem]:max-w-[50rem]">
-    <div class="flex items-center gap-3 border-b border-site-line px-4 py-3 min-[64rem]:gap-3.5 min-[64rem]:px-5 min-[64rem]:py-3.5">
+  <div class="mx-auto my-[6vh] flex max-h-[min(84dvh,42rem)] w-full max-w-[46rem] flex-col overflow-hidden rounded-[var(--radius-lg)] border border-site-line bg-site-panel shadow-[0_24px_80px_rgba(0,0,0,0.28)] lg:max-w-[50rem]">
+    <div class="flex items-center gap-3 border-b border-site-line px-4 py-3 lg:gap-3.5 lg:px-5 lg:py-3.5">
       <SearchIcon aria-hidden="true" class="size-4 shrink-0 text-site-ink-muted" />
       <input
-        class="min-w-0 flex-1 bg-transparent text-[1rem] text-site-ink outline-none placeholder:text-site-ink-muted min-[64rem]:text-[1.08rem]"
+        class="min-w-0 flex-1 bg-transparent text-[1rem] text-site-ink outline-none placeholder:text-site-ink-muted lg:text-[1.08rem]"
         data-search-input
         placeholder={copy.placeholder}
         type="search"
@@ -97,15 +99,15 @@ const mobileTriggerClass =
         <span class="sr-only">{copy.close}</span>
       </button>
     </div>
-    <div class="flex min-h-0 flex-1 flex-col gap-3 px-4 py-4 min-[64rem]:gap-3.5 min-[64rem]:px-5 min-[64rem]:py-5">
-      <p class="m-0 text-[0.76rem] uppercase tracking-[0.12em] text-site-ink-muted min-[64rem]:text-[0.84rem]">{copy.hint}</p>
+    <div class="flex min-h-0 flex-1 flex-col gap-3 px-4 py-4 lg:gap-3.5 lg:px-5 lg:py-5">
+      <p class="m-0 text-[0.76rem] uppercase tracking-[0.12em] text-site-ink-muted lg:text-[0.84rem]">{copy.hint}</p>
       <div class="grid min-h-0 flex-1 gap-2 overflow-y-auto pr-1" data-search-results></div>
-      <p class="m-0 text-sm text-site-ink-muted min-[64rem]:text-[0.96rem]" data-search-status>{isDev ? copy.unavailable : copy.empty}</p>
+      <p class="m-0 text-sm text-site-ink-muted lg:text-[0.96rem]" data-search-status>{isDev ? copy.unavailable : copy.empty}</p>
     </div>
   </div>
 </div>
 
-<script define:vars={{ copy, isDev, locale }} is:inline>
+<script define:vars={{ copy, isDev, locale, siteCopy }} is:inline>
   const searchTriggers = [...document.querySelectorAll('[data-search-trigger]')];
   const searchOverlay = document.querySelector('[data-search-overlay]');
   const searchInput = document.querySelector('[data-search-input]');
@@ -117,12 +119,12 @@ const mobileTriggerClass =
   let searchTimer;
 
   const groupLabel = (url) => {
-    if (url.startsWith('/pt-br/artigos') || url.startsWith('/articles')) return locale === 'pt-br' ? 'Artigos' : 'Articles';
-    if (url.startsWith('/pt-br/conceitos') || url.startsWith('/concepts')) return locale === 'pt-br' ? 'Conceitos' : 'Concepts';
-    if (url.startsWith('/pt-br/glossario') || url.startsWith('/glossary')) return locale === 'pt-br' ? 'Glossario' : 'Glossary';
-    if (url.startsWith('/pt-br/topicos') || url.startsWith('/topics')) return locale === 'pt-br' ? 'Topicos' : 'Topics';
-    if (url.startsWith('/pt-br/trilhas') || url.startsWith('/tracks')) return locale === 'pt-br' ? 'Trilhas' : 'Tracks';
-    return locale === 'pt-br' ? 'Pagina' : 'Page';
+    if (url.startsWith('/pt-br/artigos') || url.startsWith('/articles')) return siteCopy.layout.articles;
+    if (url.startsWith('/pt-br/conceitos') || url.startsWith('/concepts')) return siteCopy.layout.concepts;
+    if (url.startsWith('/pt-br/glossario') || url.startsWith('/glossary')) return siteCopy.layout.glossary;
+    if (url.startsWith('/pt-br/topicos') || url.startsWith('/topics')) return siteCopy.layout.topics;
+    if (url.startsWith('/pt-br/trilhas') || url.startsWith('/tracks')) return siteCopy.layout.tracks;
+    return siteCopy.directory.page;
   };
 
   const setOpen = (isOpen) => {
@@ -141,10 +143,10 @@ const mobileTriggerClass =
       .map((result) => {
         const excerpt = result.excerpt ?? '';
         return `
-          <a class="grid gap-1 rounded-[var(--radius-sm)] px-3 py-3 text-inherit transition-colors duration-150 hover:bg-site-hover hover:text-site-link-hover focus-visible:bg-site-hover focus-visible:text-site-link-hover focus-visible:outline-none min-[64rem]:gap-1.5 min-[64rem]:px-4 min-[64rem]:py-3.5" href="${result.url}">
-            <span class="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-site-ink-muted min-[64rem]:text-[0.76rem]">${groupLabel(result.url)}</span>
-            <span class="text-base font-semibold leading-[1.3] text-site-ink min-[64rem]:text-[1.08rem]">${result.meta?.title ?? result.url}</span>
-            ${excerpt ? `<span class="text-sm leading-6 text-site-ink-soft min-[64rem]:text-[0.98rem]">${excerpt}</span>` : ''}
+          <a class="grid gap-1 rounded-[var(--radius-xs)] px-3 py-3 text-inherit transition-colors duration-150 hover:bg-site-hover hover:text-site-link-hover focus-visible:bg-site-hover focus-visible:text-site-link-hover focus-visible:outline-none lg:gap-1.5 lg:px-4 lg:py-3.5" href="${result.url}">
+            <span class="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-site-ink-muted lg:text-[0.76rem]">${groupLabel(result.url)}</span>
+            <span class="text-base font-semibold leading-[1.3] text-site-ink lg:text-[1.08rem]">${result.meta?.title ?? result.url}</span>
+            ${excerpt ? `<span class="text-sm leading-6 text-site-ink-soft lg:text-[0.98rem]">${excerpt}</span>` : ''}
           </a>
         `;
       })

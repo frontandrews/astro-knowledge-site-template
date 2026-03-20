@@ -1,7 +1,7 @@
 ---
-title: Effects Without the Mess
-description: A simpler way to use effects without turning them into a pile of accidental synchronization bugs.
-summary: Effects get safer when you treat them as a bridge to the outside world, not as a generic place for logic.
+title: Effects Without Mess
+description: How to use effects without turning synchronization, fetches, and side events into a pile of hard-to-predict behavior.
+summary: A good effect synchronizes with the outside world. A bad effect tries to control the whole screen.
 guideId: effects-without-the-mess
 locale: en
 status: active
@@ -9,11 +9,11 @@ pillarId: state-and-ui-thinking
 branchId: effects-and-side-effects
 pubDate: 2026-01-24
 updatedDate: 2026-01-26
-category: State & UI Thinking
-topic: Effects and Side Effects
+category: State and UI
+topic: Effects
 path:
-  - State & UI Thinking
-  - Effects and Side Effects
+  - State and UI
+  - Effects Without Mess
 order: 10
 relationships:
   - state-ownership-without-confusion
@@ -29,64 +29,88 @@ relatedDeckIds: []
 
 ## The problem
 
-Effects often become a dumping ground for logic that the component did not know where to place.
+An effect becomes a mess when it starts being used as a tool to fix anything strange in the screen.
 
-Then fetching, subscriptions, derived values, and UI fixes all get mixed together, and every dependency change feels dangerous.
+Suddenly there is `useEffect` to derive state, synchronize a value that did not even need to exist, and patch execution order.
+
+The code may work for a while, but it becomes hard to predict when something runs and why it runs.
 
 ## Mental model
 
-An effect is not a generic place for "code that runs later."
+An effect does not exist to control render.
 
-It is a bridge between your component and something outside render, such as the network, timers, subscriptions, or imperative APIs.
+An effect exists to synchronize the interface with something outside:
 
-If the code does not need that bridge, it probably should not be in an effect.
+- network
+- timer
+- listener
+- imperative DOM
+- external integration
+
+If the logic can happen during rendering or in a user event, it probably does not need to be in an effect.
 
 ## Breaking it down
 
-Before you write an effect, ask:
+Before creating an effect, try to answer:
 
-1. what outside system am I synchronizing with?
-2. could this value be derived during render instead?
-3. what should start when the effect runs?
-4. what should stop when the effect cleans up?
+1. which external system am I synchronizing with?
+2. could this be calculated during render?
+3. should this happen because of a specific interaction?
+4. is the cleanup clear when this effect stops being valid?
 
-That makes the effect smaller and easier to trust.
+These questions eliminate a lot of unnecessary effects.
 
 ## Simple example
 
-Fetching a user when `userId` changes is a real effect because it synchronizes with the network.
+Imagine this case:
 
-Computing `visibleUsers` from `users` and `search` is not. That belongs in render.
+```tsx
+const [filteredUsers, setFilteredUsers] = useState<User[]>([])
 
-The more you separate those cases, the fewer effect bugs you create.
+useEffect(() => {
+  setFilteredUsers(users.filter((user) => user.name.includes(search)))
+}, [users, search])
+```
+
+This looks normal, but `filteredUsers` is derived from `users` and `search`.
+
+In other words: this effect is serving to keep a piece of state synchronized that did not even need to exist.
+
+A better version is to calculate it directly:
+
+```tsx
+const filteredUsers = users.filter((user) => user.name.includes(search))
+```
+
+Now reading gets better and one unnecessary synchronization point disappears.
 
 ## Common mistakes
 
-- using an effect to derive values that could be computed directly
-- packing unrelated responsibilities into one effect
-- ignoring cleanup for subscriptions, listeners, or timers
-- fighting dependency arrays instead of fixing the design
+- using an effect to derive state
+- putting event logic inside an effect without need
+- depending on an effect to "fix" render order
+- forgetting cleanup in timer, listener, or subscription
 
 ## How a senior thinks
 
-A senior engineer does not ask "how do I silence the dependency warning?"
+A strong senior does not ask only "which dependency goes in the array?"
 
 They ask:
 
-> What outside system am I syncing with, and does this logic really belong in an effect at all?
+> Am I synchronizing with something external, or only trying to compensate for bad state modeling?
 
-That question usually fixes more than the dependency array itself.
+That question usually cuts half of the effects before they are even born.
 
 ## What the interviewer wants to see
 
-Interviewers usually want to know:
+In interviews, this usually shows a lot of maturity:
 
-- you understand what effects are for
-- you can separate synchronization from derived render logic
-- you can reason about dependencies and cleanup
+- you understand what an effect is for
+- you know how to differentiate external synchronization from internal derivation
+- you think about cleanup and predictability
 
-That signals fewer accidental bugs in real UI code.
+People who do this well look like someone who builds interfaces with less surprise and fewer timing bugs.
 
-> Effects get clearer when they sync with one outside thing at a time.
+> A good effect brings the screen closer to the outside world. A bad effect tries to patch modeling holes.
 
-> If there is no outside system involved, there is a good chance you do not need an effect.
+> If there is no external system involved, maybe the effect does not need to exist.

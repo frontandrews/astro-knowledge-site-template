@@ -29,10 +29,11 @@ const items = posts.map((post) => {
   const topics = getLocalizedGuideTopics(post)
 
   return {
-    badgeLabel: post.data.kind === 'article' ? (locale === 'pt-br' ? 'Nota' : 'Journal') : undefined,
+    badgeLabel: post.data.kind === 'article' ? copy.directory.noteBadge : undefined,
+    completedCtaLabel: copy.directory.readAgain,
     completionId: post.data.guideId,
     contentKind: post.data.kind,
-    ctaLabel: locale === 'pt-br' ? 'Ler mais' : 'Learn more',
+    ctaLabel: copy.directory.readMore,
     description: post.data.description,
     eyebrow: formatEditorialDate(post.data.pubDate, dateLocale),
     href: getGuideHrefFromEntry(post),
@@ -43,35 +44,33 @@ const items = posts.map((post) => {
 ---
 
 <BaseLayout
-  description={locale === 'pt-br'
-    ? 'Explicacoes diretas para quem quer entender como as coisas funcionam, nao apenas decorar respostas.'
-    : 'Direct explanations for people who want to understand how things work, not just memorize answers.'}
+  description={copy.articlesIndex.copy}
   englishHref={locale === 'pt-br' ? getGuideIndexHref('en') : undefined}
   portugueseHref={locale === 'en' ? getGuideIndexHref('pt-br') : undefined}
-  title={copy.guideIndex.title}
+  title={copy.articlesIndex.title}
 >
   <PageHeader
     className={locale === 'pt-br' ? 'px-4 md:px-[1.1rem]' : ''}
-    description={copy.guideIndex.copy}
+    description={copy.articlesIndex.copy}
     icon={NewspaperIcon}
     iconLabel={copy.layout.articles}
-    title={copy.guideIndex.title}
+    title={copy.articlesIndex.title}
   />
 
   <CompactSection>
     <FilterableDirectory
-      allItemsLabel={copy.guideIndex.allItems}
-      articleItemsLabel={copy.guideIndex.articleItems}
+      allItemsLabel={copy.articlesIndex.allItems}
+      articleItemsLabel={copy.articlesIndex.articleItems}
       availableFilters={availableTopicFilters}
       completionStorageKey={siteStorageKeys.completedGuides}
-      filterLabel={copy.guideIndex.filterLabel}
-      fewerFiltersLabel={locale === 'pt-br' ? 'Mostrar menos' : 'Show less'}
-      guideItemsLabel={copy.guideIndex.guideItems}
+      filterLabel={copy.articlesIndex.filterLabel}
+      fewerFiltersLabel={copy.directory.showLess}
+      guideItemsLabel={copy.articlesIndex.guideItems}
       items={items}
       client:load
       kind="guide-rows"
       moreFiltersHref={getTopicIndexHref(locale)}
-      moreFiltersLabel={locale === 'pt-br' ? 'mais' : 'more'}
+      moreFiltersLabel={copy.directory.more}
     />
   </CompactSection>
 </BaseLayout>

@@ -1,7 +1,7 @@
 ---
-title: Reuse Without Extra Complexity
-description: How to share code when it actually saves time, and how to stop before reuse starts making every case harder.
-summary: Reuse helps when the shared behavior is stable. It hurts when it forces unrelated cases into one shape.
+title: Reuse Without Overcomplicating
+description: How to share logic and structure without turning the code into a fragile dependency web that is hard to understand.
+summary: Good reuse saves future work. Bad reuse spreads coupling and makes every change more expensive.
 guideId: reuse-without-extra-complexity
 locale: en
 status: active
@@ -10,10 +10,10 @@ branchId: reuse-vs-complexity
 pubDate: 2026-02-18
 updatedDate: 2026-02-22
 category: Patterns That Actually Matter
-topic: Reuse vs Complexity
+topic: Reuse Without Overcomplicating
 path:
   - Patterns That Actually Matter
-  - Reuse vs Complexity
+  - Reuse Without Overcomplicating
 order: 10
 relationships:
   - composition-vs-abstraction-without-theatre
@@ -29,64 +29,72 @@ relatedDeckIds: []
 
 ## The problem
 
-Reuse sounds like a pure win until the shared code becomes the hardest part of the system to change.
+Reuse always looks like a good idea at the beginning.
 
-Then every small variation turns into flags, special cases, and parameters that make the common code harder to trust.
+If two parts do something similar, the temptation is to merge everything quickly so you "do not duplicate."
+
+The problem is that bad reuse does not eliminate cost. It only moves the cost to later, in the form of coupling and behavior that is hard to change.
 
 ## Mental model
 
-Reuse is not the goal by itself.
+Reusing does not mean sharing just anything.
 
-The better question is:
+It means sharing what truly changes together and still makes sense in the same place.
 
-> Will sharing this logic make future changes easier, or will it force different cases to move together when they should not?
+The useful question here is usually:
 
-That usually reveals whether the reuse is real or cosmetic.
+> Am I removing real duplication or only gluing similar things together too early?
 
 ## Breaking it down
 
-Before sharing code, ask:
+A simple way to decide better is this:
 
-1. what is truly common here?
-2. how stable is that shared behavior?
-3. do these cases change for the same reasons?
-4. what complexity will the shared version introduce?
+1. see whether the cases really have the same responsibility
+2. check whether they change for the same reasons
+3. measure the cost of understanding the shared layer
+4. extract only when reuse reduces repeated change without making reading worse
 
-Those questions protect you from expensive "dry" code.
+That helps avoid a generic utility that everyone uses and nobody likes.
 
 ## Simple example
 
-Two forms might share input styling and validation helpers.
+Imagine two email-sending flows.
 
-That is useful reuse.
+Both build a message, call a provider, and register a log.
 
-But if one form creates invoices and the other manages profile settings, forcing both flows through one giant generic form engine can add more complexity than it removes because the behavior no longer changes for the same reason.
+If the main rule is the same, it may make sense to share part of the flow.
+
+But if one sends onboarding and the other sends a critical alert, maybe what looks like reuse is only superficial coincidence.
+
+Joining them too early can hide differences in priority, retry, auditing, and template.
 
 ## Common mistakes
 
-- reusing code just because it looks similar today
-- merging cases that change for different reasons
-- using configuration to hide that the shared code is doing too much
-- treating duplication as always worse than indirection
+- extracting code at the first similarity
+- sharing something that changes for different reasons
+- creating a generic utility that accepts too many parameters
+- treating small duplication as a bigger sin than structural complexity
 
 ## How a senior thinks
 
-A senior engineer checks change patterns first:
+A strong senior reuses with judgment, not by reflex.
 
-> If these cases do not evolve together, forcing them into one shared path may cost more than the duplication I am trying to avoid.
+That usually sounds like this:
 
-That keeps reuse honest.
+> If the cost of understanding the shared layer becomes bigger than repeating a little bit now, maybe the reuse still does not pay off.
+
+That question usually protects the system from coupling that looks nice on paper and bad in maintenance.
 
 ## What the interviewer wants to see
 
-Interviewers usually want to know:
+In interviews, this usually shows maturity quickly:
 
-- you can evaluate reuse as a trade-off
-- you understand the cost of indirection
-- you can explain when duplication is actually the simpler choice
+- you understand that reuse also has a cost
+- you know how to evaluate joint change, not only visual similarity
+- you protect readability and system evolution
 
-That is stronger than repeating "do not repeat yourself."
+People who do this well look like someone who knows when to share and when to leave things separate without guilt.
 
-> Reuse only pays when the shared behavior is stable enough to deserve one shape.
+> Reuse is not valuable just because it exists. It is valuable when it reduces future work without increasing confusion.
 
-> If the shared code keeps growing knobs, the reuse probably is already too expensive.
+> If everything depends on the same shared layer, any small change can become too big.

@@ -1,7 +1,7 @@
 ---
 title: Measure Before You Optimize
-description: Why guesses are expensive in performance work and why even lightweight measurement changes the whole conversation.
-summary: Optimization gets safer when measurement turns "it feels slow" into something concrete enough to improve on purpose.
+description: How to avoid optimizing by reflex and make decisions with evidence, not with feeling.
+summary: Optimization without measurement usually spends energy in the wrong place and still leaves the team too confident in an improvement that may not even exist.
 guideId: measure-before-you-optimize
 locale: en
 status: active
@@ -10,17 +10,17 @@ branchId: measurement-before-optimization
 pubDate: 2026-02-04
 updatedDate: 2026-02-08
 category: Performance That Makes Sense
-topic: Measurement Before Optimization
+topic: Measure Before You Optimize
 path:
   - Performance That Makes Sense
-  - Measurement Before Optimization
+  - Measure Before You Optimize
 order: 10
 relationships:
   - rendering-network-and-cpu-without-mixing-them-up
 tags:
   - performance
   - measurement
-  - profiling
+  - optimization
 topicIds:
   - performance
 relatedDeckIds: []
@@ -28,64 +28,76 @@ relatedDeckIds: []
 
 ## The problem
 
-Performance work gets expensive when the team optimizes from intuition alone.
+Many optimizations come from discomfort, not from evidence.
 
-People change code, feel busy, and still cannot prove whether the experience improved in the way that matters.
+The screen feels heavy, the API feels slow, the component seems to re-render too much.
+
+Without measuring, all of that may sound plausible and still be wrong.
 
 ## Mental model
 
-Measurement is not ceremony.
+Optimizing well is not improving whatever looks suspicious.
 
-It is how you turn vague discomfort into a target you can improve.
+It is confirming where the cost is, how much it weighs, and whether the change really alters the result.
 
-The useful question is:
+The useful question here is usually:
 
-> What evidence would show that this change actually moved the performance problem?
+> What can I prove about this slowness before I touch the code?
 
 ## Breaking it down
 
-Before optimizing, ask:
+A simple way to measure better is this:
 
-1. what user-facing symptom am I trying to improve?
-2. what metric or trace captures that symptom?
-3. what baseline do I have now?
-4. how will I know if the change worked or just moved cost somewhere else?
+1. choose one specific flow
+2. define which metric matters there
+3. capture the baseline before the change
+4. compare the after with the before
 
-That turns optimization into engineering instead of faith.
+Without that, "it seems better" becomes the decision criterion.
 
 ## Simple example
 
-Suppose a team says a page feels slow and immediately adds memoization everywhere.
+Imagine a list component that seems slow.
 
-If nobody measured render counts, CPU time, or route latency first, the team may not even know whether rendering was the real issue.
+A rushed response would be to add memoization everywhere.
 
-Even a lightweight before-and-after measurement is better than optimizing blind.
+A better response would be:
+
+- measure render time
+- see how many times the component actually re-renders
+- compare before and after the change
+
+If the metric barely changes, maybe the optimization created complexity without real gain.
 
 ## Common mistakes
 
-- changing code before capturing a baseline
-- using one metric that does not match the user symptom
-- assuming local feel is enough evidence
-- ignoring regressions in another part of the path
+- optimizing before having a baseline
+- trusting only local feeling
+- celebrating a micro-improvement that is irrelevant to the user
+- keeping new complexity even when the gain was minimal
 
 ## How a senior thinks
 
-A senior engineer asks for the smallest useful proof:
+A strong senior does not treat optimization as a reflex.
 
-> I want just enough measurement to know where the cost is now and whether the change improved the thing users actually feel.
+They treat it as an experiment.
 
-That keeps the work practical.
+That usually sounds like this:
+
+> Before I change anything, I want to measure the current state. Then I compare to see whether the change was really worth the cost.
+
+That posture protects the system and the team from useless complexity.
 
 ## What the interviewer wants to see
 
-Interviewers usually want to know:
+In interviews, this usually shows maturity quickly:
 
-- you understand why baselines matter
-- you can connect metrics to real user symptoms
-- you know optimization should be testable, not just persuasive
+- you know how to distinguish suspicion from evidence
+- you think in terms of metrics and impact
+- you understand that optimization also has a maintenance cost
 
-That is stronger than naming performance techniques from memory.
+People who do this well look like someone who improves performance without turning the code into ritual.
 
-> Measurement does not slow performance work down. It prevents expensive guesses.
+> What was not measured usually becomes opinion wearing an engineering costume.
 
-> If you cannot say what success looks like, the optimization is still underspecified.
+> If you did not compare before and after, you still do not know whether you optimized or only changed something.

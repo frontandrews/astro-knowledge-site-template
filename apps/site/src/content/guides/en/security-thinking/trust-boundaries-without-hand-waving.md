@@ -1,7 +1,7 @@
 ---
-title: Trust Boundaries Without Hand-Waving
-description: How to think about security in terms of who can trust what, without turning the topic into memorized checklists.
-summary: Many security failures start when the system trusts data, users, or services too early.
+title: Trust Boundaries
+description: How to think about security starting from who can trust whom, without turning everything into a memorized checklist.
+summary: Many security failures begin when the system trusts data, users, or services too early.
 guideId: trust-boundaries-without-hand-waving
 locale: en
 status: active
@@ -9,10 +9,10 @@ pillarId: security-thinking
 branchId: trust-boundaries
 pubDate: 2026-03-15
 updatedDate: 2026-03-17
-category: Security Thinking
+category: Security in Practice
 topic: Trust Boundaries
 path:
-  - Security Thinking
+  - Security in Practice
   - Trust Boundaries
 order: 10
 relationships:
@@ -28,38 +28,38 @@ relatedDeckIds: []
 
 ## The problem
 
-Many security failures do not start with advanced attacks.
+Many security failures do not come from weak encryption or exotic attacks.
 
-They start with a simple wrong assumption:
+They come from one simple and wrong assumption:
 
 the system treated something as trustworthy too early.
 
-That could be user input, a weakly validated token, data from the client, or a response from another service.
+It may be user input, a poorly validated token, data coming from the client, or a response from another service.
 
 ## Mental model
 
-Security gets clearer when you think in trust boundaries.
+Security gets clearer when you think in terms of trust boundaries.
 
-That means asking where data moves from an untrusted environment into a place where it can cause real impact.
+In other words: at what point does data leave an untrusted environment and enter a place where it can cause real impact?
 
-The useful question is:
+The useful question here is usually:
 
-> What am I accepting as true here, and why do I believe it?
+> What am I accepting as truth, and why do I believe it?
 
 ## Breaking it down
 
-A simple way to map trust boundaries is:
+A simple way to map this is:
 
-1. identify where the data comes from
-2. see who could change it before it arrives
+1. find out where the data comes from
+2. see who can change it before it arrives
 3. identify what the system does with it
-4. validate or reduce permission before the impact point
+4. validate it or reduce permission before the point of impact
 
-That turns security into a concrete flow instead of an abstract theme.
+That turns security from an abstract topic into a concrete path.
 
 ## Simple example
 
-Imagine a client sends this payload:
+Imagine a client sending in the payload:
 
 ```json
 {
@@ -68,39 +68,41 @@ Imagine a client sends this payload:
 }
 ```
 
-If the backend uses that `role` as truth without validating it on the server, the trust boundary is broken.
+If the backend uses that `role` as truth without validating it on the server, the trust boundary was broken.
 
-The issue is not the JSON itself.
+The problem is not the JSON.
 
-The issue is treating client-provided data as if it had authority over permissions.
+The problem is treating client-provided data as if it had authority to decide permission.
 
 ## Common mistakes
 
-- trusting client data without server validation
-- assuming an internal service always responds correctly
+- trusting data coming from the client without validating it
+- assuming an internal service always answers correctly
 - mixing identity with permission
-- thinking about security only after the feature is already done
+- thinking about security only after the feature is done
 
 ## How a senior thinks
 
-A senior engineer does not start with tools.
+A strong senior does not look at tools first.
 
-They start with trust flow:
+They look at the trust flow.
 
-> Before I decide the protection, I want to know where the system exchanges data with an untrusted environment and where that can turn into real impact.
+That usually sounds like this:
 
-That mindset prevents a lot of basic vulnerabilities.
+> Before deciding the protection, I want to map the points where the system exchanges data with an untrusted environment and where that can turn into real impact.
+
+That posture avoids many basic vulnerabilities.
 
 ## What the interviewer wants to see
 
-Interviewers usually want to know:
+In interviews, this usually shows maturity quickly:
 
-- you understand that security starts with trust modeling
-- you can locate validation points
-- you think about real impact, not only terminology
+- you understand that security starts in trust modeling
+- you know how to locate validation points
+- you think about real impact, not only pretty words
 
-That sounds much stronger than checklist theater.
+People who do this well look like someone who designs a safer system without depending on theatre.
 
 > Security starts when you stop assuming trust for convenience.
 
-> If the system cannot explain why it believes a value, it is probably trusting too early.
+> If the system does not know why it believes a piece of data, it is probably believing too early.

@@ -5,7 +5,7 @@ export function formatEditorialDate(
 ) {
   const resolvedOptions: Intl.DateTimeFormatOptions = {
     day: 'numeric',
-    month: 'short',
+    month: 'long',
     year: 'numeric',
     timeZone: 'UTC',
     ...options,
@@ -21,7 +21,7 @@ export function formatEditorialDate(
         return part.value.replace(/,/g, '')
       }
 
-      if (part.type === 'month' && resolvedOptions.month === 'short') {
+      if (part.type === 'month' && (resolvedOptions.month === 'short' || resolvedOptions.month === 'long')) {
         const normalizedMonth = part.value.replace(/\.$/, '')
         return normalizedMonth.charAt(0).toUpperCase() + normalizedMonth.slice(1)
       }

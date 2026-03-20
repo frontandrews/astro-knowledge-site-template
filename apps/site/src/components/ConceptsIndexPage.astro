@@ -13,7 +13,7 @@ import {
   getLocalizedConceptDomainLabel,
   getLocalizedConceptGroupLabel,
 } from '@/lib/concept-taxonomy'
-import type { SiteLocale } from '@/lib/site-copy'
+import { getSiteCopy, type SiteLocale } from '@/lib/site-copy'
 
 type Props = {
   concepts: CollectionEntry<'concepts'>[]
@@ -23,16 +23,7 @@ type Props = {
 const { concepts, locale } = Astro.props
 const englishHref = getConceptsHref('en')
 const portugueseHref = getConceptsHref('pt-br')
-const copy =
-  locale === 'pt-br'
-    ? {
-        intro: 'Conceitos tecnicos mais densos, organizados por dominio para facilitar navegacao e aprofundamento.',
-        title: 'Conceitos',
-      }
-    : {
-        intro: 'Deeper technical concepts, organized by domain so they are easier to browse and revisit.',
-        title: 'Concepts',
-      }
+const copy = getSiteCopy(locale)
 const availableDomains = CONCEPT_DOMAINS.filter((domain) =>
   concepts.some((concept) => concept.data.domainId === domain.id),
 )
@@ -73,20 +64,20 @@ const items = concepts.map((concept) => {
 ---
 
 <DirectoryIndexShell
-  description={copy.intro}
+  description={copy.conceptsIndex.copy}
   englishHref={englishHref}
   icon={BrainIcon}
-  iconLabel={copy.title}
+  iconLabel={copy.conceptsIndex.title}
   portugueseHref={portugueseHref}
-  title={copy.title}
+  title={copy.conceptsIndex.title}
 >
   <FilterableDirectory
-    allItemsLabel={locale === 'pt-br' ? 'Tudo' : 'All'}
+    allItemsLabel={copy.directory.allItems}
     availableFilters={availableFilters}
-    articleItemsLabel={locale === 'pt-br' ? 'Artigos' : 'Articles'}
-    filterLabel={locale === 'pt-br' ? 'Filtrar por area' : 'Filter by area'}
+    articleItemsLabel={copy.directory.articleItems}
+    filterLabel={copy.directory.filterByConcept}
     filterQueryKey="scope"
-    guideItemsLabel={locale === 'pt-br' ? 'Guias' : 'Guides'}
+    guideItemsLabel={copy.directory.guideItems}
     items={items}
     client:load
     kind="title-cards"

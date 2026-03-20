@@ -14,13 +14,13 @@ type GuideFeedItem = {
 export function getFeedMetadata(locale: SiteLocale) {
   if (locale === 'pt-br') {
     return {
-      description: 'Artigos editoriais do SeniorPath em portugues, com guias claros para pensar melhor antes de resolver.',
+      description: 'Artigos editoriais do SeniorPath em portugues, com explicacoes claras para pensar melhor antes de resolver.',
       title: 'SeniorPath PT-BR',
     }
   }
 
   return {
-    description: 'SeniorPath editorial articles in English, with clear guides for thinking better before you solve.',
+    description: 'SeniorPath editorial articles in English, with clear explanations for thinking better before you solve.',
     title: 'SeniorPath',
   }
 }

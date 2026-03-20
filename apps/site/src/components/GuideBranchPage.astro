@@ -8,7 +8,7 @@ import CompactSection from '@/components/ui/CompactSection.astro'
 import { getGuideBranchHref, getGuideHrefFromEntry } from '@/lib/guide-links'
 import { formatEditorialDate } from '@/lib/format-date'
 import { getBranchBreadcrumb, getLocalizedBranchLabel, getLocalizedPillarLabel } from '@/lib/guide-taxonomy'
-import type { SiteLocale } from '@/lib/site-copy'
+import { getSiteCopy, type SiteLocale } from '@/lib/site-copy'
 import { siteStorageKeys } from '@/lib/storage-keys'
 import PageHeader from '@/components/ui/PageHeader.astro'
 
@@ -20,6 +20,7 @@ type Props = {
 }
 
 const { branch, locale, pillar, posts } = Astro.props
+const copy = getSiteCopy(locale)
 const title = getLocalizedBranchLabel(branch, locale)
 const pillarLabel = getLocalizedPillarLabel(pillar, locale)
 const englishHref = getGuideBranchHref(pillar.id, branch.id, 'en')
@@ -27,15 +28,16 @@ const portugueseHref = getGuideBranchHref(pillar.id, branch.id, 'pt-br')
 const description =
   posts[0]?.data.description ??
   (locale === 'pt-br'
-    ? `Guias de ${title} dentro de ${pillarLabel}.`
-    : `Guides about ${title} inside ${pillarLabel}.`)
+    ? `Artigos de ${title} dentro de ${pillarLabel}.`
+    : `Articles about ${title} inside ${pillarLabel}.`)
 const breadcrumbItems = getBranchBreadcrumb(pillar, branch, locale)
 const dateLocale = locale === 'pt-br' ? 'pt-BR' : 'en-US'
 const items = posts.map((post) => ({
-  badgeLabel: post.data.kind === 'article' ? (locale === 'pt-br' ? 'Nota' : 'Journal') : undefined,
+  badgeLabel: post.data.kind === 'article' ? copy.directory.noteBadge : undefined,
+  completedCtaLabel: copy.directory.readAgain,
   completionId: post.data.guideId,
   contentKind: post.data.kind,
-  ctaLabel: locale === 'pt-br' ? 'Ler mais' : 'Learn more',
+  ctaLabel: copy.directory.readMore,
   description: post.data.description,
   eyebrow: formatEditorialDate(post.data.pubDate, dateLocale),
   href: getGuideHrefFromEntry(post),
@@ -54,14 +56,14 @@ const items = posts.map((post) => ({
 
   <CompactSection>
     <FilterableDirectory
-      allItemsLabel={locale === 'pt-br' ? 'Tudo' : 'All'}
-      articleItemsLabel={locale === 'pt-br' ? 'Artigos' : 'Articles'}
+      allItemsLabel={copy.directory.allItems}
+      articleItemsLabel={copy.directory.articleItems}
       completionStorageKey={siteStorageKeys.completedGuides}
-      fewerFiltersLabel={locale === 'pt-br' ? 'Mostrar menos' : 'Show less'}
-      guideItemsLabel={locale === 'pt-br' ? 'Guias' : 'Guides'}
+      fewerFiltersLabel={copy.directory.showLess}
+      guideItemsLabel={copy.directory.guideItems}
       items={items}
       kind="guide-rows"
-      moreFiltersLabel={locale === 'pt-br' ? 'mais' : 'more'}
+      moreFiltersLabel={copy.directory.more}
       client:load
     />
   </CompactSection>

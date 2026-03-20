@@ -1,7 +1,7 @@
 ---
-title: Bottleneck Detection Without Guessing
-description: A calmer way to find what is actually making a system feel slow before you spend effort on the wrong layer.
-summary: Performance work starts by locating the real bottleneck, not by applying favorite optimizations.
+title: Where the Bottleneck Is
+description: How to investigate slowness without optimizing everything and without calling every issue a performance problem.
+summary: Performance improves when you find the real bottleneck, not when you spread micro-optimizations across the system.
 guideId: bottleneck-detection-without-guessing
 locale: en
 status: active
@@ -10,10 +10,10 @@ branchId: bottleneck-detection
 pubDate: 2026-01-14
 updatedDate: 2026-01-18
 category: Performance That Makes Sense
-topic: Bottleneck Detection
+topic: Where the Bottleneck Is
 path:
   - Performance That Makes Sense
-  - Bottleneck Detection
+  - Where the Bottleneck Is
 order: 10
 relationships:
   - rendering-network-and-cpu-without-mixing-them-up
@@ -28,70 +28,83 @@ relatedDeckIds: []
 
 ## The problem
 
-When something feels slow, teams often jump straight to solutions.
+When something gets slow, many people react by optimizing whatever they can see first.
 
-They cache, memoize, paginate, parallelize, or refactor before proving which layer is actually causing the pain.
+They change the query, memoize the component, reduce the payload, swap the library, all at the same time.
 
-That wastes time and can make the system harder without making it faster.
+The problem is that slowness rarely comes from everything at once.
 
 ## Mental model
 
-A bottleneck is the thing limiting the result right now.
+Poor performance almost always has one dominant bottleneck.
 
-The useful question is:
+In other words: one point in the system is holding the flow back more than the others.
 
-> Which part of the path is actually saturating or waiting long enough to shape the user experience?
+It may be:
 
-Until that is clear, optimization is mostly guesswork.
+- CPU
+- network
+- database
+- rendering
+- external dependency
+
+Without locating that point, optimization becomes a lottery.
 
 ## Breaking it down
 
-When performance feels bad, ask:
+A simple way to investigate better is this:
 
-1. is the pain in network, CPU, rendering, storage, or a dependency?
-2. what measurement shows the slow segment?
-3. is the issue throughput, latency, or wasted work?
-4. what change would move the limit if the diagnosis is right?
+1. choose one specific slow flow
+2. measure where the time is being spent
+3. identify which step dominates the delay
+4. change the point that weighs the most first
 
-Those questions make the investigation concrete.
+It sounds obvious, but it avoids spending a lot of energy on irrelevant detail.
 
 ## Simple example
 
-A dashboard may feel slow to load.
+Imagine a dashboard screen that takes time to open.
 
-The cause could be:
+The team may suspect rendering because the UI looks heavy.
 
-- a slow API call
-- too much JavaScript on first render
-- excessive rerenders after the data arrives
+But after measuring, it discovers that:
 
-Each of those needs a different fix, so "optimize the page" is still too vague.
+- the API takes 1.8s
+- the browser renders in 180ms
+
+Here, discussing `memo` too early only diverts attention.
+
+The main bottleneck is the data arriving late, not the component drawing slowly.
 
 ## Common mistakes
 
-- optimizing the layer you understand best instead of the layer that is slow
-- relying on intuition without measurement
-- calling all slowness a frontend issue or all slowness a backend issue
-- assuming one fix improves every bottleneck
+- optimizing without measuring
+- changing everything at the same time
+- calling any wait a "render problem"
+- trusting intuition even when the flow can be observed
 
 ## How a senior thinks
 
-A senior engineer wants a measurable diagnosis first:
+A strong senior does not start the conversation with technique.
 
-> I do not want the most plausible optimization. I want the one that moves the real limit.
+They start with evidence.
 
-That keeps the work grounded.
+That usually sounds like this:
+
+> Before optimizing, I want to know which step is holding this flow back the most. Without that, the chance of changing the wrong place is high.
+
+That posture usually saves a lot of time and rework.
 
 ## What the interviewer wants to see
 
-Interviewers usually want to know:
+In interviews, this usually shows maturity quickly:
 
-- you can frame performance as diagnosis first
-- you know how to separate likely layers of slowness
-- you understand that the right fix depends on the actual bottleneck
+- you know how to investigate before optimizing
+- you understand that performance is context, not reflex
+- you improve the system through the point of highest impact
 
-That is stronger than listing generic optimizations.
+People who do this well look like someone who knows how to speed up a product without becoming hostage to guesswork.
 
-> Performance work starts when the bottleneck gets named clearly.
+> A real bottleneck is worth more than ten elegant suspicions.
 
-> If the slow layer is still fuzzy, the optimization plan is probably early.
+> If you have not measured yet, maybe you still do not know what is truly slow.

@@ -1,0 +1,193 @@
+---
+import StaticArticlePage from '@/components/ui/StaticArticlePage.astro'
+import { getLegalContactLinks } from '@/lib/legal-contact'
+import { getTermsHref } from '@/lib/terms-links'
+
+const { legalEmail, supportEmail } = getLegalContactLinks()
+const contactEmails = [legalEmail, supportEmail].filter((email) => email !== null)
+---
+
+<StaticArticlePage
+  description="Terms for using SeniorPath and related services operated by Fengsoft."
+  englishHref={getTermsHref('en')}
+  kicker="Legal"
+  portugueseHref={getTermsHref('pt-br')}
+  title="Terms of Service"
+>
+  <p>
+    These Terms of Service govern your access to and use of SeniorPath and any related websites, newsletters,
+    tools, content, products, and services we make available through it.
+  </p>
+
+  <h2>Who operates SeniorPath</h2>
+  <p>
+    SeniorPath is operated by FENGSOFT SERVICOS EM TECNOLOGIA E EDUCACAO LTDA, CNPJ 43.257.394/0001-70,
+    based in Niteroi, Rio de Janeiro, Brazil. In these terms, "SeniorPath", "we", "our", and "us" refer to
+    Fengsoft and the SeniorPath project.
+  </p>
+
+  <h2>What SeniorPath is</h2>
+  <p>
+    SeniorPath is an editorial learning platform focused on senior-level engineering judgment. It may publish
+    guides, concepts, glossary entries, topic hubs, learning paths, newsletters, and other educational or
+    product-related content.
+  </p>
+  <p>
+    Today, some parts of SeniorPath may be available for free without an account. Over time, we may add
+    accounts, comments, downloads, community features, premium content, software tools, SaaS products,
+    consulting offers, or other services operated by Fengsoft.
+  </p>
+
+  <h2>Acceptance of these terms</h2>
+  <p>
+    By accessing or using SeniorPath, you agree to these Terms of Service and any additional terms or policies
+    that apply to specific features, products, or services. If you do not agree, do not use SeniorPath.
+  </p>
+
+  <h2>Who may use SeniorPath</h2>
+  <p>
+    You may use SeniorPath only if you can legally enter into a binding agreement under applicable law. If you
+    use SeniorPath on behalf of a company or organization, you represent that you have authority to bind that
+    entity to these terms.
+  </p>
+
+  <h2>Permitted use</h2>
+  <p>
+    You may use SeniorPath for personal learning, professional development, internal team discussion, and
+    lawful business use.
+  </p>
+  <p>
+    You may not:
+  </p>
+  <ul>
+    <li>break, disable, overload, reverse engineer, or interfere with the platform or its security</li>
+    <li>scrape, harvest, or extract content in an abusive, automated, or unauthorized way</li>
+    <li>republish, mirror, resell, or redistribute substantial portions of the content as your own</li>
+    <li>use SeniorPath to build a competing content database, training set, or commercial knowledge product without permission</li>
+    <li>submit spam, malware, misleading content, or unlawful material</li>
+    <li>impersonate another person or misrepresent your affiliation with a business or brand</li>
+  </ul>
+
+  <h2>Accounts and subscriptions</h2>
+  <p>
+    Some features may require you to subscribe, submit your email address, or create an account. You agree to
+    provide accurate information and to keep your access credentials secure if accounts are introduced.
+  </p>
+  <p>
+    We may suspend or restrict access to accounts, subscriptions, or features if we reasonably believe there is
+    abuse, fraud, unlawful activity, or a violation of these terms.
+  </p>
+
+  <h2>Newsletters and communications</h2>
+  <p>
+    If you subscribe to a newsletter or other communications, you agree that we may send editorial updates,
+    product news, service announcements, and promotional communications related to SeniorPath, Fengsoft, Capta,
+    and other current or future products or services.
+  </p>
+  <p>
+    You can unsubscribe from non-essential marketing emails at any time using the unsubscribe link included in
+    the message.
+  </p>
+
+  <h2>Products, services, and promotions</h2>
+  <p>
+    SeniorPath may promote or offer products, software, SaaS tools, templates, consulting, educational offers,
+    or other services operated by Fengsoft. Some parts of the site may also include sponsored content, partner
+    placements, affiliate links, or advertising.
+  </p>
+  <p>
+    Additional terms, pricing pages, order forms, trial terms, or product-specific conditions may apply to paid
+    offers. If there is a conflict, the more specific terms for that product or service will control.
+  </p>
+
+  <h2>Intellectual property</h2>
+  <p>
+    Unless otherwise stated, SeniorPath and its content, including text, structure, branding, graphics, site
+    design, and original materials, are owned by Fengsoft or its licensors and are protected by applicable
+    intellectual property laws.
+  </p>
+  <p>
+    You may share links to SeniorPath and reference limited excerpts with proper attribution. You may not copy,
+    reproduce, republish, distribute, or commercially exploit substantial portions of the site without prior
+    written permission.
+  </p>
+
+  <h2>Feedback and submissions</h2>
+  <p>
+    If you send feedback, suggestions, ideas, or similar submissions, you grant us a non-exclusive,
+    worldwide, royalty-free license to use, adapt, publish, and improve upon that feedback for SeniorPath,
+    Capta, and our related products and services, without compensation to you.
+  </p>
+
+  <h2>No professional advice</h2>
+  <p>
+    SeniorPath is an educational and editorial resource. Its content is provided for general information and
+    learning only. It is not legal, financial, tax, security, hiring, medical, or business advice for your
+    specific situation.
+  </p>
+  <p>
+    You are responsible for how you interpret and apply anything you read on the site.
+  </p>
+
+  <h2>Third-party services and links</h2>
+  <p>
+    SeniorPath may link to third-party websites or use third-party services such as analytics providers, email
+    platforms, payment processors, embedded media, or comment systems. Those third parties operate under their
+    own terms and privacy practices, and we are not responsible for how they operate.
+  </p>
+
+  <h2>Availability and changes</h2>
+  <p>
+    We may update, change, suspend, rename, limit, or discontinue any part of SeniorPath at any time, with or
+    without notice. We may also update these Terms of Service from time to time. The updated version becomes
+    effective when it is published on the site, unless a different date is stated.
+  </p>
+
+  <h2>Disclaimer of warranties</h2>
+  <p>
+    SeniorPath is provided on an "as is" and "as available" basis. To the maximum extent permitted by law, we
+    make no warranties or guarantees that the site will always be available, accurate, complete, secure, or fit
+    for a particular purpose.
+  </p>
+
+  <h2>Limitation of liability</h2>
+  <p>
+    To the maximum extent permitted by applicable law, Fengsoft and SeniorPath will not be liable for any
+    indirect, incidental, special, consequential, or punitive damages, or for loss of profits, revenue, data,
+    goodwill, or business opportunities arising out of or related to your use of, or inability to use,
+    SeniorPath.
+  </p>
+  <p>
+    This includes losses resulting from decisions made based on content, downtime, third-party services, or
+    unauthorized access, except where liability cannot be excluded under applicable law.
+  </p>
+
+  <h2>Privacy</h2>
+  <p>
+    We may process personal data in connection with SeniorPath, including newsletter subscriptions, analytics,
+    contact requests, and product inquiries. Our data handling practices are described in our Privacy Policy and
+    must be interpreted together with these terms.
+  </p>
+
+  <h2>Governing law and venue</h2>
+  <p>
+    These terms are governed by the laws of Brazil. Unless mandatory law provides otherwise, disputes relating to
+    these terms or to SeniorPath will be submitted to the courts of Niteroi, Rio de Janeiro, Brazil.
+  </p>
+
+  {contactEmails.length > 0 ? (
+    <>
+      <h2>Contact</h2>
+      <p>
+        For legal questions, support requests, or notices related to these terms, contact us at{' '}
+        {contactEmails.map((email, index) => (
+          <>
+            {index > 0 ? (index === contactEmails.length - 1 ? ' or ' : ', ') : null}
+            <a href={email.href}>{email.value}</a>
+          </>
+        ))}
+        .
+      </p>
+    </>
+  ) : null}
+</StaticArticlePage>

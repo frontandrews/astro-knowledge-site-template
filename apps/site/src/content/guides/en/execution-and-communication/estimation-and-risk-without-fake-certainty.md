@@ -1,7 +1,7 @@
 ---
-title: Estimation and Risk Without Fake Certainty
-description: How to talk about timelines and delivery without pretending precision exists where uncertainty still dominates.
-summary: Good estimation does not sell certainty. It makes clear what is known, what can change, and what cost the team is accepting.
+title: Estimation and Risk Without Pretending to Be Certain
+description: How to talk about timeline and delivery without promising false precision or turning risk into a late surprise.
+summary: A good estimate does not sell certainty. It makes clear what we know, what can change, and what cost we are accepting.
 guideId: estimation-and-risk-without-fake-certainty
 locale: en
 status: active
@@ -32,72 +32,74 @@ relatedDeckIds: []
 
 Many estimates become precision theatre.
 
-Someone asks for a date, the team answers with too much confidence, and the risk stays hidden until it is already expensive.
+Someone asks for a timeline, the team answers with too much confidence, and the risk stays hidden until the moment it is already expensive.
 
-The problem is not estimating. The problem is pretending uncertainty disappeared because a date exists.
+The problem is not estimating. The problem is pretending uncertainty disappeared because we put a date on it.
 
 ## Mental model
 
 An estimate is not an exact promise about the future.
 
-It is a reading of the work based on what is known now.
+An estimate is a reading of the work based on what we know today.
 
-The useful question is:
+The useful question here is usually:
 
-> What is reasonably clear, what is still uncertain, and how does that affect the timeline?
+> What is reasonably clear, what is still uncertainty, and what impact does that have on the timeline?
 
-That changes the tone of the whole conversation.
+That changes the tone of the conversation.
 
 ## Breaking it down
 
-A simple way to estimate better is:
+A simple way to estimate better is this:
 
-1. separate what is understood from what still needs discovery
+1. separate what is already understood from what still needs discovery
 2. name the main source of risk
-3. give a range or scenario, not only a dry number
-4. explain what would move the estimate
+3. give the range or the scenario, not just a raw number
+4. explain what change would make the estimate move
 
-That avoids confident dates built on weak understanding.
+This avoids putting a confident date on top of fragile understanding.
 
 ## Simple example
 
-Imagine a new payment gateway integration.
+Imagine a new integration with a payment gateway.
 
-A weak answer is:
+A weak answer would be:
 
 > This will take three days.
 
-A stronger answer is:
+A better answer would be:
 
-> The part we control looks like roughly three days. The largest risk is provider behavior and certification. If that part goes smoothly, we stay near that range. If it does not, the delay will come from there.
+> The part we control seems to fit in three days. The biggest risk is in the provider response and certification. If that part goes smoothly, we stay on that timeline. If it gets stuck, the delay will come from there.
 
-Now there is context instead of only a number.
+Now there is context, not just a number.
 
 ## Common mistakes
 
-- giving one precise estimate for work that is still poorly understood
-- hiding risk to sound more confident
-- mixing discovery and implementation as if they were the same thing
-- treating delay as moral failure instead of a signal of weak reading
+- giving a single estimate for work that is still poorly understood
+- hiding risk to seem more confident
+- mixing discovery with implementation as if they were the same thing
+- treating delay as a moral failure instead of a sign of weak reading
 
 ## How a senior thinks
 
-A senior engineer does not sell fake confidence to make the conversation easier.
+A strong senior does not sell false confidence to make the conversation easier.
 
-They make uncertainty manageable:
+They make uncertainty manageable.
 
-> I can estimate the known part more strongly. The part that can still move this is this dependency here. I would rather make that explicit now than surprise people later.
+That usually sounds like this:
+
+> I can estimate the known part better. What can still move this is this dependency here. I would rather make that explicit now than surprise people later.
 
 ## What the interviewer wants to see
 
-Interviewers usually want to know:
+In interviews, this usually shows maturity quickly:
 
-- you can estimate without pretending certainty
+- you know how to estimate without performing certainty
 - you connect timeline to real risk
-- you can explain impact without sounding dramatic
+- you communicate impact without dramatizing
 
-That looks much more trustworthy than a polished but hollow date.
+People who do this well look like someone reliable for real delivery, not only for sounding polished.
 
-> Strong estimation does not hide risk. It frames risk early.
+> A strong estimate does not hide risk. It frames risk early.
 
-> If the date sounds too precise for the level of uncertainty, the conversation is probably still misaligned.
+> If the date looks too precise for the level of uncertainty, the conversation is probably still misaligned.

@@ -12,7 +12,7 @@ import {
 } from '@/lib/concept-taxonomy'
 import { formatEditorialDate } from '@/lib/format-date'
 import { getGuideHrefFromEntry } from '@/lib/guide-links'
-import type { SiteLocale } from '@/lib/site-copy'
+import { getSiteCopy, type SiteLocale } from '@/lib/site-copy'
 import { ui } from '@/lib/ui'
 import ArticleSection from '@/components/ui/ArticleSection.astro'
 import ReferenceEntryPage from '@/components/ui/ReferenceEntryPage.astro'
@@ -37,6 +37,7 @@ const relatedGuides = allGuides.filter(
 )
 const locale = concept.data.locale === 'pt-br' ? 'pt-br' : 'en'
 const siteLocale: SiteLocale = locale
+const copy = getSiteCopy(locale)
 const domainSegment = getConceptDomainRouteSegment(concept.data.domainId, siteLocale)
 const groupSegment = getConceptGroupRouteSegment(concept.data.domainId, concept.data.groupId, siteLocale)
 const englishHref =
@@ -54,8 +55,8 @@ const portugueseHref =
 const dateLocale = locale === 'pt-br' ? 'pt-BR' : 'en-US'
 const formattedPubDate = formatEditorialDate(concept.data.pubDate, dateLocale)
 const formattedUpdatedDate = concept.data.updatedDate
-  ? formatEditorialDate(concept.data.updatedDate, 'en-US', {
-      month: 'short',
+  ? formatEditorialDate(concept.data.updatedDate, dateLocale, {
+      month: 'long',
     })
   : null
 const relatedGuideItems = relatedGuides.map((guide) => ({
@@ -91,7 +92,7 @@ const conceptScopeTags = [
     {relatedGuides.length > 0 ? (
       <ArticleSection
         bodyClass="mt-4"
-        title={locale === 'pt-br' ? 'Guias relacionados' : 'Related guides'}
+        title={copy.directory.relatedArticles}
       >
           <FilterableDirectory
             items={relatedGuideItems}

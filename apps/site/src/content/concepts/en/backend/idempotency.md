@@ -1,7 +1,7 @@
 ---
 title: Idempotency
-description: What idempotency means in APIs and jobs, and why repeating the same request should not always repeat the same side effect.
-summary: Idempotency is the property that repeating the same operation does not keep creating new effects after the first successful result.
+description: What idempotency means in APIs and jobs, and why repeating the same request should not repeat the same effect.
+summary: Idempotency is the property of repeating the same operation without continuing to create new effects after the first useful result.
 conceptId: idempotency
 domainId: backend
 groupId: apis
@@ -19,30 +19,30 @@ relatedGuideIds:
 
 ## What it is
 
-Idempotency means you can retry the same operation without producing a new side effect each time.
+Idempotency means being able to repeat the same operation without generating a new side effect every time.
 
-This is especially important when clients, workers, or external systems may send the same request more than once.
+That matters when a client, worker, or external integration may resend the same intent.
 
 ## When it matters
 
-It matters in payment flows, webhooks, background jobs, and any system where retries are normal.
+It matters in payments, webhooks, jobs, and any flow where retry is normal behavior.
 
-Without it, retrying can create duplicate orders, duplicate emails, or inconsistent state.
+Without it, a retry can create a duplicate order, duplicate email, or inconsistent state.
 
 ## Common mistake
 
-The common mistake is treating every retry as a brand new command.
+The common mistake is treating every retry as a new command.
 
-That works until the first timeout, retry, or partially failed request.
+That usually works until the first timeout or partial error.
 
 ## Short example
 
-If `POST /orders` is retried after a timeout, the system may need an idempotency key to recognize that the intent is the same.
+If `POST /orders` is resent after a timeout, the system may need an idempotency key to recognize that the intent is the same.
 
-That way the second request can return the existing result instead of creating a second order.
+That way the second request returns the same result instead of creating another order.
 
 ## Why it helps
 
 Idempotency makes failure handling calmer.
 
-You stop treating retries as dangerous guesses and start treating them as planned behavior.
+Retry stops looking like a dangerous guess and becomes planned behavior.

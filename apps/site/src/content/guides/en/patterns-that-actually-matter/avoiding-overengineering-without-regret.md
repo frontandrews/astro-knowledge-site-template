@@ -1,7 +1,7 @@
 ---
-title: Avoiding Overengineering Without Regret
-description: How to resist building the future too early without feeling like you are leaving the codebase unprepared.
-summary: Strong judgment is often knowing what not to build yet and leaving the system ready for the next real step.
+title: Avoiding Overengineering
+description: How to resist the urge to build too much too early and keep the system simple enough for the current problem.
+summary: Overengineering almost always looks like preparation for the future. In practice, it is often just anticipated cost without real need.
 guideId: avoiding-overengineering-without-regret
 locale: en
 status: active
@@ -19,8 +19,8 @@ relationships:
   - reuse-without-extra-complexity
 tags:
   - patterns
-  - simplicity
-  - engineering-judgment
+  - architecture
+  - overengineering
 topicIds:
   - architecture-patterns
 relatedDeckIds: []
@@ -28,68 +28,85 @@ relatedDeckIds: []
 
 ## The problem
 
-Overengineering rarely starts as ego.
+Overengineering almost never arrives looking like excess.
 
-It often starts as a reasonable desire to prepare for the future.
+It usually arrives looking like care, flexibility, and "let us leave it ready for when it grows."
 
-The trouble is that the future stays hypothetical while the added complexity becomes real immediately.
+The problem is that a lot of that preparation anticipates complexity before there is real pressure to pay for it.
 
 ## Mental model
 
-Avoiding overengineering does not mean building carelessly.
+A good system is not the one that contains every imaginable flexibility.
 
-It means separating:
+It is the one that solves the current problem well without blocking future evolution.
 
-- what the system needs now
-- what the next likely change might require
-- what is still speculation
+The useful question here is usually:
 
-The goal is to leave a clean path forward, not to build every future path today.
+> Am I solving a real need or protecting myself from a future that has not shown up yet?
+
+That helps separate prudence from excess.
 
 ## Breaking it down
 
-Before adding complexity "for later," ask:
+A simple way to avoid overengineering is this:
 
-1. what real requirement exists today?
-2. what future change is actually likely, not just imaginable?
-3. can I leave a clean extension point instead of building the full abstraction now?
-4. what maintenance cost appears the moment I add this?
+1. describe the real problem of today
+2. say what likely change may happen next
+3. measure whether the new complexity solves that near future or only imaginary futures
+4. choose the smallest structure that lets the system evolve without drama
 
-That makes the trade-off visible.
+That protects the team from paying a high cost too early.
 
 ## Simple example
 
-Suppose the product has one payment provider today.
+Imagine a feature that today sends notification by email.
 
-Building a massive multi-provider framework on day one may feel prudent, but it also adds interfaces, indirection, and configuration long before the second provider exists.
+An excessive response would be to create right away:
 
-A smaller design that keeps the payment logic localized may be the better move if it stays easy to extend later.
+- a generic event bus
+- a pluggable provider for many channels
+- a retry dashboard
+- orchestration prepared for five kinds of notification
+
+All of that before a real second channel even exists.
+
+A better response may be:
+
+- isolate email sending behind a simple boundary
+- keep the flow clear
+- prepare extension where it is most likely
+
+That way you keep room to evolve without paying for the whole architecture in advance.
 
 ## Common mistakes
 
-- solving speculative future cases as if they were current requirements
-- adding abstractions before the repeated shape exists
-- confusing "possible someday" with "likely soon"
-- ignoring the maintenance cost of the flexibility you just added
+- building for scenarios that are still hypothetical
+- calling complexity flexibility
+- using a known pattern only because it looks more professional
+- forgetting the cost of explaining, testing, and maintaining the new structure
 
 ## How a senior thinks
 
-A senior engineer protects simplicity on purpose:
+A strong senior does not think only about what would look nice in two years.
 
-> I want the current case to stay clear, and I want the next likely change to stay possible. I do not need to pay for every hypothetical future today.
+They think about the cost the team will carry starting today.
 
-That is a strong form of restraint.
+That usually sounds like this:
+
+> If this extra level of architecture does not solve a real pressure now or in the near future, I would rather keep it simple and leave room to evolve when the signal appears.
+
+That stance usually produces a healthier system and a faster team.
 
 ## What the interviewer wants to see
 
-Interviewers usually want to know:
+In interviews, this usually shows maturity quickly:
 
-- you can separate current need from speculation
-- you understand the cost of premature flexibility
-- you know how to leave room for change without building the whole future
+- you know how to balance simplicity and evolution
+- you do not confuse big architecture with good architecture
+- you understand the cost of maintenance, explanation, and testing
 
-That often looks more mature than ambitious design.
+People who do this well look like someone who knows how to design systems with discipline, not anxiety.
 
-> Overengineering is expensive because the hypothetical benefit is later, but the complexity cost is now.
+> Overengineering is not thinking about the future. It is charging the present too much for a future that may never come.
 
-> Strong judgment often sounds like "not yet" instead of "let's build everything."
+> If the new structure needs too much justification, maybe it still does not need to exist.

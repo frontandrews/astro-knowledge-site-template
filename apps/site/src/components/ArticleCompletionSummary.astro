@@ -1,0 +1,97 @@
+---
+import { cn } from '@/lib/cn'
+import { getSiteCopy, type SiteLocale } from '@/lib/site-copy'
+import { ui } from '@/lib/ui'
+
+type CompletionLink = {
+  href: string
+  title: string
+}
+
+type TrackSummary = {
+  href: string
+  stepIndex: number
+  title: string
+  totalSteps: number
+}
+
+type Props = {
+  locale: SiteLocale
+  nextStep?: CompletionLink | null
+  relatedItems?: CompletionLink[]
+  track?: TrackSummary | null
+  variant?: 'compact' | 'default'
+}
+
+const {
+  locale,
+  nextStep = null,
+  relatedItems = [],
+  track = null,
+  variant = 'default',
+} = Astro.props
+
+const copy = getSiteCopy(locale)
+const isCompact = variant === 'compact'
+const completionHeadingClass = isCompact
+  ? 'm-0 flex items-center gap-2 text-[0.88rem] font-semibold leading-6 text-site-ink lg:text-[0.96rem]'
+  : 'm-0 flex items-center gap-2 text-[0.92rem] font-semibold leading-6 text-site-ink lg:text-[1rem]'
+const trackMetaClass = isCompact
+  ? 'm-0 text-[0.78rem] leading-6 text-site-ink-soft lg:text-[0.86rem]'
+  : 'm-0 text-[0.8rem] leading-6 text-site-ink-soft lg:text-[0.88rem]'
+const nextStepTitleClass = isCompact
+  ? 'text-[0.88rem] font-semibold leading-6 text-site-ink transition-colors duration-150 group-hover:text-site-link-hover group-focus-visible:text-site-link-hover lg:text-[0.96rem]'
+  : 'text-[0.9rem] font-semibold leading-6 text-site-ink transition-colors duration-150 group-hover:text-site-link-hover group-focus-visible:text-site-link-hover lg:text-[0.98rem]'
+const nextStepMetaClass = isCompact
+  ? 'text-[0.76rem] font-medium text-site-ink-soft lg:text-[0.84rem]'
+  : 'text-[0.78rem] font-medium text-site-ink-soft lg:text-[0.86rem]'
+const quietActionClass = isCompact
+  ? 'w-fit text-[0.76rem] font-medium text-site-ink-muted transition-colors duration-150 hover:text-site-link-hover focus-visible:text-site-link-hover focus-visible:outline-none lg:text-[0.84rem]'
+  : ui.quietAction
+---
+
+<div class="grid gap-2">
+  <p class={completionHeadingClass}>
+    <span aria-hidden="true" class="text-site-success">✓</span>
+    <span>{copy.article.finishedArticle}</span>
+  </p>
+  {track ? (
+    <p class={trackMetaClass}>
+      {copy.article.partOfTrack}:{' '}
+      <a class="font-medium text-site-ink transition-colors duration-150 hover:text-site-link-hover focus-visible:text-site-link-hover focus-visible:outline-none" href={track.href}>
+        {track.title}
+      </a>{' '}
+      ({track.stepIndex}/{track.totalSteps})
+    </p>
+  ) : null}
+</div>
+
+{nextStep ? (
+  <div class="grid gap-2">
+    <p class={ui.eyebrow}>{copy.article.nextStep}</p>
+    <a
+      class="group grid gap-2 rounded-[var(--radius-xs)] border border-site-line bg-[color:color-mix(in_srgb,var(--site-panel)_55%,transparent)] px-3 py-3 text-inherit transition-colors duration-150 hover:border-site-line-strong hover:bg-site-hover hover:text-site-link-hover focus-visible:border-site-line-strong focus-visible:bg-site-hover focus-visible:text-site-link-hover focus-visible:outline-none"
+      href={nextStep.href}
+    >
+      <span class={nextStepTitleClass}>{nextStep.title}</span>
+      <span class={nextStepMetaClass}>{copy.article.nextStep} →</span>
+    </a>
+  </div>
+) : null}
+
+{relatedItems.length > 0 ? (
+  <div class="grid gap-2.5">
+    <p class={ui.eyebrow}>{copy.article.exploreRelated}</p>
+    <div class="flex flex-wrap gap-2">
+      {relatedItems.map((item) => (
+        <a class={cn(ui.badge, ui.badgeLink, 'min-h-0 px-3 py-1.5 normal-case tracking-[0.02em] text-site-ink-soft')} href={item.href}>
+          {item.title}
+        </a>
+      ))}
+    </div>
+  </div>
+) : null}
+
+<button class={quietActionClass} data-completion-mark-unread type="button">
+  {copy.article.markUnread}
+</button>

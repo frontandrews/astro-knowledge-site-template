@@ -1,7 +1,7 @@
 ---
 title: Data Modeling Without Overcomplicating
-description: A simpler way to turn messy business rules into durable models without making the schema fight the product.
-summary: Better data models come from clear business rules and access patterns, not from making the schema look sophisticated.
+description: How to turn business rules into a useful data structure without falling into a schema that looks nice but is fragile.
+summary: Modeling well is not predicting everything. It is representing what matters with enough clarity for the system to keep evolving.
 guideId: data-modeling-without-overcomplicating
 locale: en
 status: active
@@ -20,7 +20,7 @@ relationships:
 tags:
   - data
   - modeling
-  - storage
+  - backend
 topicIds:
   - data-storage
 relatedDeckIds: []
@@ -28,62 +28,84 @@ relatedDeckIds: []
 
 ## The problem
 
-Data modeling often goes wrong in one of two ways.
+Many data models go wrong because they try to look complete too early.
 
-Either the team mirrors the UI too directly and creates brittle tables, or it overengineers the model before understanding the real rules.
+The team creates structure thinking about every imaginable scenario, but loses clarity exactly in the real flow the product needs to support now.
+
+The table looks nice in the diagram and strange in real life.
 
 ## Mental model
 
-A good model is not the prettiest schema diagram.
+Good modeling is not the one that looks most sophisticated.
 
-It is the structure that preserves the business rules while staying usable for the access patterns that matter.
+It is the one that represents the most important rules in a clear, consistent, and easy-to-evolve way.
 
-The model should reduce confusion, not create a puzzle.
+Instead of asking "what is the most flexible model?", the better question is usually:
+
+> What does this system really need to guarantee and query frequently?
 
 ## Breaking it down
 
-When modeling data, ask:
+A simple way to model better is this:
 
-1. what entities actually exist in the business domain?
-2. which rules must always stay true?
-3. how will this data be queried and updated most often?
-4. which relationships are essential and which ones are accidental?
+1. start with the entities the business actually sees
+2. name the rules that cannot break
+3. think about the most important queries
+4. only then refine relationships, indexes, and normalization
 
-That keeps the model grounded in product reality.
+That keeps modeling from turning into an abstract exercise detached from real use.
 
 ## Simple example
 
-Suppose you are modeling subscriptions.
+Imagine an order system.
 
-If you only copy the current UI, you may end up storing "plan card state" or "billing screen state" instead of modeling customers, subscriptions, invoices, and status changes.
+A rushed model might throw everything into one giant table:
 
-A better model keeps the durable business objects first and lets the UI derive its own view from them.
+- order data
+- customer data
+- status
+- items
+- total
+
+At first it looks practical.
+
+But soon it becomes hard to update an item without touching the rest, to repeat customer data without inconsistency, and to query history clearly.
+
+A better model separates:
+
+- `customers`
+- `orders`
+- `order_items`
+
+Now each part has a clearer responsibility and the system gains room to grow without making the data messy.
 
 ## Common mistakes
 
-- modeling the screen instead of the domain
-- storing duplicate sources of truth
-- forcing abstractions before access patterns are clear
-- ignoring update flows and thinking only about reads
+- modeling for imaginary scenarios before real use
+- mixing too many responsibilities in the same structure
+- ignoring how the data will be queried later
+- thinking normalization or denormalization are good by themselves
 
 ## How a senior thinks
 
-A senior engineer models for rules and change:
+A strong senior models by looking at rules and access, not technical ornament.
 
-> I want the durable entities to reflect the business, and I want the shape to stay usable when the product flow changes later.
+That usually sounds like this:
 
-That produces a more resilient schema.
+> Before choosing the structure, I want to make clear which rules this data needs to protect and which queries need to be simple.
+
+That question usually prevents a lot of free complexity.
 
 ## What the interviewer wants to see
 
-Interviewers usually want to know:
+In interviews, this usually shows maturity quickly:
 
-- you can identify the real entities
-- you understand invariants and relationships
-- you are thinking about reads, writes, and change over time
+- you understand entity, relationship, and business rule
+- you think about reads and writes, not only about storage
+- you know how to justify the structure through real use
 
-That sounds much stronger than naming normalization levels alone.
+People who do this well look like someone who designs systems to last, not only to pass on the whiteboard.
 
-> A strong data model protects business rules first and convenience second.
+> Modeling data is not drawing boxes. It is deciding what the system needs to represent without lying to itself.
 
-> If the schema only mirrors today's screen, it probably will not age well.
+> If the structure only makes sense in the diagram, it is probably not ready for the product yet.

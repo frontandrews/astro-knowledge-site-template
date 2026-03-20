@@ -1,7 +1,7 @@
 ---
 title: Event Loop
-description: What the event loop coordinates, and why async JavaScript often runs in an order that surprises people.
-summary: The event loop is the mechanism that decides when queued work gets a turn after the current call stack finishes.
+description: What the event loop coordinates and why asynchronous JavaScript often runs in an order that surprises people.
+summary: The event loop is the mechanism that decides when queued work gets its turn after the current stack finishes.
 conceptId: event-loop
 domainId: javascript
 groupId: runtime
@@ -18,30 +18,30 @@ relatedGuideIds:
 
 ## What it is
 
-The event loop coordinates when queued work can run after the current synchronous work is done.
+The event loop coordinates when queued work can run after the current synchronous work ends.
 
-It is part of why promises, timers, and callbacks do not all run immediately when you see them in code.
+That is why promises, timers, and callbacks do not all execute at the same moment they appear in the code.
 
 ## When it matters
 
-It matters when you debug ordering issues, racey UI behavior, or interview questions about async JavaScript.
+It matters when you are debugging execution order, async bugs, or JavaScript interview questions.
 
-If you do not separate stack, queue, and scheduling, the behavior feels random.
+Without separating stack, queue, and scheduling, the behavior looks random.
 
 ## Common mistake
 
-A common mistake is saying "async runs later" without explaining what "later" means.
+A common mistake is saying only "async code runs later" without explaining what that "later" means.
 
-That answer is too vague to help with real debugging.
+That does not help either to debug or to explain it properly.
 
 ## Short example
 
-If you call `console.log('A')`, schedule a promise callback, then call `console.log('B')`, the synchronous logs finish first.
+If you do `console.log('A')`, schedule a promise callback, and then do `console.log('B')`, the synchronous logs finish first.
 
-Only after the current stack clears does the queued callback get a turn.
+Only after that does the queued callback get its turn.
 
 ## Why it helps
 
-Once you think in execution order instead of syntax alone, many async bugs become easier to explain.
+When you think in terms of execution order instead of only looking at syntax, many bugs become much easier to explain.
 
-That is the real value of the concept.
+That is the real gain of the concept.

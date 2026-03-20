@@ -27,8 +27,8 @@ const englishHref = getGuidePillarHref(pillar.id, 'en')
 const portugueseHref = getGuidePillarHref(pillar.id, 'pt-br')
 const description =
   locale === 'pt-br'
-    ? `Guias e ramificacoes de ${title} para estudar com mais estrutura.`
-    : `Guides and branches for ${title} so you can study with more structure.`
+    ? `Artigos e ramificacoes de ${title} para estudar com mais estrutura.`
+    : `Articles and branches about ${title} to study with more structure.`
 const breadcrumbItems = getPillarBreadcrumb(pillar, locale)
 const items = branchSections.map((section) => ({
   href: getGuideBranchHref(pillar.id, section.branch.id, locale) ?? '#',

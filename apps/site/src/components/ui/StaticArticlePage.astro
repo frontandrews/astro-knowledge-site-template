@@ -1,6 +1,5 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro'
-import { cn } from '@/lib/cn'
 import { ui } from '@/lib/ui'
 
 type Props = {
@@ -26,9 +25,9 @@ const {
   portugueseHref={portugueseHref}
   title={title}
 >
-  <section class={cn(ui.section)}>
-    <article class={cn(ui.articleShell)}>
-      <header class={cn(ui.articleHeader)}>
+  <section class={ui.section}>
+    <article class={ui.articleShell}>
+      <header class={ui.articleHeader}>
         {kicker ? <p class={ui.articleKicker}>{kicker}</p> : null}
         <h1 class={ui.articleTitle}>{title}</h1>
         <p class={ui.articleExcerpt}>{description}</p>

@@ -1,7 +1,7 @@
 ---
 title: O(n²)
-description: What O(n²) means, why nested loops often end up there, and when it actually matters.
-summary: O(n²) usually appears when work grows with every pair comparison or repeated full scan.
+description: What O(n²) means, why nested loops often fall into it, and when it actually matters.
+summary: O(n²) usually appears when work grows with each pairwise comparison or with each new full scan.
 termId: o-n-squared
 locale: en
 status: active
@@ -15,15 +15,15 @@ pubDate: 2026-03-18
 
 ## What it means
 
-`O(n²)` means the amount of work grows roughly with the square of the input size.
+`O(n²)` means that the amount of work grows roughly with the square of the input size.
 
-If the input doubles, the work can become about four times bigger.
+If the input doubles, the work can become close to four times bigger.
 
-That is why small examples may feel fine, but larger inputs suddenly become slow.
+That is why small examples seem calm, but larger inputs suddenly become slow.
 
-## A common shape
+## Common shape
 
-The classic case is a loop inside another loop where each item is compared with many other items.
+The classic case is one loop inside another where each item is compared with many other items.
 
 ```ts
 for (let i = 0; i < items.length; i += 1) {
@@ -33,7 +33,7 @@ for (let i = 0; i < items.length; i += 1) {
 }
 ```
 
-That is not the only way to get `O(n²)`, but it is the most common shape people should recognize quickly.
+That is not the only way to reach `O(n²)`, but it is the most common shape to recognize quickly.
 
 ## When it matters
 
@@ -43,18 +43,18 @@ It becomes a problem when:
 
 - `n` can grow a lot
 - the operation inside the loop is expensive
-- the code runs often enough to affect user experience or infrastructure cost
+- the code runs often enough to affect experience or cost
 
-If `n` is tiny and fixed, a quadratic approach may still be acceptable.
+If `n` is small and fixed, a quadratic solution may still be acceptable.
 
-## Better question to ask
+## Better question
 
 Do not ask only "is this O(n²)?"
 
 Ask:
 
-1. how large can `n` actually get?
+1. what size can `n` actually reach?
 2. how often does this run?
-3. can a hash map, set, sort, or preprocessing step reduce repeated scanning?
+3. can hash map, set, sort, or preprocessing be used to avoid repeated scans?
 
-That framing is usually more useful than complexity theatre by itself.
+That framing almost always helps more than complexity theatre by itself.

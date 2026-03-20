@@ -41,7 +41,14 @@ type SiteCopy = {
     description: string
     glossary: string
     home: string
+    newsletterDisclaimerAfterLinks: string
+    newsletterDisclaimerBeforeLinks: string
+    newsletterDisclaimerBetweenLinks: string
     learn: string
+    newsletterInputPlaceholder: string
+    newsletterSubmitLabel: string
+    newsletterCopy: string
+    newsletterTitle: string
     privacy: string
     practice: string
     rss: string
@@ -53,7 +60,7 @@ type SiteCopy = {
     title: string
     topics: string
   }
-  guideIndex: {
+  articlesIndex: {
     allItems: string
     articleItems: string
     comingSoon: string
@@ -84,6 +91,26 @@ type SiteCopy = {
     solutionLanguage: string
     typeLabel: string
     whatToNotice: string
+  }
+  conceptsIndex: {
+    copy: string
+    title: string
+  }
+  directory: {
+    allItems: string
+    articleItems: string
+    filterByConcept: string
+    filterBySubtopic: string
+    filterByTag: string
+    filterByTopic: string
+    guideItems: string
+    more: string
+    noteBadge: string
+    page: string
+    readAgain: string
+    readMore: string
+    relatedArticles: string
+    showLess: string
   }
   glossaryIndex: {
     copy: string
@@ -146,6 +173,11 @@ type SiteCopy = {
     copy: string
     title: string
   }
+  tracksIndex: {
+    copy: string
+    filterLabel: string
+    title: string
+  }
 }
 
 const siteCopy: Record<SiteLocale, SiteCopy> = {
@@ -158,10 +190,10 @@ const siteCopy: Record<SiteLocale, SiteCopy> = {
       exploreRelated: 'Or explore related',
       finishedArticle: 'You finished this article',
       confirmBody:
-        'When you mark this as complete, it will stop showing up in suggestions. You can still practice the topic later. Do you want to continue?',
+        'When you mark this article as complete, it will stop showing up in suggestions. You can still practice the topic later. Do you want to continue?',
       confirmCancel: 'Cancel',
       confirmConfirm: 'Yes, continue',
-      confirmTitle: 'Mark this guide as completed?',
+      confirmTitle: 'Mark this article as completed?',
       copyLink: 'Copy link',
       copyLinkError: 'This browser could not copy the link.',
       copyLinkSuccess: 'Link copied. You can paste it into any chat.',
@@ -185,13 +217,20 @@ const siteCopy: Record<SiteLocale, SiteCopy> = {
       shareTitle: 'Share this page',
       tableOfContents: 'On this page',
       nextStep: 'Next step',
-      updatedPrefix: 'Updated',
+      updatedPrefix: 'Updated on',
     },
     footer: {
-      description: 'Guided editorial maps and clear guides for people who want to think better before they solve.',
+      description: 'Organized content and easy-to-understand explanations for people who want to think better before they solve.',
       glossary: 'Glossary',
       home: 'Home',
+      newsletterDisclaimerAfterLinks: '',
+      newsletterDisclaimerBeforeLinks: 'By subscribing, you agree to the ',
+      newsletterDisclaimerBetweenLinks: ' and the ',
       learn: 'Articles',
+      newsletterInputPlaceholder: 'Your main email',
+      newsletterSubmitLabel: 'Subscribe',
+      newsletterCopy: 'Sign up to receive important insights about senior growth. No spam.',
+      newsletterTitle: 'Subscribe to our newsletter',
       privacy: 'Privacy policy',
       practice: 'Practice',
       rss: 'RSS feed',
@@ -208,28 +247,28 @@ const siteCopy: Record<SiteLocale, SiteCopy> = {
       closeMenu: 'Close menu',
       explore: 'Explore',
       menu: 'Menu',
-      primaryNav: 'Primary',
+      primaryNav: 'Primary navigation',
       languageSwitcher: 'Language switcher',
     },
     startHere: {
       articleLabel: 'Article',
-      backToRoadmap: 'Back to trail',
-      browseLibrary: 'Browse articles',
+      backToRoadmap: 'Back to track',
+      browseLibrary: 'Explore articles',
       completedCountSuffix: 'completed',
       continueWhereLeftOff: 'Continue where you left off',
       conceptLabel: 'Concept',
       copy:
-        'A guided reading path for how to think before you jump into solutions, interviews, or challenge-style problems.',
+        'A guided reading track for thinking better before you jump into solutions, interviews, or coding-style challenges.',
       exploreFurther: 'Explore further',
       glossary: 'Look up a term',
       inThisTrack: 'In this track',
-      introEyebrow: 'Trail',
+      introEyebrow: 'Track',
       linearHeading: 'Follow the reading in order',
       nextArticle: 'Next article',
       nextTrack: 'Next track',
       previousArticle: 'Previous article',
       progressLabel: 'Track progress',
-      roadmapEyebrow: 'Trail',
+      roadmapEyebrow: 'Track',
       reviewTrack: 'Review the track',
       stepLabel: 'Step',
       stepsLabel: 'Steps',
@@ -239,14 +278,14 @@ const siteCopy: Record<SiteLocale, SiteCopy> = {
       title: 'How to think before you solve',
       topics: 'Explore topics',
     },
-    guideIndex: {
+    articlesIndex: {
       allItems: 'All',
-      articleItems: 'Articles',
+      articleItems: 'Notes',
       comingSoon: 'Coming soon',
-      copy: 'Direct explanations so you can actually understand the idea, without extra jargon.',
-      filterLabel: 'Pick a topic',
-      guideItems: 'Guides',
-      title: 'Articles without the fluff',
+      copy: 'Articles, guides, and tracks to help you understand better and decide with more clarity.',
+      filterLabel: 'Choose a theme',
+      guideItems: 'Articles',
+      title: 'Explaining the things people pretend to understand',
     },
     challengeIndex: {
       allItems: 'All',
@@ -265,14 +304,34 @@ const siteCopy: Record<SiteLocale, SiteCopy> = {
       nextChallenge: 'Next challenge',
       previousChallenge: 'Previous challenge',
       readChallenge: 'Open challenge',
-      relatedChallenges: 'Related challenges',
       relatedArticles: 'Related articles',
+      relatedChallenges: 'Related challenges',
       solutionLanguage: 'Solution language',
       typeLabel: 'Type',
       whatToNotice: 'What to notice before coding',
     },
+    conceptsIndex: {
+      copy: 'Master the most important concepts to grow your understanding.',
+      title: 'Concepts',
+    },
+    directory: {
+      allItems: 'All',
+      articleItems: 'Notes',
+      filterByConcept: 'Filter by concept',
+      filterBySubtopic: 'Filter by subtopic',
+      filterByTag: 'Filter by tag',
+      filterByTopic: 'Filter by topic',
+      guideItems: 'Articles',
+      more: 'more',
+      noteBadge: 'Note',
+      page: 'Page',
+      readAgain: 'Read again',
+      readMore: 'Read more',
+      relatedArticles: 'Related articles',
+      showLess: 'Show less',
+    },
     glossaryIndex: {
-      copy: 'Short reference entries for concepts that keep showing up across guides and interviews.',
+      copy: 'Short reference entries for concepts that keep showing up across articles and interviews.',
       title: 'Glossary',
     },
     learn: 'Articles',
@@ -294,63 +353,75 @@ const siteCopy: Record<SiteLocale, SiteCopy> = {
       title: 'Search the site',
     },
     topicIndex: {
-      copy: 'Cross-cutting hubs that connect articles by theme instead of by curriculum branch.',
+      copy: 'Content organized by theme. Explore articles and deepen your understanding without confusion.',
       title: 'Topics',
+    },
+    tracksIndex: {
+      copy: 'Content organized in sequence to make your progress easier.',
+      filterLabel: 'Filter by tag',
+      title: 'Tracks to grow with consistency',
     },
   },
   'pt-br': {
     article: {
       categoryLabel: 'Categoria',
       chatShare: 'Compartilhar no chat',
-      comments: 'Comentarios',
-      completed: 'Concluido',
+      comments: 'Comentários',
+      completed: 'Concluído',
       exploreRelated: 'Ou explore relacionados',
-      finishedArticle: 'Voce concluiu este artigo',
+      finishedArticle: 'Você concluiu este artigo',
       confirmBody:
-        'Quando voce marcar este guia como concluido, ele para de aparecer nas sugestoes. Ainda sera possivel praticar o tema depois. Quer continuar?',
+        'Quando você marcar este artigo como concluído, ele para de aparecer nas sugestões. Ainda será possível praticar o tema depois. Quer continuar?',
       confirmCancel: 'Cancelar',
       confirmConfirm: 'Sim, continuar',
-      confirmTitle: 'Marcar este guia como concluido?',
+      confirmTitle: 'Marcar este artigo como concluído?',
       copyLink: 'Copiar link',
-      copyLinkError: 'Este navegador nao conseguiu copiar o link.',
-      copyLinkSuccess: 'Link copiado. Agora voce pode colar em qualquer chat.',
-      levelLabel: 'Nivel',
-      markCompleted: 'Marcar como concluido',
-      markUnread: 'Marcar como nao lido',
-      nextReads: 'Proximas leituras',
+      copyLinkError: 'Este navegador não conseguiu copiar o link.',
+      copyLinkSuccess: 'Link copiado. Agora você pode colar em qualquer chat.',
+      levelLabel: 'Nível',
+      markCompleted: 'Marcar como concluído',
+      markUnread: 'Marcar como não lido',
+      nextReads: 'Próximas leituras',
       practice: 'Praticar',
       practiceChecklist: 'Checklist de pratica',
       practiceChecklistTitle: 'Use isto ao responder',
       practiceInApp: 'Pratique no app',
       practiceInAppTitle: 'Transforme esta ideia em repeticoes',
       partOfTrack: 'Parte da trilha',
-      quickSummary: 'Resumo rapido',
-      quickSummaryTitle: 'O que vale manter na cabeca',
+      quickSummary: 'Resumo rápido',
+      quickSummaryTitle: 'O que vale manter na cabeça',
       readingTimeLabel: 'Tempo de leitura',
       share: 'Compartilhar',
-      shareArticleTitle: 'Compartilhar esta pagina',
-      shareDescription: 'Compartilhe esta pagina direto do site, abra no chat ou copie o link.',
-      shareFallback: 'Este navegador nao conseguiu abrir o menu de compartilhamento. Use copiar link.',
-      shareTitle: 'Compartilhar esta pagina',
-      tableOfContents: 'Nesta pagina',
-      nextStep: 'Proximo passo',
-      updatedPrefix: 'Atualizado',
+      shareArticleTitle: 'Compartilhar esta página',
+      shareDescription: 'Compartilhe esta página direto do site, abra no chat ou copie o link.',
+      shareFallback: 'Este navegador não conseguiu abrir o menu de compartilhamento. Use copiar link.',
+      shareTitle: 'Compartilhar esta página',
+      tableOfContents: 'Nesta página',
+      nextStep: 'Próximo passo',
+      updatedPrefix: 'Atualizado em',
     },
     footer: {
-      description: 'Mapas editoriais guiados e guias claros para quem quer pensar melhor antes de resolver.',
-      glossary: 'Glossario',
+      description: 'Conteúdo organizado e explicações fáceis de entender pra quem quer pensar melhor antes de resolver.',
+      glossary: 'Glossário',
       home: 'Inicio',
+      newsletterDisclaimerAfterLinks: '',
+      newsletterDisclaimerBeforeLinks: 'Ao se inscrever, você concorda com os ',
+      newsletterDisclaimerBetweenLinks: ' e ',
       learn: 'Artigos',
-      privacy: 'Politica de privacidade',
+      newsletterInputPlaceholder: 'Seu email principal',
+      newsletterSubmitLabel: 'Inscrever-se',
+      newsletterCopy: 'Cadastre-se para receber insights importantes sobre senioridade. Sem spam.',
+      newsletterTitle: 'Inscreva-se na nossa newsletter',
+      privacy: 'Política de privacidade',
       practice: 'Praticar',
       rss: 'Feed RSS',
       rights: 'Todos os direitos reservados.',
       search: 'Busca',
       startHere: 'Comece aqui',
-      terms: 'Termos e condicoes',
+      terms: 'Termos e condições',
       tracks: 'Trilhas',
       title: 'SeniorPath',
-      topics: 'Topicos',
+      topics: 'Tópicos',
     },
     header: {
       brand: 'SeniorPath',
@@ -364,38 +435,38 @@ const siteCopy: Record<SiteLocale, SiteCopy> = {
       articleLabel: 'Artigo',
       backToRoadmap: 'Voltar para a trilha',
       browseLibrary: 'Explorar artigos',
-      completedCountSuffix: 'concluidos',
-      continueWhereLeftOff: 'Continuar de onde voce parou',
+      completedCountSuffix: 'concluídos',
+      continueWhereLeftOff: 'Continuar de onde você parou',
       conceptLabel: 'Conceito',
       copy:
-        'Uma trilha guiada de leitura para pensar melhor antes de pular para solucoes, entrevistas ou desafios de codigo.',
+        'Uma trilha guiada de leitura para pensar melhor antes de pular para soluções, entrevistas ou desafios de código.',
       exploreFurther: 'Explore mais',
       glossary: 'Consultar um termo',
       inThisTrack: 'Nesta trilha',
       introEyebrow: 'Trilha',
       linearHeading: 'Siga a leitura em ordem',
-      nextArticle: 'Proximo artigo',
-      nextTrack: 'Proxima trilha',
+      nextArticle: 'Próximo artigo',
+      nextTrack: 'Próxima trilha',
       previousArticle: 'Artigo anterior',
       progressLabel: 'Progresso da trilha',
       roadmapEyebrow: 'Trilha',
       reviewTrack: 'Rever a trilha',
       stepLabel: 'Etapa',
       stepsLabel: 'Etapas',
-      supportCopy: 'Quando voce quiser explorar com mais liberdade, use os artigos, os topicos e o glossario como apoio.',
+      supportCopy: 'Quando você quiser explorar com mais liberdade, use os artigos, os tópicos e o glossário como apoio.',
       supportHeading: 'Continue explorando',
-      trackCompleted: 'Trilha concluida',
+      trackCompleted: 'Trilha concluída',
       title: 'Como pensar antes de resolver',
-      topics: 'Explorar topicos',
+      topics: 'Explorar tópicos',
     },
-    guideIndex: {
+    articlesIndex: {
       allItems: 'Tudo',
-      articleItems: 'Artigos',
+      articleItems: 'Notas',
       comingSoon: 'Em breve',
-      copy: 'Explicacoes diretas para entender de verdade, sem jargao desnecessario.',
+      copy: 'Artigos, guias e trilhas para ajudar você a entender melhor e decidir com mais clareza.',
       filterLabel: 'Escolha um tema',
-      guideItems: 'Guias',
-      title: 'Artigos sem enrolação',
+      guideItems: 'Artigos',
+      title: 'Explicando as coisas que as pessoas fingem entender',
     },
     challengeIndex: {
       allItems: 'Tudo',
@@ -414,37 +485,62 @@ const siteCopy: Record<SiteLocale, SiteCopy> = {
       nextChallenge: 'Proximo desafio',
       previousChallenge: 'Desafio anterior',
       readChallenge: 'Abrir desafio',
-      relatedChallenges: 'Desafios relacionados',
       relatedArticles: 'Artigos relacionados',
+      relatedChallenges: 'Desafios relacionados',
       solutionLanguage: 'Linguagem da solucao',
       typeLabel: 'Tipo',
       whatToNotice: 'O que perceber antes de codar',
     },
+    conceptsIndex: {
+      copy: 'Domine os conceitos mais importantes para evoluir seu conhecimento.',
+      title: 'Conceitos',
+    },
+    directory: {
+      allItems: 'Tudo',
+      articleItems: 'Notas',
+      filterByConcept: 'Filtrar por conceito',
+      filterBySubtopic: 'Filtrar por subtema',
+      filterByTag: 'Filtrar por tag',
+      filterByTopic: 'Filtrar por tópico',
+      guideItems: 'Artigos',
+      more: 'mais',
+      noteBadge: 'Nota',
+      page: 'Página',
+      readAgain: 'Ler novamente',
+      readMore: 'Ler mais',
+      relatedArticles: 'Artigos relacionados',
+      showLess: 'Mostrar menos',
+    },
     glossaryIndex: {
-      copy: 'Entradas curtas de referencia para conceitos que aparecem o tempo todo em guias e entrevistas.',
-      title: 'Glossario',
+      copy: 'Entradas curtas de referência para conceitos que aparecem o tempo todo em artigos e entrevistas.',
+      title: 'Glossário',
     },
     learn: 'Artigos',
     layout: {
       articles: 'Artigos',
       concepts: 'Conceitos',
-      glossary: 'Glossario',
+      glossary: 'Glossário',
       home: 'Inicio',
       practice: 'Praticar',
       search: 'Busca',
       startHere: 'Comece aqui',
       themeToggle: 'Alternar tema',
       tracks: 'Trilhas',
-      topics: 'Topicos',
+      topics: 'Tópicos',
     },
     search: {
-      copy: 'Busque em artigos, topicos e termos do glossario em um unico lugar.',
-      devNotice: 'O indice de busca e gerado no build. Use preview/build para testar o Pagefind localmente.',
+      copy: 'Busque em artigos, tópicos e termos do glossário em um único lugar.',
+      devNotice: 'O índice de busca é gerado no build. Use preview/build para testar o Pagefind localmente.',
       title: 'Buscar no site',
     },
     topicIndex: {
-      copy: 'Hubs transversais que conectam os artigos por tema, nao so pela trilha curricular.',
-      title: 'Topicos',
+      copy: 'Conteúdos organizados por tema. Explore artigos e aprofunde seu entendimento sem confusão.',
+      title: 'Tópicos',
+    },
+    tracksIndex: {
+      copy: 'Conteúdo organizado em sequência pra facilitar seu progresso.',
+      filterLabel: 'Filtrar por tag',
+      title: 'Trilhas pra evoluir com consistência',
     },
   },
 }

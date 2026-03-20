@@ -1,7 +1,7 @@
 ---
 title: Trust Boundaries
-description: How to reason about where trust starts and stops in a system, instead of assuming data is safe because it came from "inside."
-summary: A trust boundary is a line where data, identity, or control moves from one level of trust to another.
+description: How to think about where trust starts and ends in a system instead of assuming internal data is safe by definition.
+summary: A trust boundary is the line where data, identity, or control moves from one level of trust to another.
 conceptId: trust-boundaries
 domainId: security
 groupId: trust
@@ -19,30 +19,30 @@ relatedGuideIds:
 
 ## What it is
 
-A trust boundary is the point where you should stop assuming something is safe by default.
+A trust boundary is the point where you should stop assuming that something is safe by default.
 
-That can happen between browser and server, service and database, internal system and vendor, or user and admin roles.
+That can happen between browser and server, service and database, internal system and vendor, or regular user and admin.
 
 ## When it matters
 
-It matters any time data crosses systems, permissions change, or inputs arrive from outside your current control.
+It matters whenever data crosses systems, permission changes, or input arrives from outside the current context.
 
-If you skip that boundary, you often skip validation and authorization at the same time.
+If you ignore that boundary, you usually ignore validation and authorization together with it.
 
 ## Common mistake
 
 The common mistake is treating "internal" as automatically trustworthy.
 
-Internal systems can still be stale, compromised, misconfigured, or simply wrong.
+An internal system can also be wrong, outdated, or misconfigured.
 
 ## Short example
 
-If one service says a user is admin, another service should still decide what that claim means inside its own rules.
+If one service says a user is admin, another service still needs to decide what that means inside its own rules.
 
-Trusting the label blindly can turn an integration shortcut into a permission bug.
+Trusting the label blindly can turn into a permission bug.
 
 ## Why it helps
 
 This concept makes security more concrete.
 
-Instead of vague fear, you get a clearer question: where does trust change here, and what checks belong at that edge?
+Instead of vague fear, you get a better question: where does trust change here, and which checks belong at that edge?

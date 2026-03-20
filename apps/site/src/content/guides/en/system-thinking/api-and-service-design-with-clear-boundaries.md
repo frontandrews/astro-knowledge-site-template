@@ -1,7 +1,7 @@
 ---
-title: API and Service Design With Clear Boundaries
-description: A simpler way to design system boundaries that stay understandable as the product and team grow.
-summary: Strong service design is less about splitting things apart and more about making ownership and contracts clear.
+title: APIs and Services Without Blurry Boundaries
+description: How to design boundaries between routes, services, and responsibilities without turning the system into a pile of hidden coupling.
+summary: A good API is not the one that exposes everything. It is the one that makes clear who does what and where the rule really lives.
 guideId: api-and-service-design-with-clear-boundaries
 locale: en
 status: active
@@ -10,18 +10,18 @@ branchId: api-and-service-design
 pubDate: 2026-01-07
 updatedDate: 2026-01-11
 category: System Thinking
-topic: API and Service Design
+topic: APIs and Services
 path:
   - System Thinking
-  - API and Service Design
+  - APIs and Services
 order: 10
 relationships:
   - scalability-and-bottlenecks-without-theatre
   - rag-vs-fine-tuning
 tags:
-  - systems
   - api
   - services
+  - systems
 topicIds:
   - system-design
 relatedDeckIds: []
@@ -29,64 +29,86 @@ relatedDeckIds: []
 
 ## The problem
 
-Teams often split systems into APIs and services before they are clear about ownership.
+Many APIs start simple and become confusing because the boundaries were never truly decided.
 
-Then the boundaries look organized on paper, but the product logic leaks across services and every change crosses too many lines.
+Soon the controller validates, the service formats the response, the repository applies business rules, and everything seems to work until the first bigger change.
+
+The problem is not only folder organization. The problem is mixed responsibility.
 
 ## Mental model
 
-A useful boundary is not one that sounds architectural.
+A good boundary is a boundary that reduces doubt.
 
-It is one that makes ownership, contracts, and change easier to understand.
+When someone looks at one part of the system, it should be clear:
 
-The better question is:
+- who receives the input
+- who applies the rule
+- who talks to infrastructure
+- who returns the response
 
-> What should this service own so the rest of the system depends on it cleanly?
+If those layers mix too much, the system loses predictability.
 
 ## Breaking it down
 
-When designing a boundary, ask:
+A simple way to think about API and service is this:
 
-1. what domain or capability does this service truly own?
-2. what data or invariants should stay behind that boundary?
-3. what contract do other systems need from it?
-4. what coupling will this boundary reduce or accidentally create?
+1. the route receives and validates the request
+2. the service coordinates the business rule
+3. the access layer talks to the database or external dependency
+4. the response comes back in a coherent shape for the consumer
 
-That keeps the boundary tied to responsibility.
+It does not need to become textbook architecture.
+
+It only needs to prevent any place from doing anything.
 
 ## Simple example
 
-Suppose one service manages billing and another manages user profiles.
+Imagine an endpoint for creating an order.
 
-If billing starts depending on profile internals and profile starts knowing billing rules, the split stops helping.
+A messy version may:
 
-A cleaner design lets billing own invoices, plans, and payment rules while profile owns user presentation and identity details.
+- validate input in the controller
+- query stock directly in the controller
+- calculate total in a loose helper
+- save to the database in several different places
+
+A better version concentrates the rule in one service:
+
+- the route validates input and calls `createOrder`
+- the service checks stock, calculates the total, and decides the flow
+- the repository only persists
+
+Now it is clearer where to change things when the rule changes.
 
 ## Common mistakes
 
-- splitting services by team preference instead of domain ownership
-- exposing internal details through the API contract
-- creating boundaries that still require constant cross-service coordination
-- adding services before a real ownership problem exists
+- leaving business rules spread across controller, service, and repository
+- creating too many layers without real responsibility
+- designing the service around the entity name instead of the business flow
+- coupling the API response to internal implementation detail
 
 ## How a senior thinks
 
-A senior engineer wants the boundary to reduce confusion:
+A strong senior does not think about layers only as a pattern.
 
-> I want each service to own a clear capability, protect its own rules, and expose the smallest contract the rest of the system needs.
+They think about maintenance friction.
 
-That is usually more valuable than splitting for the sake of splitting.
+That usually sounds like this:
+
+> I want the main rule to live in a predictable place and for infrastructure to be able to change without spreading impact across the whole application.
+
+That sentence usually leads to a much better architecture than "let us do clean architecture just because."
 
 ## What the interviewer wants to see
 
-Interviewers usually want to know:
+In interviews, this usually shows maturity quickly:
 
-- you think about ownership, not only endpoints
-- you understand contracts and invariants
-- you can explain why a boundary helps the system stay clearer over time
+- you understand responsibility and boundary
+- you know how to separate business rules from transport and persistence detail
+- you think about future change without overengineering
 
-That is stronger than saying "I would make this a microservice."
+People who do this well give the image of someone who can keep the system readable as it grows.
 
-> Good boundaries reduce accidental coupling instead of renaming it.
+> A good API is not the one with more layers. It is the one that makes clear where each decision lives.
 
-> If the contract is fuzzy, the service boundary probably is too.
+> If every change crosses the whole system, the boundary is still not doing its job.

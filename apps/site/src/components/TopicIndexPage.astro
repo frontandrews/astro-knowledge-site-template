@@ -23,10 +23,11 @@ const dateLocale = locale === 'pt-br' ? 'pt-BR' : 'en-US'
 const sortedPosts = sortGuidesByRecency(posts)
 const availableFilters = getOrderedAvailableTopicFilters(sortedPosts, locale)
 const items = sortedPosts.map((post) => ({
-  badgeLabel: post.data.kind === 'article' ? (locale === 'pt-br' ? 'Nota' : 'Journal') : undefined,
+  badgeLabel: post.data.kind === 'article' ? copy.directory.noteBadge : undefined,
+  completedCtaLabel: copy.directory.readAgain,
   completionId: post.data.guideId,
   contentKind: post.data.kind,
-  ctaLabel: locale === 'pt-br' ? 'Ler mais' : 'Learn more',
+  ctaLabel: copy.directory.readMore,
   description: post.data.description,
   eyebrow: formatEditorialDate(post.data.pubDate, dateLocale),
   href: getGuideHrefFromEntry(post),
@@ -44,13 +45,13 @@ const items = sortedPosts.map((post) => ({
   title={copy.topicIndex.title}
 >
   <FilterableDirectory
-    allItemsLabel={locale === 'pt-br' ? 'Tudo' : 'All'}
-    articleItemsLabel={locale === 'pt-br' ? 'Artigos' : 'Articles'}
+    allItemsLabel={copy.directory.allItems}
+    articleItemsLabel={copy.directory.articleItems}
     availableFilters={availableFilters}
     completionStorageKey={siteStorageKeys.completedGuides}
-    filterLabel={locale === 'pt-br' ? 'Filtrar por topico' : 'Filter by topic'}
+    filterLabel={copy.directory.filterByTopic}
     filterQueryKey="topic"
-    guideItemsLabel={locale === 'pt-br' ? 'Guias' : 'Guides'}
+    guideItemsLabel={copy.directory.guideItems}
     items={items}
     client:load
     kind="guide-rows"

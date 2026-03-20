@@ -1,7 +1,7 @@
 ---
-title: Writing Code People Can Read
-description: A simpler way to choose names, structure, and abstraction level without turning code into a puzzle.
-summary: Good code is not the code that looks clever. It is the code another person can understand without pain.
+title: Writing Code People Can Understand
+description: A simple way to decide names, structure, and level of abstraction without turning the code into a puzzle.
+summary: Good code is not the code that looks smart. It is the code another person can understand without suffering.
 guideId: writing-code-people-can-read
 locale: en
 status: active
@@ -10,10 +10,10 @@ branchId: code-for-humans
 pubDate: 2026-03-17
 updatedDate: 2026-03-19
 category: Thinking Like a Senior
-topic: Code for Humans
+topic: Code That Is Easy to Understand
 path:
   - Thinking Like a Senior
-  - Code for Humans
+  - Code That Is Easy to Understand
 order: 10
 relationships:
   - trade-offs-and-constraints-without-fake-certainty
@@ -28,34 +28,36 @@ relatedDeckIds: []
 
 ## The problem
 
-Some code works, passes tests, and still slows the whole team down.
+Some code works, passes tests, and still makes everyone slower.
 
 Not because the logic is hard.
 
-Because every name needs interpretation, every function mixes responsibilities, and every abstraction asks for more context than it gives back.
+But because every name demands interpretation, every function mixes responsibilities, and every abstraction seems to ask for more context than it gives back.
 
 ## Mental model
 
-Code is not only instructions for a machine.
+Code is not only instruction for the machine.
 
-It is also an explanation for the next person who will read, review, or change it.
+Code is also an explanation for the next person who will read, review, or change it.
 
-If every line needs decoding before it can be trusted, the issue is not the reader. The code is charging too much context.
+If you need to stop at every line to decode the intent, the problem is not lack of intelligence. The code is demanding too much context.
 
 ## Breaking it down
 
-A simple way to write clearer code is:
+A simple way to write better is this:
 
-1. choose names that explain intent, not implementation detail
-2. keep each function focused on one visible responsibility
+1. choose names that explain intent, not implementation
+2. keep a function focused on one visible responsibility
 3. keep code that changes together close together
-4. extract abstraction only when it truly simplifies the reading
+4. extract abstraction only when it really simplifies reading
 
-The goal is not to make everything shorter.
+The goal is not to make everything short.
 
-The goal is to make the code clear enough for someone else to continue without guessing.
+The goal is to make it clear enough that another person can continue without guessing.
 
 ## Simple example
+
+Imagine this code:
 
 ```ts
 function p(u) {
@@ -63,9 +65,11 @@ function p(u) {
 }
 ```
 
-It works, but you have to decode what `p`, `u`, `a`, and `n` mean before you can trust it.
+It works.
 
-A clearer version is:
+But you need to discover what `p`, `u`, `a`, and `n` mean before you can trust what is happening.
+
+A better version would be:
 
 ```ts
 function getActiveUserNames(users: User[]) {
@@ -73,35 +77,39 @@ function getActiveUserNames(users: User[]) {
 }
 ```
 
-That improves understanding speed, not just aesthetics.
+Now the reading is almost immediate.
+
+You did not gain only beauty. You gained speed of understanding.
 
 ## Common mistakes
 
-- using names that are short only to look elegant
-- splitting everything into tiny functions that hide the main line
-- extracting abstraction too early
-- treating "dry" as more important than readability
+- using names that are too short to seem elegant
+- breaking everything into small functions that hide the main line
+- creating abstraction too early
+- prioritizing "dry code" when reading would get worse
 
 ## How a senior thinks
 
-A senior engineer does not write code to impress.
+A strong senior does not write to impress.
 
-They write to reduce friction:
+They write to reduce friction.
 
-> If I come back to this in three months, will I still understand quickly what this block does and why it exists?
+That usually sounds like this:
 
-That question usually improves naming, structure, and abstraction level by itself.
+> If I come back here in three months, will I still understand quickly what this block does and why it exists?
+
+That question usually improves names, structure, and level of abstraction almost by itself.
 
 ## What the interviewer wants to see
 
-Interviewers often notice a few things fast:
+In interviews, this appears in a simple way:
 
-- do your names help or hurt?
-- is the main line of the solution easy to follow?
-- do you know when to extract a function and when to leave code together?
+- do your names help or get in the way?
+- does your solution have a main line that is easy to follow?
+- do you know when to extract a function and when to keep it together?
 
-Readable code usually signals more maturity than code that tries to sound sophisticated.
+People who write readable code usually look more mature than people trying to sound sophisticated.
 
-> Good code is not the code that looks smart. It is the code that stays clear when another person touches it.
+> Good code is not the code that looks clever. It is the code that stays clear when another person touches it.
 
-> If the abstraction made the reading harder, it probably did not help.
+> If reading got harder after the abstraction, maybe it did not help.

@@ -1,7 +1,7 @@
 ---
-title: Safer Input and API Design
-description: How to handle user input and external calls without leaving avoidable security and correctness gaps behind.
-summary: Safer APIs come from being explicit about validation, allowed shapes, and how much authority the caller really has.
+title: Safer Inputs and APIs
+description: How to treat external input with less naivety and design APIs that do not accept too much data for convenience.
+summary: A secure API is not the one that trusts a nice-looking payload. It is the one that validates, restricts, and reduces the error surface.
 guideId: safer-input-and-api-design
 locale: en
 status: active
@@ -9,11 +9,11 @@ pillarId: security-thinking
 branchId: input-and-api-safety
 pubDate: 2026-02-20
 updatedDate: 2026-02-25
-category: Security Thinking
-topic: Input and API Safety
+category: Security in Practice
+topic: Safer Inputs and APIs
 path:
-  - Security Thinking
-  - Input and API Safety
+  - Security in Practice
+  - Safer Inputs and APIs
 order: 10
 relationships:
   - auth-and-authorization-without-mixing-them-up
@@ -28,68 +28,83 @@ relatedDeckIds: []
 
 ## The problem
 
-Input handling often gets treated as a boring implementation detail.
+Many APIs become vulnerable not because auth is missing, but because they accept too much input without criteria.
 
-That is dangerous because many security and correctness failures start exactly where the system accepts data with too much authority and too little validation.
+Extra fields get through, wrong formats get through, unexpected values get through, and the system tries to deal with all of it later.
+
+That "later" usually gets expensive.
 
 ## Mental model
 
-Input safety is not only about rejecting malformed payloads.
+External input should never enter the system as ready-made truth.
 
-It is about defining:
+It needs to go through a few questions:
 
-- what shape is allowed
-- what values are allowed
-- which fields the caller is allowed to influence
+- is this format valid?
+- should this field exist?
+- does this value make sense in this context?
+- is this data allowed to trigger this action?
 
-That is where safer APIs begin.
+Security here has a lot to do with discipline at the boundary.
 
 ## Breaking it down
 
-When handling input, ask:
+A simple way to make input safer is this:
 
-1. what exact shape does this endpoint accept?
-2. which values need validation beyond type checking?
-3. which fields should be ignored or overwritten by the server?
-4. what should happen when the input is invalid or unexpected?
+1. validate the format right at the edge
+2. accept only the fields the flow really needs
+3. normalize whatever is necessary before using it
+4. reject early what does not make sense
 
-That prevents the API from becoming overly trusting.
+That reduces the surface for error, abuse, and unexpected behavior.
 
 ## Simple example
 
-Suppose an endpoint allows a client to create a support ticket.
+Imagine a profile update endpoint.
 
-Fields like title and description belong to the client.
+If it receives a whole object and does a blind merge into the user, any unexpected field can end up entering the model:
 
-Fields like `createdBy`, `tenantId`, or `priorityOverride` may need to come from the server or stricter authorization logic, not straight from the caller.
+- `role`
+- `isAdmin`
+- internal configuration
 
-Safer design is often about refusing the wrong authority boundary.
+A better version accepts only the minimum contract:
+
+- `name`
+- `bio`
+- `avatarUrl`
+
+The gain here is not only organization.
+
+It is control over what can actually be changed.
 
 ## Common mistakes
 
-- validating type but not business rules
-- accepting extra fields silently
-- letting the client influence server-owned fields
-- treating validation as optional because the UI already checks input
+- trusting the frontend to send the correct payload
+- validating type without validating the business rule
+- accepting extra fields "because we ignore them later"
+- leaving the API too generic to look flexible
 
 ## How a senior thinks
 
-A senior engineer wants the API contract to be explicit:
+A strong senior treats input as a risk surface.
 
-> I want to be clear about the allowed shape, the server-owned fields, and the validation rules before I trust this input anywhere important.
+That usually sounds like this:
 
-That reduces both security risk and ambiguous behavior.
+> I want to validate early and accept the smallest possible contract, because every extra field increases the area of behavior the system needs to defend.
+
+That posture improves security and clarity at the same time.
 
 ## What the interviewer wants to see
 
-Interviewers usually want to know:
+In interviews, this usually shows maturity quickly:
 
-- you think about validation as part of the contract
-- you understand that client-side checks are not enough
-- you can separate caller-controlled data from server-controlled data
+- you understand that external input needs to be validated at the boundary
+- you think in terms of minimum contract, not open payload
+- you connect security to API design, not only to middleware
 
-That is stronger than saying "sanitize input" with no concrete model.
+People who do this well look like someone who reduces risk before it enters the system.
 
-> Safer input handling starts with deciding what the caller is allowed to influence.
+> A safer API does not accept everything and try to survive. It accepts little and does it deliberately.
 
-> If the contract is vague, the validation story probably is too.
+> If any "almost right" payload can enter the system, the boundary is still too loose.

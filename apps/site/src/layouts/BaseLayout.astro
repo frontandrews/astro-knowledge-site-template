@@ -4,6 +4,7 @@ import '@/styles/global.css'
 import BookTextIcon from '@lucide/astro/icons/book-text'
 import BrainIcon from '@lucide/astro/icons/brain'
 import ChevronDownIcon from '@lucide/astro/icons/chevron-down'
+import MailIcon from '@lucide/astro/icons/mail'
 import MenuIcon from '@lucide/astro/icons/menu'
 import NewspaperIcon from '@lucide/astro/icons/newspaper'
 import PuzzleIcon from '@lucide/astro/icons/puzzle'
@@ -67,14 +68,18 @@ const isChallengesPage = pathname === challengesHref || pathname.startsWith(`${c
 const isTopicsPage = pathname === topicsHref || pathname.startsWith(`${topicsHref}/`)
 const isGlossaryPage = pathname === glossaryHref || pathname.startsWith(`${glossaryHref}/`)
 const isArticlesPage = pathname === homeHref || pathname === articlesHref
+const configuredNewsletterAction = import.meta.env.PUBLIC_NEWSLETTER_URL?.trim() || null
+const newsletterFormAction = configuredNewsletterAction && configuredNewsletterAction.length > 0
+  ? configuredNewsletterAction
+  : null
 const brandLinkClass =
-  'inline-flex min-h-10 items-center gap-3 text-site-ink min-[64rem]:min-h-11 min-[64rem]:gap-3.5 max-[56rem]:min-h-8 max-[56rem]:gap-2'
-const brandIconWrapClass = 'inline-flex size-8 items-center justify-center min-[64rem]:size-9 max-[56rem]:size-[1.6rem]'
-const brandIconClass = 'size-7 min-[64rem]:size-[1.85rem] max-[56rem]:size-[1.3rem]'
+  'inline-flex min-h-10 items-center gap-3 text-site-ink lg:min-h-11 lg:gap-3.5 max-[56rem]:min-h-8 max-[56rem]:gap-2'
+const brandIconWrapClass = 'inline-flex size-8 items-center justify-center lg:size-9 max-[56rem]:size-[1.6rem]'
+const brandIconClass = 'size-7 lg:size-[1.85rem] max-[56rem]:size-[1.3rem]'
 const brandLabelClass =
-  'font-head text-[clamp(1.45rem,3vw,2rem)] leading-none tracking-[-0.04em] min-[64rem]:text-[clamp(1.6rem,2.4vw,2.2rem)] max-[56rem]:text-[1.2rem]'
+  'font-head text-[clamp(1.45rem,3vw,2rem)] leading-none tracking-[-0.04em] lg:text-[clamp(1.6rem,2.4vw,2.2rem)] max-[56rem]:text-[1.2rem]'
 const mobileNavLinkClass =
-  'block rounded-[var(--radius-sm)] px-3 py-3 text-[0.98rem] font-medium text-site-ink transition-colors duration-150 hover:bg-site-hover hover:text-site-link-hover focus-visible:bg-site-hover focus-visible:text-site-link-hover focus-visible:outline-none min-[64rem]:px-3.5 min-[64rem]:py-3.5 min-[64rem]:text-[1.02rem]'
+  'block rounded-[var(--radius-xs)] px-3 py-3 text-[0.98rem] font-medium text-site-ink transition-colors duration-150 hover:bg-site-hover hover:text-site-link-hover focus-visible:bg-site-hover focus-visible:text-site-link-hover focus-visible:outline-none lg:px-3.5 lg:py-3.5 lg:text-[1.02rem]'
 const mobileNavActiveClass = 'bg-site-hover text-site-link-hover'
 const localeSwitchClass =
   'inline-flex items-center rounded-full border border-site-line bg-site-panel p-1'
@@ -82,20 +87,20 @@ const localeOptionActiveClass = 'bg-site-hover text-site-link-hover'
 const mobileLocaleOptionClass =
   'inline-flex min-h-9 min-w-12 items-center justify-center rounded-full px-3 py-1.5 text-[0.76rem] font-semibold tracking-[0.08em] text-site-ink transition-colors duration-150 hover:text-site-link-hover focus-visible:text-site-link-hover focus-visible:outline-none'
 const desktopDropdownTriggerClass =
-  'inline-flex min-h-9 cursor-pointer list-none items-center justify-center gap-1.5 rounded-full px-1 py-2 text-[0.92rem] font-medium text-site-ink transition-colors duration-150 hover:text-site-link-hover focus-visible:text-site-link-hover focus-visible:outline-none min-[64rem]:min-h-10 min-[64rem]:px-2 min-[64rem]:text-[1rem] [&::-webkit-details-marker]:hidden'
+  'inline-flex min-h-9 cursor-pointer list-none items-center justify-center gap-1.5 rounded-full px-1 py-2 text-[0.92rem] font-medium text-site-ink transition-colors duration-150 hover:text-site-link-hover focus-visible:text-site-link-hover focus-visible:outline-none lg:min-h-10 lg:px-2 lg:text-[1rem] [&::-webkit-details-marker]:hidden'
 const desktopDropdownMenuClass =
-  'absolute right-0 top-[calc(100%+0.6rem)] z-30 grid min-w-[13rem] gap-1 rounded-[var(--radius)] border border-site-line bg-site-panel p-2 shadow-[0_18px_60px_rgba(5,10,20,0.2)] min-[64rem]:min-w-[14rem]'
+  'absolute right-0 top-[calc(100%+0.6rem)] z-30 grid min-w-[13rem] gap-1 rounded-[var(--radius)] border border-site-line bg-site-panel p-2 shadow-[0_18px_60px_rgba(5,10,20,0.2)] lg:min-w-[14rem]'
 const desktopExploreLinkClass =
-  'flex items-center gap-2.5 rounded-[var(--radius-sm)] px-3 py-3 text-[0.95rem] font-medium text-site-ink transition-colors duration-150 hover:bg-site-hover hover:text-site-link-hover focus-visible:bg-site-hover focus-visible:text-site-link-hover focus-visible:outline-none min-[64rem]:gap-3 min-[64rem]:px-3.5 min-[64rem]:py-3.5 min-[64rem]:text-[1.04rem]'
+  'flex items-center gap-2.5 rounded-[var(--radius-xs)] px-3 py-3 text-[0.95rem] font-medium text-site-ink transition-colors duration-150 hover:bg-site-hover hover:text-site-link-hover focus-visible:bg-site-hover focus-visible:text-site-link-hover focus-visible:outline-none lg:gap-3 lg:px-3.5 lg:py-3.5 lg:text-[1.04rem]'
 const desktopLocaleTriggerClass =
-  'inline-flex min-h-9 cursor-pointer list-none items-center justify-center gap-1 rounded-[var(--radius-sm)] border border-site-line bg-site-panel px-2.5 py-2 text-[0.78rem] font-semibold tracking-[0.08em] text-site-ink transition-colors duration-150 hover:bg-site-hover hover:text-site-link-hover focus-visible:bg-site-hover focus-visible:text-site-link-hover focus-visible:outline-none min-[64rem]:min-h-10 min-[64rem]:gap-1.5 min-[64rem]:px-3 min-[64rem]:text-[0.86rem] [&::-webkit-details-marker]:hidden'
+  cn(ui.controlButton, 'min-h-9 cursor-pointer list-none gap-1 px-2.5 py-2 text-[0.78rem] font-semibold tracking-[0.08em] lg:min-h-10 lg:gap-1.5 lg:px-3 lg:text-[0.86rem] [&::-webkit-details-marker]:hidden')
 const desktopChallengesLinkClass =
-  'inline-flex min-h-9 items-center justify-center gap-2 rounded-full px-1 py-2 text-[0.92rem] font-medium text-site-ink transition-colors duration-150 hover:text-site-link-hover focus-visible:text-site-link-hover focus-visible:outline-none min-[64rem]:min-h-10 min-[64rem]:px-2 min-[64rem]:text-[1rem]'
+  'inline-flex min-h-9 items-center justify-center gap-2 rounded-full px-1 py-2 text-[0.92rem] font-medium text-site-ink transition-colors duration-150 hover:text-site-link-hover focus-visible:text-site-link-hover focus-visible:outline-none lg:min-h-10 lg:px-2 lg:text-[1rem]'
 const desktopChallengesBadgeClass =
   'inline-flex items-center rounded-full bg-black px-2 py-[0.18rem] text-[0.54rem] font-black uppercase tracking-[0.18em] text-yellow-300'
 const pageShellClass =
   contentWidth === 'wide'
-    ? 'mx-auto min-h-screen max-w-[72rem] px-4 pb-16 md:px-6 min-[64rem]:max-w-[80rem]'
+    ? 'mx-auto min-h-screen max-w-[72rem] px-4 pb-16 md:px-6 lg:max-w-[80rem]'
     : ui.pageShell
 ---
 
@@ -123,7 +128,7 @@ const pageShellClass =
   </head>
   <body data-locale-alternate={alternateLocale} data-locale-redirect-href={localeRedirectHref}>
     <header class="sticky top-0 z-20 mb-4 border-b border-site-line bg-site-bg">
-      <div class={cn(ui.blogFrame, 'py-[0.85rem] min-[64rem]:py-[1rem] max-[56rem]:py-[0.55rem]')}>
+      <div class={cn(ui.blogFrame, 'py-[0.85rem] lg:py-[1rem] max-[56rem]:py-[0.55rem]')}>
         <div class="flex items-center justify-between gap-4 max-[56rem]:gap-3">
           <a class={brandLinkClass} href={homeHref}>
             <span class={brandIconWrapClass}>
@@ -143,29 +148,29 @@ const pageShellClass =
                   <ChevronDownIcon class="size-4" />
                 </summary>
                 <div class={desktopDropdownMenuClass}>
-                  <a class={cn(desktopExploreLinkClass, isChallengesPage && mobileNavActiveClass)} href={challengesHref}>
-                    <PuzzleIcon class="size-4 shrink-0 text-site-ink-muted" />
-                    {copy.challengeIndex.title}
-                  </a>
-                  <a class={cn(desktopExploreLinkClass, isGlossaryPage && mobileNavActiveClass)} href={glossaryHref}>
-                    <BookTextIcon class="size-4 shrink-0 text-site-ink-muted" />
-                    {copy.layout.glossary}
-                  </a>
                   <a class={cn(desktopExploreLinkClass, isArticlesPage && mobileNavActiveClass)} href={articlesHref}>
-                    <NewspaperIcon class="size-4 shrink-0 text-site-ink-muted" />
+                    <NewspaperIcon class="size-4 shrink-0 text-site-link-hover" />
                     {copy.layout.articles}
                   </a>
-                  <a class={cn(desktopExploreLinkClass, isConceptsPage && mobileNavActiveClass)} href={conceptsHref}>
-                    <BrainIcon class="size-4 shrink-0 text-site-ink-muted" />
-                    {copy.layout.concepts}
+                  <a class={cn(desktopExploreLinkClass, isTracksPage && mobileNavActiveClass)} href={tracksHref}>
+                    <RouteIcon class="size-4 shrink-0 text-site-link-hover" />
+                    {copy.layout.tracks}
                   </a>
                   <a class={cn(desktopExploreLinkClass, isTopicsPage && mobileNavActiveClass)} href={topicsHref}>
-                    <TagsIcon class="size-4 shrink-0 text-site-ink-muted" />
+                    <TagsIcon class="size-4 shrink-0 text-site-link-hover" />
                     {copy.layout.topics}
                   </a>
-                  <a class={cn(desktopExploreLinkClass, isTracksPage && mobileNavActiveClass)} href={tracksHref}>
-                    <RouteIcon class="size-4 shrink-0 text-site-ink-muted" />
-                    {copy.layout.tracks}
+                  <a class={cn(desktopExploreLinkClass, isChallengesPage && mobileNavActiveClass)} href={challengesHref}>
+                    <PuzzleIcon class="size-4 shrink-0 text-site-link-hover" />
+                    {copy.challengeIndex.title}
+                  </a>
+                  <a class={cn(desktopExploreLinkClass, isConceptsPage && mobileNavActiveClass)} href={conceptsHref}>
+                    <BrainIcon class="size-4 shrink-0 text-site-link-hover" />
+                    {copy.layout.concepts}
+                  </a>
+                  <a class={cn(desktopExploreLinkClass, isGlossaryPage && mobileNavActiveClass)} href={glossaryHref}>
+                    <BookTextIcon class="size-4 shrink-0 text-site-link-hover" />
+                    {copy.layout.glossary}
                   </a>
                 </div>
               </details>
@@ -194,7 +199,7 @@ const pageShellClass =
                     lang="pt-BR"
                     data-locale-choice="pt-br"
                   >
-                    Portugues
+                    Português
                   </a>
                 </div>
               </details>
@@ -202,7 +207,7 @@ const pageShellClass =
             <button
               aria-controls="mobile-site-nav"
               aria-expanded="false"
-              class="inline-flex min-h-10 items-center justify-center rounded-[var(--radius-sm)] border border-site-line bg-site-panel px-3 py-2 text-sm font-semibold tracking-[0.04em] text-site-ink transition-colors duration-150 hover:bg-site-hover hover:text-site-link-hover focus-visible:bg-site-hover focus-visible:text-site-link-hover focus-visible:outline-none min-[56rem]:hidden"
+              class={cn(ui.controlButton, 'min-h-10 px-3 py-2 text-sm font-semibold tracking-[0.04em] min-[56rem]:hidden')}
               data-label-close={copy.header.closeMenu}
               data-label-open={copy.header.menu}
               data-mobile-nav-toggle
@@ -220,20 +225,20 @@ const pageShellClass =
               <a class={cn(mobileNavLinkClass, isArticlesPage && mobileNavActiveClass)} href={articlesHref}>
                 {copy.layout.articles}
               </a>
-              <a class={cn(mobileNavLinkClass, isChallengesPage && mobileNavActiveClass)} href={challengesHref}>
-                {copy.challengeIndex.title}
-              </a>
-              <a class={cn(mobileNavLinkClass, isGlossaryPage && mobileNavActiveClass)} href={glossaryHref}>
-                {copy.layout.glossary}
-              </a>
-              <a class={cn(mobileNavLinkClass, isConceptsPage && mobileNavActiveClass)} href={conceptsHref}>
-                {copy.layout.concepts}
+              <a class={cn(mobileNavLinkClass, isTracksPage && mobileNavActiveClass)} href={tracksHref}>
+                {copy.layout.tracks}
               </a>
               <a class={cn(mobileNavLinkClass, isTopicsPage && mobileNavActiveClass)} href={topicsHref}>
                 {copy.layout.topics}
               </a>
-              <a class={cn(mobileNavLinkClass, isTracksPage && mobileNavActiveClass)} href={tracksHref}>
-                {copy.layout.tracks}
+              <a class={cn(mobileNavLinkClass, isChallengesPage && mobileNavActiveClass)} href={challengesHref}>
+                {copy.challengeIndex.title}
+              </a>
+              <a class={cn(mobileNavLinkClass, isConceptsPage && mobileNavActiveClass)} href={conceptsHref}>
+                {copy.layout.concepts}
+              </a>
+              <a class={cn(mobileNavLinkClass, isGlossaryPage && mobileNavActiveClass)} href={glossaryHref}>
+                {copy.layout.glossary}
               </a>
             </nav>
             <div class="grid gap-2 border-t border-site-line pt-3">
@@ -268,8 +273,69 @@ const pageShellClass =
     <main class={pageShellClass} data-pagefind-body>
       <slot />
     </main>
-    <footer class="mt-12 border-t-2 border-site-line-strong bg-site-surface">
-      <div class={cn(ui.blogFrame, 'grid gap-8 py-10 md:grid-cols-[minmax(0,1.5fr)_minmax(12rem,1fr)_minmax(12rem,1fr)]')}>
+    <section class="mt-4" aria-label={copy.footer.newsletterTitle}>
+      <div class={cn(ui.blogFrame, 'py-8 md:py-10')}>
+        <div
+          class={cn(
+            ui.panel,
+            'grid justify-items-center gap-4 overflow-hidden px-5 py-5 text-center md:px-6 md:py-6',
+          )}
+        >
+          <div class="grid justify-items-center gap-2">
+            <h2 class="m-0 text-[1.08rem] font-semibold leading-[1.3] text-site-ink lg:text-[1.22rem]">
+              {copy.footer.newsletterTitle}
+            </h2>
+            <p class={cn(ui.bodyCopy, 'max-w-[38rem]')}>
+              {copy.footer.newsletterCopy}
+            </p>
+          </div>
+          {newsletterFormAction ? (
+            <form
+              action={newsletterFormAction}
+              class="mx-auto w-full max-w-[32rem]"
+              method="post"
+            >
+              <label class="sr-only" for="newsletter-email">Email</label>
+              <div class="flex h-12 w-full overflow-hidden rounded-[var(--radius-xs)] border border-site-line bg-site-bg transition-colors duration-150 focus-within:border-site-link-hover">
+                <div class="relative min-w-0 flex-1">
+                  <MailIcon class="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-site-ink-muted" />
+                  <input
+                    autocomplete="email"
+                    class="h-full w-full border-0 bg-transparent pr-4 pl-11 text-[0.98rem] text-site-ink outline-none placeholder:text-site-ink-muted"
+                    id="newsletter-email"
+                    name="email"
+                    placeholder={copy.footer.newsletterInputPlaceholder}
+                    required
+                    type="email"
+                  />
+                </div>
+                <button
+                  class="inline-flex h-full shrink-0 items-center justify-center border-l border-site-line-strong bg-site-hover px-4 text-sm font-semibold tracking-[0.04em] text-site-link-hover transition-colors duration-150 hover:border-site-link-hover hover:bg-site-surface-strong hover:text-site-ink focus-visible:outline-none"
+                  type="submit"
+                >
+                  {copy.footer.newsletterSubmitLabel}
+                </button>
+              </div>
+              <input name="EMAIL" type="hidden" value="" data-newsletter-email-mirror />
+              <p class="mt-3 mb-0 text-center text-[0.76rem] leading-5 text-site-ink-muted lg:text-[0.82rem]">
+                {copy.footer.newsletterDisclaimerBeforeLinks}
+                <a class="underline decoration-site-line-strong underline-offset-2 transition-colors duration-150 hover:text-site-link-hover" href={termsHref}>
+                  {copy.footer.terms}
+                </a>
+                {copy.footer.newsletterDisclaimerBetweenLinks}
+                <a class="underline decoration-site-line-strong underline-offset-2 transition-colors duration-150 hover:text-site-link-hover" href="/privacy">
+                  {copy.footer.privacy}
+                </a>
+                {copy.footer.newsletterDisclaimerAfterLinks}
+              </p>
+            </form>
+          ) : null}
+        </div>
+      </div>
+    </section>
+    <footer class="border-t-2 border-site-line-strong bg-site-surface">
+      <div class={cn(ui.blogFrame, 'grid gap-6 py-10')}>
+        <div class="grid gap-8 md:grid-cols-[minmax(0,1.5fr)_minmax(12rem,1fr)_minmax(12rem,1fr)]">
           <div class="grid content-start gap-3">
             <a class={brandLinkClass} href={homeHref}>
               <span class={brandIconWrapClass}>
@@ -281,25 +347,26 @@ const pageShellClass =
           </div>
           <div class="grid content-start gap-3">
             <div class="grid gap-[0.85rem]">
-              <a class={ui.footerLink} href={challengesHref}>{copy.challengeIndex.title}</a>
-              <a class={ui.footerLink} href={topicsHref}>{copy.footer.topics}</a>
-              <a class={ui.footerLink} href={glossaryHref}>{copy.footer.glossary}</a>
-              <a class={ui.footerLink} href={conceptsHref}>{copy.layout.concepts}</a>
+              <a class={ui.footerLink} href={articlesHref}>{copy.footer.learn}</a>
               <a class={ui.footerLink} href={tracksHref}>{copy.footer.tracks}</a>
+              <a class={ui.footerLink} href={topicsHref}>{copy.footer.topics}</a>
+              <a class={ui.footerLink} href={challengesHref}>{copy.challengeIndex.title}</a>
+              <a class={ui.footerLink} href={conceptsHref}>{copy.layout.concepts}</a>
+              <a class={ui.footerLink} href={glossaryHref}>{copy.footer.glossary}</a>
             </div>
           </div>
           <div class="grid content-start gap-3">
             <div class="grid gap-[0.85rem]">
-              <a class={ui.footerLink} href={learnHref}>{copy.footer.learn}</a>
               <a class={ui.footerLink} href={termsHref}>{copy.footer.terms}</a>
               <a class={ui.footerLink} href={rssHref}>{copy.footer.rss}</a>
               <a class={ui.footerLink} href="/privacy">{copy.footer.privacy}</a>
             </div>
           </div>
+        </div>
       </div>
       <div class="border-t-2 border-site-line-strong bg-site-surface text-center">
         <div class={cn(ui.blogFrame, 'py-4')}>
-          <p class="m-0 text-sm leading-[1.3] text-site-ink min-[64rem]:text-[0.96rem]">© {currentYear} {copy.footer.title}. {copy.footer.rights}</p>
+          <p class="m-0 text-sm leading-[1.3] text-site-ink lg:text-[0.96rem]">© {currentYear} {copy.footer.title}. {copy.footer.rights}</p>
         </div>
       </div>
     </footer>
@@ -318,6 +385,8 @@ const pageShellClass =
   const mobileNavCloseIcon = document.querySelector('[data-mobile-nav-close-icon]')
   const mobileNavToggleLabel = document.querySelector('[data-mobile-nav-toggle-label]')
   const mobileNavLinks = [...document.querySelectorAll('#mobile-site-nav a')]
+  const newsletterEmailInput = document.querySelector('#newsletter-email')
+  const newsletterEmailMirror = document.querySelector('[data-newsletter-email-mirror]')
   const syncCompletedGuideCards = () => {
     const completedGuideIds = new Set(readCompletedGuides())
     const guideCards = document.querySelectorAll('[data-guide-post]')
@@ -342,6 +411,15 @@ const pageShellClass =
       writeLocalStorageString(siteStorageKeys.localePreference, value)
     })
   })
+
+  if (newsletterEmailInput instanceof HTMLInputElement && newsletterEmailMirror instanceof HTMLInputElement) {
+    const syncNewsletterEmail = () => {
+      newsletterEmailMirror.value = newsletterEmailInput.value
+    }
+
+    syncNewsletterEmail()
+    newsletterEmailInput.addEventListener('input', syncNewsletterEmail)
+  }
 
   // @ts-expect-error Astro inline scripts do not preserve local type annotations here.
   const setMobileNavOpen = (isOpen) => {

@@ -1,0 +1,25 @@
+---
+import { cn } from '@/lib/cn'
+import { ui } from '@/lib/ui'
+
+type Props = {
+  className?: string
+}
+
+const { className = '' } = Astro.props
+---
+
+<div class={cn('mt-4 flex items-center gap-3', className)}>
+  <img
+    alt="Andrews Ribeiro"
+    class="size-11 shrink-0 rounded-full border border-article-rule bg-article-surface object-cover"
+    height="48"
+    loading="lazy"
+    src="/andrews.jpg"
+    width="48"
+  />
+  <div class="grid gap-0.5">
+    <p class={ui.articleBylineName}>Andrews Ribeiro</p>
+    <p class={ui.articleMetaSubtle}>Founder & Engineer</p>
+  </div>
+</div>

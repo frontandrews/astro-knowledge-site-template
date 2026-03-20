@@ -36,10 +36,10 @@ const copyLabels =
   locale === 'pt-br'
     ? {
         continueTrack: 'Continue nesta trilha',
-        nextLabel: 'Proximo',
+        nextLabel: 'Próximo',
       }
     : {
-        continueTrack: 'Keep going',
+        continueTrack: 'Continue on this track',
         nextLabel: 'Next',
       }
 ---
@@ -56,17 +56,17 @@ const copyLabels =
   data-track-next-label={copyLabels.nextLabel}
   data-track-next-track-label={copy.startHere.nextTrack}
 >
-  <div class="grid gap-5 border-y border-site-line bg-transparent px-[0.45rem] py-5 min-[64rem]:gap-6 min-[64rem]:px-[0.55rem] min-[64rem]:py-6">
+  <div class="grid gap-5 border-y border-site-line bg-transparent px-[0.45rem] py-5 lg:gap-6 lg:px-[0.55rem] lg:py-6">
     <div class="grid gap-2.5">
-      <p class="m-0 text-[0.82rem] font-medium tracking-[0.03em] text-site-ink-soft min-[64rem]:text-[0.9rem]">
+      <p class="m-0 text-[0.82rem] font-medium tracking-[0.03em] text-site-ink-soft lg:text-[0.9rem]">
         {metaLine}
       </p>
       <div class="grid gap-2">
         <div class="flex items-center justify-between gap-4">
-          <p class="m-0 text-[0.9rem] font-medium text-site-ink min-[64rem]:text-[0.98rem]" data-track-progress-status>
+          <p class="m-0 text-[0.9rem] font-medium text-site-ink lg:text-[0.98rem]" data-track-progress-status>
             {copy.startHere.progressLabel}: {copy.startHere.stepLabel} 1 {ofLabel} {items.length}
           </p>
-          <p class="m-0 text-[0.82rem] font-semibold text-site-ink-soft min-[64rem]:text-[0.9rem]" data-track-progress-value>
+          <p class="m-0 text-[0.82rem] font-semibold text-site-ink-soft lg:text-[0.9rem]" data-track-progress-value>
             0%
           </p>
         </div>
@@ -80,7 +80,7 @@ const copyLabels =
     </div>
 
     <a
-      class="group inline-flex w-fit items-center gap-2 rounded-[var(--radius-sm)] border border-site-line bg-site-card px-3.5 py-2 text-[0.82rem] font-medium text-site-ink transition-colors duration-150 hover:border-site-line-strong hover:bg-site-hover hover:text-site-link-hover focus-visible:border-site-line-strong focus-visible:bg-site-hover focus-visible:text-site-link-hover focus-visible:outline-none min-[64rem]:px-4 min-[64rem]:py-2.5 min-[64rem]:text-[0.9rem]"
+      class={ui.cardButton}
       data-track-progress-cta
       href={initialHref}
     >
@@ -89,17 +89,17 @@ const copyLabels =
     </a>
 
     <div class="grid gap-3 border-t border-site-line pt-4">
-      <p class="m-0 flex items-center gap-2 text-[0.88rem] font-semibold leading-6 text-site-ink min-[64rem]:text-[0.96rem]" data-track-overall-status>
+      <p class="m-0 flex items-center gap-2 text-[0.88rem] font-semibold leading-6 text-site-ink lg:text-[0.96rem]" data-track-overall-status>
         <span aria-hidden="true" class="text-site-ink-muted" data-track-overall-icon>→</span>
         <span data-track-overall-text>{copyLabels.continueTrack}</span>
       </p>
 
       <div class="grid gap-2">
-        <p class="m-0 text-[0.72rem] font-bold uppercase tracking-[0.18em] text-site-line-strong min-[64rem]:text-[0.78rem]">
+        <p class="m-0 text-[0.72rem] font-bold uppercase tracking-[0.18em] text-site-line-strong lg:text-[0.78rem]">
           {copyLabels.nextLabel}
         </p>
         <a
-          class="group inline-flex w-fit items-center gap-2 rounded-[var(--radius-sm)] border border-site-line bg-site-card px-3.5 py-2 text-[0.82rem] font-medium text-site-ink transition-colors duration-150 hover:border-site-line-strong hover:bg-site-hover hover:text-site-link-hover focus-visible:border-site-line-strong focus-visible:bg-site-hover focus-visible:text-site-link-hover focus-visible:outline-none min-[64rem]:px-4 min-[64rem]:py-2.5 min-[64rem]:text-[0.9rem]"
+          class={ui.cardButton}
           data-track-next-default-href={tracksHref}
           data-track-next-link
           href={tracksHref}

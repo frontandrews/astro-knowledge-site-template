@@ -33,7 +33,7 @@ const labels =
         whatsapp: 'Share on WhatsApp',
       }
 const iconButtonClass =
-  'inline-flex size-11 items-center justify-center rounded-full border border-site-line bg-site-card text-site-ink transition-colors duration-150 hover:border-site-line-strong hover:bg-site-hover hover:text-site-link-hover focus-visible:border-site-line-strong focus-visible:bg-site-hover focus-visible:text-site-link-hover focus-visible:outline-none min-[64rem]:size-12'
+  'inline-flex size-11 items-center justify-center rounded-full border border-site-line bg-site-card text-site-ink transition-colors duration-150 hover:border-site-line-strong hover:bg-site-hover hover:text-site-link-hover focus-visible:border-site-line-strong focus-visible:bg-site-hover focus-visible:text-site-link-hover focus-visible:outline-none lg:size-12'
 ---
 
 <section
@@ -46,8 +46,8 @@ const iconButtonClass =
   data-share-title={title}
   data-share-url={url}
 >
-  <div class="grid justify-items-center gap-3 py-3 text-center min-[64rem]:gap-4 min-[64rem]:py-4">
-    <p class="m-0 text-[0.8rem] font-medium uppercase tracking-[0.22em] text-site-ink-soft min-[64rem]:text-[0.88rem]">
+  <div class="grid justify-items-center gap-3 py-3 text-center lg:gap-4 lg:py-4">
+    <p class="m-0 text-[0.8rem] font-medium uppercase tracking-[0.22em] text-site-ink-soft lg:text-[0.88rem]">
       {copy.article.shareTitle}
     </p>
 
@@ -70,7 +70,7 @@ const iconButtonClass =
         target="_blank"
         title={labels.twitter}
       >
-        <span aria-hidden="true" class="text-[0.88rem] font-semibold tracking-[0.02em] min-[64rem]:text-[0.96rem]">X</span>
+        <span aria-hidden="true" class="text-[0.88rem] font-semibold tracking-[0.02em] lg:text-[0.96rem]">X</span>
         <span class="sr-only">{labels.twitter}</span>
       </a>
       <a
@@ -81,7 +81,7 @@ const iconButtonClass =
         target="_blank"
         title={labels.linkedin}
       >
-        <span aria-hidden="true" class="text-[0.9rem] font-semibold lowercase tracking-[-0.02em] min-[64rem]:text-[0.98rem]">in</span>
+        <span aria-hidden="true" class="text-[0.9rem] font-semibold lowercase tracking-[-0.02em] lg:text-[0.98rem]">in</span>
         <span class="sr-only">{labels.linkedin}</span>
       </a>
       <a
@@ -110,7 +110,7 @@ const iconButtonClass =
 
   <p
     aria-live="polite"
-    class="hidden text-center text-sm leading-6 text-site-ink-soft min-[64rem]:text-[0.96rem]"
+    class="hidden text-center text-sm leading-6 text-site-ink-soft lg:text-[0.96rem]"
     data-share-feedback
   />
 </section>

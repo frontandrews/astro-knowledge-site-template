@@ -1,7 +1,7 @@
 ---
 title: Derived State
-description: What derived state is, when it helps, and why copying values into state often creates bugs.
-summary: Derived state is data you can compute from other state or props instead of storing again.
+description: What derived state is, when it helps, and why copying values into state usually creates bugs.
+summary: Derived state is data you can calculate from existing props or state without storing an extra copy.
 conceptId: derived-state
 domainId: react
 groupId: state
@@ -14,37 +14,34 @@ tags:
   - ui
 relatedGuideIds:
   - state-ownership-without-confusion
-  - react-derived-state
 ---
 
 ## What it is
 
-Derived state is a value you can calculate from other values you already have.
+Derived state is a value you can calculate from other values that already exist.
 
-If `filteredItems` can be computed from `items` and `query`, that is usually derived state.
-
-The key idea is simple: if you can recompute it safely, you often do not need to store it separately.
+If `visibleItems` can be calculated from `items` and `query`, that is usually derived state.
 
 ## When it matters
 
-This matters when a component starts mirroring props into state or keeps multiple values that can drift apart.
+It matters when a component starts mirroring props into state or storing two sources of truth at the same time.
 
-That is where UI bugs usually start to look random even though the real problem is duplicated truth.
+That is how many UI bugs begin.
 
 ## Common mistake
 
-The common mistake is storing a second copy just because it feels convenient.
+The common mistake is saving a second copy just because it feels more practical.
 
-That usually creates synchronization work you did not need.
+Then you need to synchronize both sides manually.
 
 ## Short example
 
-If a list screen stores `items`, `query`, and `visibleItems` in state, the third value may be unnecessary.
+If a screen stores `items`, `query`, and `visibleItems` in state, the third value may be unnecessary.
 
-In many cases, `visibleItems` should just be computed from `items` and `query` during render.
+In many cases, `visibleItems` should be calculated during render.
 
 ## Why it helps
 
-The fewer places that own the same truth, the easier the component is to reason about.
+The fewer places try to own the same truth, the easier it gets to understand the component.
 
-That reduces stale UI, effect churn, and weird update paths.
+That reduces stale UI and unnecessary update paths.

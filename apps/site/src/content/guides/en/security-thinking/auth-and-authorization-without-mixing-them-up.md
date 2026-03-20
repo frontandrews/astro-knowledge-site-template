@@ -1,7 +1,7 @@
 ---
-title: Auth and Authorization Without Mixing Them Up
-description: How to separate identity from permission so login logic and access rules do not collapse into one fuzzy layer.
-summary: The system gets safer when you separate who the user is from what the user is allowed to do.
+title: Authentication and Permission Without Mixing the Two
+description: How to separate identity from authorization without treating login as if it solved access control by itself.
+summary: Knowing who the user is does not automatically answer what they are allowed to do.
 guideId: auth-and-authorization-without-mixing-them-up
 locale: en
 status: active
@@ -9,11 +9,11 @@ pillarId: security-thinking
 branchId: auth-and-authorization
 pubDate: 2026-01-10
 updatedDate: 2026-01-12
-category: Security Thinking
-topic: Auth and Authorization
+category: Security in Practice
+topic: Authentication and Permission
 path:
-  - Security Thinking
-  - Auth and Authorization
+  - Security in Practice
+  - Authentication and Permission
 order: 10
 relationships:
   - trust-boundaries-without-hand-waving
@@ -29,66 +29,69 @@ relatedDeckIds: []
 
 ## The problem
 
-Many systems say "auth" when they actually mean several different things at once.
+Many applications treat authentication as if it ended the security conversation.
 
-That creates confusion because login, session validation, role checks, and resource permissions all get treated like one step.
+The user logged in, so it looks like the system already knows enough.
+
+But login only answers who the person is. It does not answer what they are allowed to do.
 
 ## Mental model
 
-Authentication answers:
+Authentication and authorization answer different questions:
 
-- who is this actor?
+- authentication: who are you?
+- authorization: are you allowed to do this here?
 
-Authorization answers:
-
-- what is this actor allowed to do here?
-
-You need both, but they solve different problems.
+Mixing those two things usually creates improper access in flows that looked safe on the surface.
 
 ## Breaking it down
 
-When designing access control, ask:
+A simple way to think better is this:
 
-1. how do I establish identity?
-2. how do I verify the session or token is still valid?
-3. what permission is needed for this action?
-4. where should the authorization decision happen?
+1. confirm the identity of the user
+2. find out which resource or action is being accessed
+3. validate the permission on the server
+4. never treat the interface as the final source of authorization
 
-That keeps identity and access rules from collapsing into one vague layer.
+That avoids a good part of the most basic mistakes.
 
 ## Simple example
 
-A user may be correctly authenticated with a valid session.
+Imagine a dashboard where the frontend hides the delete-user button from anyone who is not admin.
 
-That does not mean they can delete a project, refund a payment, or read another tenant's data.
+If the backend does not validate that permission and accepts the request anyway, the system stays vulnerable.
 
-Authentication proves who they are. Authorization decides whether the action is allowed.
+The mistake is not in the button.
+
+The mistake is treating a visual rule as if it were an access rule.
 
 ## Common mistakes
 
-- treating login as proof of permission
-- storing role claims in places that the client can influence
-- scattering authorization logic across too many layers
-- checking broad role names instead of resource-specific permissions
+- thinking login already solves authorization
+- trusting the UI to block a sensitive action
+- using a role that is too generic without checking the resource context
+- forgetting that the server needs to validate access on every critical operation
 
 ## How a senior thinks
 
-A senior engineer separates the questions clearly:
+A strong senior separates identity from access from the start.
 
-> First I establish identity. Then I decide whether that identity has permission for this specific action on this specific resource.
+That usually sounds like this:
 
-That makes the system easier to reason about and safer to evolve.
+> First I confirm who the user is. Then I validate whether they can execute this action on this specific resource.
+
+That separation looks simple, but it avoids many serious bugs.
 
 ## What the interviewer wants to see
 
-Interviewers usually want to know:
+In interviews, this usually shows maturity quickly:
 
-- you understand the difference between identity and permission
-- you can explain where access control should be enforced
-- you know why a valid login is not enough
+- you know how to differentiate authentication from authorization
+- you understand that a visual rule does not replace access validation
+- you think of permission as a backend decision, not only an interface concern
 
-That is much stronger than saying "use JWT" and stopping there.
+People who do this well look like someone who understands security as a real flow, not only as a login screen.
 
-> A valid identity is not the same thing as a valid permission.
+> Login proves identity. Permission proves limit.
 
-> If the system mixes those questions, the access model usually gets blurry fast.
+> If the access rule only exists in the interface, it does not really exist yet.
