@@ -8,11 +8,8 @@ import BaseLayout from '@/layouts/BaseLayout.astro'
 import TrackProgressPanel from '@/components/TrackProgressPanel.astro'
 import { getGuideLevelLabel, getGuideReadingTimeMinutes } from '@/lib/article-meta'
 import { formatEditorialDate } from '@/lib/format-date'
-import { getGlossaryIndexHref } from '@/lib/glossary-links'
-import { getGuideIndexHref } from '@/lib/guide-links'
 import { getSiteCopy, type SiteLocale } from '@/lib/site-copy'
 import { getTracksHref } from '@/lib/tracks-links'
-import { getTopicIndexHref } from '@/lib/topic-links'
 import CompactSection from '@/components/ui/CompactSection.astro'
 import PageHeader from '@/components/ui/PageHeader.astro'
 import { ui } from '@/lib/ui'
@@ -47,20 +44,6 @@ const highestLevel =
     roadmap.articleNodes[0]?.post.data.level ?? 'beginner',
   )
 const levelLabel = getGuideLevelLabel(highestLevel, locale)
-const supportLinks = [
-  {
-    href: getGuideIndexHref(locale),
-    title: copy.startHere.browseLibrary,
-  },
-  {
-    href: getTopicIndexHref(locale),
-    title: copy.startHere.topics,
-  },
-  {
-    href: getGlossaryIndexHref(locale),
-    title: copy.startHere.glossary,
-  },
-]
 ---
 
 <BaseLayout
@@ -75,11 +58,11 @@ const supportLinks = [
     items={trackItems}
     levelLabel={levelLabel}
     locale={locale}
-    supportLinks={supportLinks}
+    tracksHref={getTracksHref(locale)}
     totalReadingMinutes={totalReadingMinutes}
   />
 
-  <CompactSection className="xl:mt-0 xl:max-w-none">
+  <CompactSection className="xl:mt-0">
     <div class={ui.linearList}>
       {roadmap.articleNodes.map((node, index) => (
         <ArticleCard
@@ -94,12 +77,10 @@ const supportLinks = [
     </div>
   </CompactSection>
 
-  <CompactSection className="xl:max-w-none">
-    <ArticleSharePanel
-      description={roadmap.summary}
-      locale={locale}
-      title={roadmap.title}
-      url={shareUrl}
-    />
-  </CompactSection>
+  <ArticleSharePanel
+    description={roadmap.summary}
+    locale={locale}
+    title={roadmap.title}
+    url={shareUrl}
+  />
 </BaseLayout>

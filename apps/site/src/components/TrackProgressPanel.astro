@@ -10,17 +10,12 @@ type TrackItem = {
   title: string
 }
 
-type SupportLink = {
-  href: string
-  title: string
-}
-
 type Props = {
   className?: string
   items: TrackItem[]
   levelLabel: string
   locale: SiteLocale
-  supportLinks: SupportLink[]
+  tracksHref: string
   totalReadingMinutes: number
 }
 
@@ -29,7 +24,7 @@ const {
   items,
   levelLabel,
   locale,
-  supportLinks,
+  tracksHref,
   totalReadingMinutes,
 } = Astro.props
 
@@ -37,6 +32,16 @@ const copy = getSiteCopy(locale)
 const metaLine = `${items.length} ${copy.startHere.stepsLabel.toLocaleLowerCase(locale === 'pt-br' ? 'pt-BR' : 'en-US')} • ~${totalReadingMinutes} min • ${levelLabel}`
 const ofLabel = locale === 'pt-br' ? 'de' : 'of'
 const initialHref = items[0]?.href ?? '#'
+const copyLabels =
+  locale === 'pt-br'
+    ? {
+        continueTrack: 'Continue nesta trilha',
+        nextLabel: 'Proximo',
+      }
+    : {
+        continueTrack: 'Keep going',
+        nextLabel: 'Next',
+      }
 ---
 
 <section
@@ -47,16 +52,24 @@ const initialHref = items[0]?.href ?? '#'
   data-review-label={copy.startHere.reviewTrack}
   data-step-label={copy.startHere.stepLabel}
   data-track-completed-label={copy.startHere.trackCompleted}
+  data-track-continue-label={copyLabels.continueTrack}
+  data-track-next-label={copyLabels.nextLabel}
+  data-track-next-track-label={copy.startHere.nextTrack}
 >
-  <div class={cn(ui.panel, 'grid gap-5 px-5 py-5 min-[64rem]:gap-6 min-[64rem]:px-6 min-[64rem]:py-6')}>
+  <div class="grid gap-5 border-y border-site-line bg-transparent px-[0.45rem] py-5 min-[64rem]:gap-6 min-[64rem]:px-[0.55rem] min-[64rem]:py-6">
     <div class="grid gap-2.5">
       <p class="m-0 text-[0.82rem] font-medium tracking-[0.03em] text-site-ink-soft min-[64rem]:text-[0.9rem]">
         {metaLine}
       </p>
       <div class="grid gap-2">
-        <p class="m-0 text-[0.9rem] font-medium text-site-ink min-[64rem]:text-[0.98rem]" data-track-progress-status>
-          {copy.startHere.progressLabel}: {copy.startHere.stepLabel} 1 {ofLabel} {items.length}
-        </p>
+        <div class="flex items-center justify-between gap-4">
+          <p class="m-0 text-[0.9rem] font-medium text-site-ink min-[64rem]:text-[0.98rem]" data-track-progress-status>
+            {copy.startHere.progressLabel}: {copy.startHere.stepLabel} 1 {ofLabel} {items.length}
+          </p>
+          <p class="m-0 text-[0.82rem] font-semibold text-site-ink-soft min-[64rem]:text-[0.9rem]" data-track-progress-value>
+            0%
+          </p>
+        </div>
         <div class="h-2 overflow-hidden rounded-full bg-[color:color-mix(in_srgb,var(--site-bg)_72%,transparent)]">
           <div
             class="h-full w-0 rounded-full bg-[linear-gradient(90deg,color-mix(in_srgb,var(--site-link-hover)_70%,white_30%)_0%,var(--site-link-hover)_100%)] transition-[width,background,box-shadow] duration-200"
@@ -75,19 +88,25 @@ const initialHref = items[0]?.href ?? '#'
       <ArrowRightIcon className="size-[0.92rem]" />
     </a>
 
-    <div class="grid gap-2 border-t border-site-line pt-4">
-      <p class="m-0 text-[0.72rem] font-bold uppercase tracking-[0.18em] text-site-line-strong min-[64rem]:text-[0.78rem]">
-        {copy.startHere.exploreFurther}
+    <div class="grid gap-3 border-t border-site-line pt-4">
+      <p class="m-0 flex items-center gap-2 text-[0.88rem] font-semibold leading-6 text-site-ink min-[64rem]:text-[0.96rem]" data-track-overall-status>
+        <span aria-hidden="true" class="text-site-ink-muted" data-track-overall-icon>→</span>
+        <span data-track-overall-text>{copyLabels.continueTrack}</span>
       </p>
-      <div class="flex flex-wrap gap-2.5">
-        {supportLinks.map((link) => (
-          <a
-            class="inline-flex items-center rounded-full border border-site-line bg-site-card px-3 py-1.5 text-[0.76rem] font-medium text-site-ink transition-colors duration-150 hover:border-site-line-strong hover:bg-site-hover hover:text-site-link-hover focus-visible:border-site-line-strong focus-visible:bg-site-hover focus-visible:text-site-link-hover focus-visible:outline-none min-[64rem]:px-3.5 min-[64rem]:text-[0.84rem]"
-            href={link.href}
-          >
-            {link.title}
-          </a>
-        ))}
+
+      <div class="grid gap-2">
+        <p class="m-0 text-[0.72rem] font-bold uppercase tracking-[0.18em] text-site-line-strong min-[64rem]:text-[0.78rem]">
+          {copyLabels.nextLabel}
+        </p>
+        <a
+          class="group inline-flex w-fit items-center gap-2 rounded-[var(--radius-sm)] border border-site-line bg-site-card px-3.5 py-2 text-[0.82rem] font-medium text-site-ink transition-colors duration-150 hover:border-site-line-strong hover:bg-site-hover hover:text-site-link-hover focus-visible:border-site-line-strong focus-visible:bg-site-hover focus-visible:text-site-link-hover focus-visible:outline-none min-[64rem]:px-4 min-[64rem]:py-2.5 min-[64rem]:text-[0.9rem]"
+          data-track-next-default-href={tracksHref}
+          data-track-next-link
+          href={tracksHref}
+        >
+          <span data-track-next-text>{copy.startHere.nextTrack}</span>
+          <ArrowRightIcon className="size-[0.92rem]" />
+        </a>
       </div>
     </div>
 
@@ -113,9 +132,14 @@ const initialHref = items[0]?.href ?? '#'
     }
 
     const progressStatus = root.querySelector('[data-track-progress-status]')
+    const progressValue = root.querySelector('[data-track-progress-value]')
     const progressBar = root.querySelector('[data-track-progress-bar]')
     const cta = root.querySelector('[data-track-progress-cta]')
     const ctaLabel = root.querySelector('[data-track-progress-cta-label]')
+    const nextLink = root.querySelector('[data-track-next-link]')
+    const nextText = root.querySelector('[data-track-next-text]')
+    const overallIcon = root.querySelector('[data-track-overall-icon]')
+    const overallText = root.querySelector('[data-track-overall-text]')
     const itemLinks = [...root.querySelectorAll('[data-track-progress-item]')]
     const totalSteps = itemLinks.length
     const progressLabel = root.dataset.progressLabel ?? 'Progress'
@@ -124,12 +148,15 @@ const initialHref = items[0]?.href ?? '#'
     const continueLabel = ctaLabel?.textContent ?? 'Continue'
     const reviewLabel = root.dataset.reviewLabel ?? 'Review'
     const completedLabel = root.dataset.trackCompletedLabel ?? 'Completed'
+    const continueTrackLabel = root.dataset.trackContinueLabel ?? 'Keep going'
+    const nextTrackLabel = root.dataset.trackNextTrackLabel ?? 'Next track'
 
     const syncTrackProgress = () => {
       const completedGuideIds = new Set(readCompletedGuides())
       let completedCount = 0
       let firstUnreadHref = ''
       let firstUnreadStep = totalSteps
+      let firstUnreadTitle = ''
 
       itemLinks.forEach((item, index) => {
         if (!(item instanceof HTMLElement)) {
@@ -147,6 +174,7 @@ const initialHref = items[0]?.href ?? '#'
         if (!firstUnreadHref) {
           firstUnreadHref = item.dataset.trackHref ?? ''
           firstUnreadStep = index + 1
+          firstUnreadTitle = item.textContent?.trim() ?? ''
         }
       })
 
@@ -155,14 +183,18 @@ const initialHref = items[0]?.href ?? '#'
 
       root.classList.toggle('is-complete', isComplete)
 
-      if (progressBar instanceof HTMLElement) {
-        progressBar.style.width = `${percent}%`
-      }
-
       if (progressStatus instanceof HTMLElement) {
         progressStatus.textContent = isComplete
-          ? completedLabel
+          ? `${progressLabel}: ${completedLabel}`
           : `${progressLabel}: ${stepLabel} ${firstUnreadStep} ${ofLabel} ${totalSteps}`
+      }
+
+      if (progressValue instanceof HTMLElement) {
+        progressValue.textContent = `${percent}%`
+      }
+
+      if (progressBar instanceof HTMLElement) {
+        progressBar.style.width = `${percent}%`
       }
 
       if (cta instanceof HTMLAnchorElement) {
@@ -172,6 +204,25 @@ const initialHref = items[0]?.href ?? '#'
       if (ctaLabel instanceof HTMLElement) {
         ctaLabel.textContent = isComplete ? reviewLabel : continueLabel
       }
+
+      if (nextLink instanceof HTMLAnchorElement) {
+        nextLink.href = isComplete ? nextLink.dataset.trackNextDefaultHref ?? '#' : firstUnreadHref || '#'
+      }
+
+      if (nextText instanceof HTMLElement) {
+        nextText.textContent = isComplete ? nextTrackLabel : firstUnreadTitle || continueLabel
+      }
+
+      if (overallIcon instanceof HTMLElement) {
+        overallIcon.textContent = isComplete ? '✓' : '→'
+        overallIcon.classList.toggle('text-site-success', isComplete)
+        overallIcon.classList.toggle('text-site-ink-muted', !isComplete)
+      }
+
+      if (overallText instanceof HTMLElement) {
+        overallText.textContent = isComplete ? completedLabel : continueTrackLabel
+      }
+
     }
 
     syncTrackProgress()

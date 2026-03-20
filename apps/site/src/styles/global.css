@@ -289,23 +289,6 @@ pre {
     display: grid;
   }
 
-  [data-track-step].is-complete {
-    background: color-mix(in srgb, var(--site-surface) 18%, transparent);
-  }
-
-  [data-track-step].is-complete [data-track-step-index] {
-    border-color: color-mix(in srgb, var(--site-success) 50%, transparent);
-    color: var(--site-success);
-  }
-
-  [data-track-step].is-complete [data-track-step-title] {
-    color: var(--site-ink);
-  }
-
-  [data-track-step].is-complete [data-track-step-status] {
-    opacity: 1;
-  }
-
   [data-track-progress-root].is-complete [data-track-progress-bar] {
     background: linear-gradient(
       90deg,
@@ -313,6 +296,10 @@ pre {
       var(--site-success) 100%
     );
     box-shadow: 0 0 0 1px color-mix(in srgb, var(--site-success) 40%, transparent);
+  }
+
+  [data-track-progress-root].is-complete [data-track-progress-value] {
+    color: var(--site-success);
   }
 
   [data-track-progress-root].is-complete [data-track-progress-status] {
