@@ -19,6 +19,8 @@
     "style:guard": "pnpm --filter @template/site style:guard",
     "tailwind:canonical": "pnpm --filter @template/site tailwind:canonical",
     "tailwind:canonical:fix": "pnpm --filter @template/site tailwind:canonical:fix",
+    "test:e2e:site": "pnpm --filter @template/site test:e2e",
+    "test:unit:site": "pnpm --filter @template/site test:unit",
     "typecheck:site": "pnpm --filter @template/site check",
     "typecheck": "pnpm typecheck:site",
     "verify": "pnpm verify:starter",

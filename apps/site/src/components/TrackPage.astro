@@ -8,8 +8,8 @@ import BaseLayout from '@/layouts/BaseLayout.astro'
 import TrackProgressPanel from '@/components/TrackProgressPanel.astro'
 import { getArticleReadingTimeMinutes } from '@/lib/article-meta'
 import { formatEditorialDate } from '@/lib/format-date'
-import { resolveLocaleHrefMap } from '@/lib/locale-config'
-import { getSiteCopy, type SiteLocale } from '@/lib/site-copy'
+import { resolveLocaleHrefMap, resolveLocaleMap } from '@/lib/locale-config'
+import { getSiteCopy, getSiteDateLocale, type SiteLocale } from '@/lib/site-copy'
 import { getTracksHref } from '@/lib/tracks-links'
 import CompactSection from '@/components/ui/CompactSection.astro'
 import PageHeader from '@/components/ui/PageHeader.astro'
@@ -23,12 +23,16 @@ type Props = {
 const { locale, roadmap } = Astro.props
 const copy = getSiteCopy(locale)
 const roadmapSlugs = roadmap.slugs as Record<string, string | undefined>
+const alternateLocaleHrefs = resolveLocaleMap((supportedLocale) => {
+  const localizedSlug = roadmapSlugs[supportedLocale]
+  return localizedSlug ? getTracksHref(supportedLocale, localizedSlug) : null
+})
 const localeHrefs = resolveLocaleHrefMap((supportedLocale) =>
   getTracksHref(supportedLocale, roadmapSlugs[supportedLocale] ?? null)
   ?? getTracksHref(supportedLocale),
 )
 const tracksHref = getTracksHref(locale) ?? '/'
-const dateLocale = locale === 'pt-br' ? 'pt-BR' : 'en-US'
+const dateLocale = getSiteDateLocale(locale)
 const shareUrl = Astro.url.href
 const trackItems = roadmap.articleNodes.map((node, index) => ({
   articleId: node.articleId,
@@ -40,6 +44,7 @@ const totalReadingMinutes = roadmap.articleNodes.reduce((sum, node) => sum + get
 ---
 
 <BaseLayout
+  alternateLocaleHrefs={alternateLocaleHrefs}
   description={roadmap.summary}
   localeHrefs={localeHrefs}
   title={roadmap.title}

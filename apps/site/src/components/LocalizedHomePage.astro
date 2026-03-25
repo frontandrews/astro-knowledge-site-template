@@ -1,5 +1,4 @@
 ---
-import { getCollection } from 'astro:content'
 
 import ArticlesIndexPage from '@/components/ArticlesIndexPage.astro'
 import ChallengeIndexPage from '@/components/ChallengeIndexPage.astro'
@@ -8,14 +7,22 @@ import GlossaryIndexPage from '@/components/GlossaryIndexPage.astro'
 import HomeLandingPage from '@/components/HomeLandingPage.astro'
 import TopicIndexPage from '@/components/TopicIndexPage.astro'
 import TracksPage from '@/components/TracksPage.astro'
+import { HOME_DIRECTORY_PREVIEW_SIZE } from '@/lib/directory'
 import {
   resolveEditorialRoadmaps,
+  type EditorialLocale,
   type ResolvedEditorialRoadmap,
 } from '@/lib/roadmaps'
 import { getSection } from '@/lib/section-manifest'
 import {
   getHomeDefaultSection,
 } from '@/lib/site-config'
+import {
+  getActiveChallengesByLocale,
+  getActiveConceptsByLocale,
+  getActiveGlossaryByLocale,
+  getArticleCollection,
+} from '@/lib/site-content'
 import type { SiteLocale } from '@/lib/site-copy'
 import type { CollectionEntry } from 'astro:content'
 
@@ -28,41 +35,34 @@ const homeSectionId = getHomeDefaultSection()
 const homeSection = homeSectionId === 'landing' ? null : getSection(homeSectionId)
 
 let roadmaps: ResolvedEditorialRoadmap[] = []
-let activeArticles: CollectionEntry<'articles'>[] = []
 let activeConcepts: CollectionEntry<'concepts'>[] = []
 let activeChallenges: CollectionEntry<'challenges'>[] = []
 let activeGlossary: CollectionEntry<'glossary'>[] = []
 
 if (homeSection?.pageType === 'tracks') {
-  const articles = await getCollection('articles')
-  roadmaps = resolveEditorialRoadmaps(locale === 'pt-br' ? 'pt-br' : 'en', articles)
-} else if (homeSection?.pageType === 'articles' || homeSection?.pageType === 'topics') {
-  const articles = await getCollection('articles')
-  activeArticles = articles.filter((post) => post.data.locale === locale && post.data.status === 'active')
+  const articles = await getArticleCollection()
+  roadmaps = resolveEditorialRoadmaps(locale as EditorialLocale, articles)
 } else if (homeSection?.pageType === 'concepts') {
-  const concepts = await getCollection('concepts')
-  activeConcepts = concepts.filter((concept) => concept.data.locale === locale && concept.data.status === 'active')
+  activeConcepts = await getActiveConceptsByLocale(locale)
 } else if (homeSection?.pageType === 'glossary') {
-  const terms = await getCollection('glossary')
-  activeGlossary = terms.filter((term) => term.data.locale === locale && term.data.status === 'active')
+  activeGlossary = await getActiveGlossaryByLocale(locale)
 } else if (homeSection?.pageType === 'challenges') {
-  const challenges = await getCollection('challenges')
-  activeChallenges = challenges.filter((challenge) => challenge.data.locale === locale && challenge.data.status === 'active')
+  activeChallenges = await getActiveChallengesByLocale(locale)
 }
 ---
 
 {homeSection?.pageType === 'tracks' ? (
-  <TracksPage locale={locale} roadmaps={roadmaps} />
+  <TracksPage isHome locale={locale} roadmaps={roadmaps} />
 ) : homeSection?.pageType === 'topics' ? (
-  <TopicIndexPage locale={locale} posts={activeArticles} />
+  <TopicIndexPage isHome locale={locale} previewCount={HOME_DIRECTORY_PREVIEW_SIZE} />
 ) : homeSection?.pageType === 'concepts' ? (
-  <ConceptsIndexPage concepts={activeConcepts} locale={locale} />
+  <ConceptsIndexPage concepts={activeConcepts} isHome locale={locale} />
 ) : homeSection?.pageType === 'glossary' ? (
-  <GlossaryIndexPage locale={locale} terms={activeGlossary} />
+  <GlossaryIndexPage isHome locale={locale} terms={activeGlossary} />
 ) : homeSection?.pageType === 'challenges' ? (
-  <ChallengeIndexPage challenges={activeChallenges} locale={locale} />
+  <ChallengeIndexPage challenges={activeChallenges} isHome locale={locale} />
 ) : homeSectionId === 'landing' ? (
   <HomeLandingPage locale={locale} />
 ) : (
-  <ArticlesIndexPage locale={locale} />
+  <ArticlesIndexPage isHome locale={locale} previewCount={HOME_DIRECTORY_PREVIEW_SIZE} />
 )}

@@ -2,42 +2,44 @@
   import { onMount, tick } from 'svelte'
   import ArrowRightIcon from '@/components/ui/icons/ArrowRightIcon.svelte'
   import { cn } from '@/lib/cn'
-  import { readCompletedArticles, completedArticlesChangedEvent } from '@/lib/article-progress'
+  import { completedArticlesSetStore } from '@/lib/completed-articles-store'
+  import type { DirectoryItem, DirectoryTag } from '@/lib/directory'
+  import { completionDomHooks, getDataHookAttributes } from '@/lib/dom-hooks'
+  import { readQueryParam, setQueryParam, subscribeToQueryParam } from '@/lib/url-state'
   import { ui } from '@/lib/ui'
   import { directoryLinkVariants, directoryListVariants, filterChipVariants } from '@/lib/ui-variants'
 
-  type DirectoryTag = {
-    id: string
-    label: string
+  type Props = {
+    allItemsLabel?: string
+    articleItemsLabel?: string
+    availableFilters?: DirectoryTag[]
+    completionStorageKey?: string | null
+    fewerFiltersLabel?: string
+    filterLabel?: string
+    filterQueryKey?: string | null
+    items?: DirectoryItem[]
+    layout?: 'rows' | 'cards'
+    moreFiltersHref?: string | null
+    moreFiltersLabel?: string
+    noteItemsLabel?: string
+    sectionLabel?: string
   }
 
-  type DirectoryItem = {
-    badgeLabel?: string
-    completedCtaLabel?: string
-    completionId?: string
-    contentKind?: 'article' | 'note'
-    ctaLabel?: string
-    description?: string
-    eyebrow?: string
-    href: string
-    meta?: string
-    tags: DirectoryTag[]
-    title: string
-  }
-
-  export let items: DirectoryItem[] = []
-  export let filterLabel = ''
-  export let sectionLabel = ''
-  export let completionStorageKey: string | null = null
-  export let layout: 'rows' | 'cards' = 'cards'
-  export let allItemsLabel = 'All'
-  export let articleItemsLabel = 'Articles'
-  export let noteItemsLabel = 'Notes'
-  export let moreFiltersLabel = 'more'
-  export let fewerFiltersLabel = 'Show less'
-  export let moreFiltersHref: string | null = null
-  export let availableFilters: DirectoryTag[] = []
-  export let filterQueryKey: string | null = null
+  let {
+    items = [],
+    filterLabel = '',
+    sectionLabel = '',
+    completionStorageKey = null,
+    layout = 'cards',
+    allItemsLabel = 'All',
+    articleItemsLabel = 'Articles',
+    noteItemsLabel = 'Notes',
+    moreFiltersLabel = 'more',
+    fewerFiltersLabel = 'Show less',
+    moreFiltersHref = null,
+    availableFilters = [],
+    filterQueryKey = null,
+  }: Props = $props()
 
   const filterTones = [
     { dark: 'var(--site-filter-tone-1-dark)', light: 'var(--site-filter-tone-1-light)' },
@@ -49,54 +51,73 @@
   ]
   const filterLabelClass = ui.filterLabel
   const itemEyebrowClass = ui.metaQuiet
-  const listClass = directoryListVariants({ layout })
+  const measureChipAttr = 'data-measure-chip'
+  const measureChipValues = {
+    all: 'all',
+    category: 'category',
+    more: 'more',
+    type: 'type',
+  } as const
   const rowItemClass = ui.linearRow
-  const itemLinkClass = directoryLinkVariants({ layout })
-  let activeFilter: string | null = null
-  let activeType: 'all' | 'article' | 'note' = 'all'
-  let showAllFilters = false
-  let visibleCategoryCount = 0
-  let completedItemIds = new Set<string>(typeof window === 'undefined' ? [] : readCompletedArticles())
-  let filterMeasureContainer: HTMLDivElement | null = null
-  let resizeObserver: ResizeObserver | null = null
-  let measureRun = 0
-  let hasInitializedQueryFilter = false
-  let hasMeasuredCollapsedFilters = false
-  let previousCollapsedSignature = ''
+  let activeFilter = $state<string | null>(null)
+  let activeType = $state<'all' | 'article' | 'note'>('all')
+  let showAllFilters = $state(false)
+  let visibleCategoryCount = $state(0)
+  let completedItemIds = $state(new Set<string>())
+  let filterMeasureContainer = $state<HTMLDivElement | null>(null)
+  let resizeObserver = $state<ResizeObserver | null>(null)
+  let measurementFrame = $state<number | null>(null)
+  let measureRun = $state(0)
+  let hasInitializedQueryFilter = $state(false)
+  let hasMeasuredCollapsedFilters = $state(false)
+  let previousCollapsedSignature = $state('')
+  let previousMeasurementSignature = $state('')
 
-  $: typeScopedItems = items.filter((item) =>
-    activeType === 'all' ? true : (item.contentKind ?? 'article') === activeType,
+  let listClass = $derived(directoryListVariants({ layout }))
+  let itemLinkClass = $derived(directoryLinkVariants({ layout }))
+  let typeScopedItems = $derived.by(() =>
+    items.filter((item) => (activeType === 'all' ? true : (item.contentKind ?? 'article') === activeType)),
   )
-  $: typeScopedFilterIds = new Set(typeScopedItems.flatMap((item) => item.tags.map((tag) => tag.id)))
-  $: filters =
+  let typeScopedFilterIds = $derived.by(
+    () => new Set(typeScopedItems.flatMap((item) => item.tags.map((tag) => tag.id))),
+  )
+  let filters = $derived.by(() =>
     availableFilters.length > 0
       ? availableFilters.filter((filter) => typeScopedFilterIds.has(filter.id))
       : Array.from(
           new Map(typeScopedItems.flatMap((item) => item.tags.map((tag) => [tag.id, tag.label]))).entries(),
-        ).map(([id, label]) => ({ id, label }))
-  $: hasTypeFilters =
+        ).map(([id, label]) => ({ id, label })),
+  )
+  let hasTypeFilters = $derived(
     items.some((item) => item.contentKind === 'note') &&
-    items.some((item) => (item.contentKind ?? 'article') !== 'note')
-  $: if (activeFilter && !filters.some((filter) => filter.id === activeFilter)) {
-    activeFilter = null
-  }
-  $: if (showAllFilters) {
-    visibleCategoryCount = filters.length
-  }
-  $: shouldCollapseCategoryFilters = hasTypeFilters
-  $: if (!shouldCollapseCategoryFilters) {
-    visibleCategoryCount = filters.length
-    hasMeasuredCollapsedFilters = true
-  }
-  $: visibleFilters = showAllFilters || !shouldCollapseCategoryFilters ? filters : filters.slice(0, visibleCategoryCount)
-  $: shouldRenderCategoryFilters = !shouldCollapseCategoryFilters || showAllFilters || hasMeasuredCollapsedFilters
-  $: hiddenFiltersCount = shouldCollapseCategoryFilters ? Math.max(filters.length - visibleFilters.length, 0) : 0
-  $: visibleItems = typeScopedItems.filter((item) => {
-    const matchesTag = activeFilter ? item.tags.some((tag) => tag.id === activeFilter) : true
+      items.some((item) => (item.contentKind ?? 'article') !== 'note'),
+  )
+  let shouldCollapseCategoryFilters = $derived(hasTypeFilters)
+  let needsCollapsedMeasurement = $derived(
+    shouldCollapseCategoryFilters && !showAllFilters && filters.length > 0,
+  )
+  let visibleFilters = $derived(
+    showAllFilters || !shouldCollapseCategoryFilters ? filters : filters.slice(0, visibleCategoryCount),
+  )
+  let shouldRenderCategoryFilters = $derived(
+    !needsCollapsedMeasurement || hasMeasuredCollapsedFilters,
+  )
+  let hiddenFiltersCount = $derived(
+    shouldCollapseCategoryFilters ? Math.max(filters.length - visibleFilters.length, 0) : 0,
+  )
+  let visibleItems = $derived.by(() =>
+    typeScopedItems.filter((item) => {
+      const matchesTag = activeFilter ? item.tags.some((tag) => tag.id === activeFilter) : true
 
-    return matchesTag
-  })
-  $: collapsedSignature = showAllFilters ? 'expanded' : `${activeType}|${filters.map((filter) => filter.id).join(',')}`
+      return matchesTag
+    }),
+  )
+  let collapsedSignature = $derived(
+    showAllFilters ? 'expanded' : `${activeType}|${filters.map((filter) => filter.id).join(',')}`,
+  )
+  let measurementSignature = $derived(
+    `${needsCollapsedMeasurement ? 'measure' : 'skip'}|${filterMeasureContainer ? 'ready' : 'pending'}|${filters.map((filter) => filter.id).join(',')}`,
+  )
 
   function toggleFilter(id: string) {
     activeFilter = activeFilter === id ? null : id
@@ -110,13 +131,14 @@
     showAllFilters = !showAllFilters
   }
 
-  function setMeasuredCategoryCount(count: number) {
+  function setMeasuredCategoryCount(
+    categoryChips: HTMLElement[],
+    moreChip: HTMLElement | null,
+    count: number,
+  ) {
     if (!filterMeasureContainer) {
       return
     }
-
-    const categoryChips = Array.from(filterMeasureContainer.querySelectorAll<HTMLElement>('[data-measure-chip="category"]'))
-    const moreChip = filterMeasureContainer.querySelector<HTMLElement>('[data-measure-chip="more"]')
 
     categoryChips.forEach((chip, index) => {
       chip.style.display = index < count ? '' : 'none'
@@ -127,43 +149,83 @@
     }
   }
 
+  function countVisibleRows(chips: HTMLElement[]) {
+    let rows = 0
+    let previousOffsetTop: number | null = null
+
+    for (const chip of chips) {
+      if (chip.style.display === 'none') {
+        continue
+      }
+
+      if (chip.offsetTop !== previousOffsetTop) {
+        rows += 1
+        previousOffsetTop = chip.offsetTop
+      }
+    }
+
+    return rows
+  }
+
+  function getMeasureChipAttributes(value: (typeof measureChipValues)[keyof typeof measureChipValues]) {
+    return { [measureChipAttr]: value } as Record<typeof measureChipAttr, string>
+  }
+
+  function getMeasureChipSelector(value?: (typeof measureChipValues)[keyof typeof measureChipValues]) {
+    if (!value) {
+      return `[${measureChipAttr}]`
+    }
+
+    return `[${measureChipAttr}="${value}"]`
+  }
+
   function measureCollapsedCategoryCount() {
-    if (!filterMeasureContainer || !shouldCollapseCategoryFilters || showAllFilters || filters.length === 0) {
+    if (!filterMeasureContainer || !needsCollapsedMeasurement) {
       visibleCategoryCount = filters.length
       hasMeasuredCollapsedFilters = true
       return
     }
 
-    const categoryChips = Array.from(filterMeasureContainer.querySelectorAll<HTMLElement>('[data-measure-chip="category"]'))
+    const categoryChips = Array.from(filterMeasureContainer.querySelectorAll<HTMLElement>(getMeasureChipSelector(measureChipValues.category)))
+    const allChips = Array.from(filterMeasureContainer.querySelectorAll<HTMLElement>(getMeasureChipSelector()))
+    const moreChip = filterMeasureContainer.querySelector<HTMLElement>(getMeasureChipSelector(measureChipValues.more))
 
     if (categoryChips.length === 0) {
       visibleCategoryCount = 0
+      hasMeasuredCollapsedFilters = true
       return
     }
 
-    let best = categoryChips.length
+    let low = 0
+    let high = categoryChips.length
+    let best = 0
 
-    for (let count = categoryChips.length; count >= 0; count -= 1) {
-      setMeasuredCategoryCount(count)
-
-      const visibleChips = Array.from(filterMeasureContainer.querySelectorAll<HTMLElement>('[data-measure-chip]')).filter(
-        (chip) => chip.style.display !== 'none',
-      )
-      const visibleRows = new Set(visibleChips.map((chip) => chip.offsetTop)).size
+    while (low <= high) {
+      const count = Math.floor((low + high) / 2)
+      setMeasuredCategoryCount(categoryChips, moreChip, count)
+      const visibleRows = countVisibleRows(allChips)
 
       if (visibleRows <= 2) {
         best = count
-        break
+        low = count + 1
+      } else {
+        high = count - 1
       }
     }
 
     visibleCategoryCount = best
-    setMeasuredCategoryCount(best)
+    setMeasuredCategoryCount(categoryChips, moreChip, best)
     hasMeasuredCollapsedFilters = true
   }
 
   async function scheduleCollapsedCategoryMeasurement() {
     if (typeof window === 'undefined') {
+      return
+    }
+
+    if (!needsCollapsedMeasurement) {
+      visibleCategoryCount = filters.length
+      hasMeasuredCollapsedFilters = true
       return
     }
 
@@ -174,7 +236,30 @@
       return
     }
 
+    if (measurementFrame !== null) {
+      cancelAnimationFrame(measurementFrame)
+    }
+
+    await new Promise<void>((resolve) => {
+      measurementFrame = requestAnimationFrame(() => {
+        measurementFrame = null
+        resolve()
+      })
+    })
+
+    if (currentRun !== measureRun) {
+      return
+    }
+
     measureCollapsedCategoryCount()
+  }
+
+  function syncMeasurementObserver() {
+    resizeObserver?.disconnect()
+
+    if (needsCollapsedMeasurement && filterMeasureContainer?.parentElement) {
+      resizeObserver?.observe(filterMeasureContainer.parentElement)
+    }
   }
 
   function isComplete(item: DirectoryItem) {
@@ -197,79 +282,95 @@
     return 'Read again'
   }
 
-  function syncFilterFromQuery() {
-    if (typeof window === 'undefined' || !filterQueryKey) {
-      return
-    }
-
-    const queryValue = new URL(window.location.href).searchParams.get(filterQueryKey)
-
+  function applyFilterFromQuery(queryValue: string | null) {
     if (queryValue && filters.some((filter) => filter.id === queryValue)) {
       activeFilter = queryValue
+    } else {
+      activeFilter = null
     }
+
+    hasInitializedQueryFilter = true
   }
 
   onMount(() => {
     const cleanup: Array<() => void> = []
-    const syncCompletedItems = () => {
-      completedItemIds = new Set(readCompletedArticles())
-    }
 
     if (completionStorageKey) {
-      syncCompletedItems()
-
-      const handleCompletedItemsChanged = () => {
-        syncCompletedItems()
-      }
-
-      const handleStorage = (event: StorageEvent) => {
-        if (event.key === completionStorageKey) {
-          syncCompletedItems()
-        }
-      }
-
-      window.addEventListener(completedArticlesChangedEvent, handleCompletedItemsChanged)
-      window.addEventListener('storage', handleStorage)
-      cleanup.push(() => {
-        window.removeEventListener(completedArticlesChangedEvent, handleCompletedItemsChanged)
-        window.removeEventListener('storage', handleStorage)
-      })
+      cleanup.push(
+        completedArticlesSetStore.subscribe((completedSet) => {
+          completedItemIds = new Set(completedSet)
+        }),
+      )
     }
 
-    syncFilterFromQuery()
-    hasInitializedQueryFilter = true
+    if (filterQueryKey) {
+      cleanup.push(
+        subscribeToQueryParam(filterQueryKey, (queryValue) => {
+          applyFilterFromQuery(queryValue)
+        }),
+      )
+    } else {
+      hasInitializedQueryFilter = true
+    }
+
     resizeObserver = new ResizeObserver(() => {
       void scheduleCollapsedCategoryMeasurement()
     })
-
-    if (filterMeasureContainer?.parentElement) {
-      resizeObserver.observe(filterMeasureContainer.parentElement)
-    }
 
     void scheduleCollapsedCategoryMeasurement()
 
     return () => {
       cleanup.forEach((callback) => callback())
+      if (measurementFrame !== null) {
+        cancelAnimationFrame(measurementFrame)
+      }
       resizeObserver?.disconnect()
     }
   })
 
-  $: void filters, hasTypeFilters, showAllFilters, scheduleCollapsedCategoryMeasurement()
-  $: if (hasInitializedQueryFilter && typeof window !== 'undefined' && filterQueryKey) {
-    const nextUrl = new URL(window.location.href)
-
-    if (activeFilter) {
-      nextUrl.searchParams.set(filterQueryKey, activeFilter)
-    } else {
-      nextUrl.searchParams.delete(filterQueryKey)
+  $effect(() => {
+    if (activeFilter && !filters.some((filter) => filter.id === activeFilter)) {
+      activeFilter = null
     }
+  })
 
-    window.history.replaceState({}, '', `${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`)
-  }
-  $: if (collapsedSignature !== previousCollapsedSignature) {
-    previousCollapsedSignature = collapsedSignature
-    hasMeasuredCollapsedFilters = false
-  }
+  $effect(() => {
+    if (showAllFilters) {
+      visibleCategoryCount = filters.length
+    }
+  })
+
+  $effect(() => {
+    if (!shouldCollapseCategoryFilters) {
+      visibleCategoryCount = filters.length
+      hasMeasuredCollapsedFilters = true
+    }
+  })
+
+  $effect(() => {
+    if (resizeObserver && measurementSignature !== previousMeasurementSignature) {
+      previousMeasurementSignature = measurementSignature
+      syncMeasurementObserver()
+      void scheduleCollapsedCategoryMeasurement()
+    }
+  })
+
+  $effect(() => {
+    if (hasInitializedQueryFilter && typeof window !== 'undefined' && filterQueryKey) {
+      const currentQueryValue = readQueryParam(filterQueryKey)
+
+      if (currentQueryValue !== activeFilter) {
+        setQueryParam(filterQueryKey, activeFilter)
+      }
+    }
+  })
+
+  $effect(() => {
+    if (collapsedSignature !== previousCollapsedSignature) {
+      previousCollapsedSignature = collapsedSignature
+      hasMeasuredCollapsedFilters = false
+    }
+  })
 </script>
 
 {#if sectionLabel || filters.length > 0 || hasTypeFilters}
@@ -355,41 +456,43 @@
             {/if}
           {/if}
         </div>
-        <div
-          aria-hidden="true"
-          bind:this={filterMeasureContainer}
-          class="pointer-events-none invisible absolute left-0 top-0 -z-10 flex w-full flex-wrap justify-start gap-2.5 overflow-hidden"
-        >
-          {#if hasTypeFilters}
-            <button class={filterChipVariants({ active: activeType === 'all' })} data-measure-chip="type" type="button">
-              <span>{allItemsLabel}</span>
+        {#if needsCollapsedMeasurement}
+          <div
+            aria-hidden="true"
+            bind:this={filterMeasureContainer}
+            class="pointer-events-none invisible absolute left-0 top-0 -z-10 flex w-full flex-wrap justify-start gap-2.5 overflow-hidden"
+          >
+            {#if hasTypeFilters}
+              <button class={filterChipVariants({ active: activeType === 'all' })} {...getMeasureChipAttributes(measureChipValues.type)} type="button">
+                <span>{allItemsLabel}</span>
+              </button>
+              <button class={filterChipVariants({ active: activeType === 'article' })} {...getMeasureChipAttributes(measureChipValues.type)} type="button">
+                <span>{articleItemsLabel}</span>
+              </button>
+              <button class={filterChipVariants({ active: activeType === 'note' })} {...getMeasureChipAttributes(measureChipValues.type)} type="button">
+                <span>{noteItemsLabel}</span>
+              </button>
+            {:else if filters.length > 0}
+              <button class={filterChipVariants({ active: !activeFilter })} {...getMeasureChipAttributes(measureChipValues.all)} type="button">
+                <span>{allItemsLabel}</span>
+              </button>
+            {/if}
+            {#each filters as filter, index}
+              {@const tone = filterTones[index % filterTones.length]}
+              <button
+                class={filterChipVariants({ active: false })}
+                {...getMeasureChipAttributes(measureChipValues.category)}
+                style={`--chip-accent: ${tone.light}; --chip-accent-dark: ${tone.dark};`}
+                type="button"
+              >
+                <span>{filter.label}</span>
+              </button>
+            {/each}
+            <button class={filterChipVariants({ active: false })} {...getMeasureChipAttributes(measureChipValues.more)} type="button">
+              <span>+{filters.length} {moreFiltersLabel}</span>
             </button>
-            <button class={filterChipVariants({ active: activeType === 'article' })} data-measure-chip="type" type="button">
-              <span>{articleItemsLabel}</span>
-            </button>
-            <button class={filterChipVariants({ active: activeType === 'note' })} data-measure-chip="type" type="button">
-              <span>{noteItemsLabel}</span>
-            </button>
-          {:else if filters.length > 0}
-            <button class={filterChipVariants({ active: !activeFilter })} data-measure-chip="all" type="button">
-              <span>{allItemsLabel}</span>
-            </button>
-          {/if}
-          {#each filters as filter, index}
-            {@const tone = filterTones[index % filterTones.length]}
-            <button
-              class={filterChipVariants({ active: false })}
-              data-measure-chip="category"
-              style={`--chip-accent: ${tone.light}; --chip-accent-dark: ${tone.dark};`}
-              type="button"
-            >
-              <span>{filter.label}</span>
-            </button>
-          {/each}
-          <button class={filterChipVariants({ active: false })} data-measure-chip="more" type="button">
-            <span>+{filters.length} {moreFiltersLabel}</span>
-          </button>
-        </div>
+          </div>
+        {/if}
       </div>
     {/if}
   </div>
@@ -398,13 +501,13 @@
 <div class={listClass}>
   {#each visibleItems as item}
     {#if layout === 'rows'}
-      <article class={cn(rowItemClass, 'relative', isComplete(item) && 'is-complete')} data-article-post={item.completionId}>
+      <article class={cn('content-directory-item', rowItemClass, 'relative', isComplete(item) && 'is-complete')} {...getDataHookAttributes(completionDomHooks.item, item.completionId)}>
         <a class={itemLinkClass} href={item.href}>
           {#if item.completionId}
             <span
               aria-hidden="true"
-              class={ui.completionBadgeLinear}
-              data-article-post-complete-badge
+              class={cn('content-directory-complete-badge', ui.completionBadgeLinear)}
+              {...getDataHookAttributes(completionDomHooks.completeBadge)}
             >
               ✓
             </span>
@@ -423,7 +526,7 @@
             </div>
           {/if}
           <div class="grid gap-2 md:pr-20 lg:pr-24">
-            <h3 class={cn(ui.linearItemTitle, 'transition-colors duration-150')} data-card-title>
+            <h3 class={cn('content-directory-title', ui.linearItemTitle, 'transition-colors duration-150')} {...getDataHookAttributes(completionDomHooks.title)}>
               {item.title}
             </h3>
           </div>
@@ -432,23 +535,23 @@
           {/if}
           {#if item.ctaLabel}
             {#if isComplete(item)}
-              <span class={cn(ui.inlineCta, 'md:hidden')}>
+              <span class={cn('content-directory-mobile-complete-text', ui.inlineCta, 'md:hidden')}>
                 <span>{getCompletedCtaLabel(item)}</span>
                 <ArrowRightIcon className="size-[0.88rem]" />
               </span>
               <span class={ui.completionRailLg}>
-                <span class={ui.completionDesktopCtaInteractive} data-article-post-complete-text>
+                <span class={cn('content-directory-complete-text', ui.completionDesktopCtaInteractive)} {...getDataHookAttributes(completionDomHooks.completeText)}>
                   <span>{getCompletedCtaLabel(item)}</span>
                   <ArrowRightIcon className="size-[0.88rem]" />
                 </span>
               </span>
             {:else}
-              <span class={cn(ui.inlineCta, 'md:hidden')}>
+              <span class={cn('content-directory-mobile-default-cta', ui.inlineCta, 'md:hidden')}>
                 <span>{item.ctaLabel}</span>
                 <ArrowRightIcon className="size-[0.88rem]" />
               </span>
               <span class={ui.completionRailInlineMd}>
-                <span class={ui.completionDesktopCtaInteractive}>
+                <span class={cn('content-directory-default-cta', ui.completionDesktopCtaInteractive)}>
                   <span>{item.ctaLabel}</span>
                   <ArrowRightIcon className="size-[0.88rem]" />
                 </span>
@@ -458,19 +561,19 @@
         </a>
       </article>
     {:else}
-      <a class={cn(itemLinkClass, 'relative', isComplete(item) && 'is-complete')} data-article-post={item.completionId} href={item.href}>
+      <a class={cn('content-directory-item', itemLinkClass, 'relative', isComplete(item) && 'is-complete')} href={item.href} {...getDataHookAttributes(completionDomHooks.item, item.completionId)}>
         {#if item.completionId}
           <span
             aria-hidden="true"
-            class={ui.completionBadgeCard}
-            data-article-post-complete-badge
+            class={cn('content-directory-complete-badge', ui.completionBadgeCard)}
+            {...getDataHookAttributes(completionDomHooks.completeBadge)}
           >
             ✓
           </span>
         {/if}
         <div class="grid gap-2">
           <div class="flex items-center justify-between gap-4">
-            <h2 class={ui.linkCardTitle}>{item.title}</h2>
+            <h2 class={cn('content-directory-title', ui.linkCardTitle)}>{item.title}</h2>
             <ArrowRightIcon className="size-4 shrink-0 text-site-ink-muted transition-colors duration-150 group-hover:text-site-link-hover group-focus-within:text-site-link-hover" />
           </div>
           {#if item.description}

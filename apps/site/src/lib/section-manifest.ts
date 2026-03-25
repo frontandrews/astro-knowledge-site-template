@@ -1,4 +1,4 @@
-import { sectionManifest as rawSectionManifest } from '../../.content/sections.manifest.mjs'
+import { sectionManifest as rawSectionManifest } from '@content/sections.manifest.mjs'
 import { getDefaultLocale, getLocalePath, getLocalizedValue, normalizeSiteLocale } from '@/lib/locale-config'
 
 export type SectionLocale = string

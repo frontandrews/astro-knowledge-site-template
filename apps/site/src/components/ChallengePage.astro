@@ -1,6 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content'
-import { getCollection, render } from 'astro:content'
+import { render } from 'astro:content'
 import ArrowLeft from '@lucide/astro/icons/arrow-left'
 import ArrowRight from '@lucide/astro/icons/arrow-right'
 import ChevronLeft from '@lucide/astro/icons/chevron-left'
@@ -18,8 +18,9 @@ import { getArticleHrefFromEntry } from '@/lib/article-links'
 import { getChallengeLanguageLabel, getChallengeLevelLabel, sortChallenges } from '@/lib/challenge-meta'
 import { getChallengeHrefFromEntry, getChallengeIndexHref } from '@/lib/challenge-links'
 import { cn } from '@/lib/cn'
-import { resolveLocalizedEntryHrefMap } from '@/lib/locale-config'
+import { resolveLocalizedEntryHrefMap, resolveLocaleMap } from '@/lib/locale-config'
 import { getSiteCopy, getSiteLocale } from '@/lib/site-copy'
+import { getActiveChallengesByLocale, getArticleCollection, getChallengeCollection } from '@/lib/site-content'
 import { ui } from '@/lib/ui'
 
 type Props = {
@@ -30,15 +31,15 @@ const { challenge } = Astro.props
 const { Content } = await render(challenge)
 const locale = getSiteLocale(challenge.data.locale)
 const copy = getSiteCopy(locale)
-const allChallenges = await getCollection('challenges')
+const allChallenges = await getChallengeCollection()
 const localizedChallenges = allChallenges.filter(
   (entry) => entry.data.challengeId === challenge.data.challengeId && entry.data.status === 'active',
 )
-const activeChallenges = sortChallenges(
-  allChallenges.filter(
-    (entry) => entry.data.locale === challenge.data.locale && entry.data.status === 'active',
-  ),
-)
+const alternateLocaleHrefs = resolveLocaleMap((supportedLocale) => {
+  const localizedEntry = localizedChallenges.find((entry) => entry.data.locale === supportedLocale)
+  return localizedEntry ? getChallengeHrefFromEntry(localizedEntry) : null
+})
+const activeChallenges = sortChallenges(await getActiveChallengesByLocale(challenge.data.locale))
 const localeHrefs = resolveLocalizedEntryHrefMap(
   localizedChallenges,
   (entry) => getChallengeHrefFromEntry(entry),
@@ -50,7 +51,7 @@ const nextChallenge =
   currentChallengeIndex >= 0 && currentChallengeIndex < activeChallenges.length - 1
     ? activeChallenges[currentChallengeIndex + 1]
     : null
-const allArticles = await getCollection('articles')
+const allArticles = await getArticleCollection()
 const relatedArticles = allArticles.filter(
   (entry) =>
     entry.data.locale === challenge.data.locale &&
@@ -75,8 +76,8 @@ const relatedChallenges = [...explicitRelatedChallenges, ...fallbackRelatedChall
 const levelLabel = getChallengeLevelLabel(challenge.data.level, locale)
 const solutionLanguageLabel = getChallengeLanguageLabel(challenge.data.solutionLanguage)
 const detailMeta = `${copy.challenge.estimatedTime}: ${challenge.data.estimatedMinutes} min • ${copy.challenge.solutionLanguage}: ${solutionLanguageLabel}`
-const complexityTimeLabel = locale === 'pt-br' ? 'Tempo' : 'Time'
-const complexitySpaceLabel = locale === 'pt-br' ? 'Espaço' : 'Space'
+const complexityTimeLabel = copy.challenge.complexityTimeLabel
+const complexitySpaceLabel = copy.challenge.complexitySpaceLabel
 const problemStatementHtml = challenge.data.problemStatement
   ? await marked.parse(challenge.data.problemStatement)
   : null
@@ -96,6 +97,7 @@ const relatedChallengeItems = relatedChallenges.map((entry) => ({
 ---
 
 <BaseLayout
+  alternateLocaleHrefs={alternateLocaleHrefs}
   contentWidth="wide"
   description={challenge.data.description}
   localeHrefs={localeHrefs}
@@ -147,7 +149,7 @@ const relatedChallengeItems = relatedChallenges.map((entry) => ({
 
     {challenge.data.starterCode ? (
       <ChallengePlayground
-        client:load
+        client:visible
         challengeId={challenge.data.challengeId}
         starterCode={challenge.data.starterCode}
         testCases={challenge.data.testCases}
@@ -158,9 +160,9 @@ const relatedChallengeItems = relatedChallenges.map((entry) => ({
     ) : null}
 
     <SolutionReveal
-      client:load
+      client:visible
       challengeId={challenge.data.challengeId}
-      locale={challenge.data.locale}
+      copy={copy.solutionReveal}
     >
       {challenge.data.complexity ? (
         <section class={cn(ui.panel, 'mb-8 grid gap-3 p-5')}>

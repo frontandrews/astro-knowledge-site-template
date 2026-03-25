@@ -3,6 +3,7 @@ import { siteEvents } from '@/lib/site-config'
 import { siteStorageKeys } from '@/lib/storage-keys'
 
 export const completedArticlesChangedEvent = siteEvents.completedArticlesChanged
+export type CompletedArticlesListener = (ids: string[], completedSet: Set<string>) => void
 
 function dispatchCompletedArticlesChanged(ids: string[]) {
   if (typeof window === 'undefined') {
@@ -14,6 +15,10 @@ function dispatchCompletedArticlesChanged(ids: string[]) {
 
 export function readCompletedArticles() {
   return readLocalStorageJson<string[]>(siteStorageKeys.completedArticles, [])
+}
+
+export function readCompletedArticlesSet() {
+  return new Set(readCompletedArticles())
 }
 
 export function writeCompletedArticles(ids: string[]) {
@@ -50,4 +55,36 @@ export function markArticleUnread(articleId: string) {
   }
 
   return writeCompletedArticles(readCompletedArticles().filter((id) => id !== articleId))
+}
+
+export function subscribeToCompletedArticles(
+  listener: CompletedArticlesListener,
+  options: { emitInitial?: boolean } = {},
+) {
+  if (typeof window === 'undefined') {
+    return () => {}
+  }
+
+  const emit = () => {
+    const ids = readCompletedArticles()
+    listener(ids, new Set(ids))
+  }
+
+  const handleStorage = (event: StorageEvent) => {
+    if (event.key === siteStorageKeys.completedArticles) {
+      emit()
+    }
+  }
+
+  if (options.emitInitial !== false) {
+    emit()
+  }
+
+  window.addEventListener(completedArticlesChangedEvent, emit)
+  window.addEventListener('storage', handleStorage)
+
+  return () => {
+    window.removeEventListener(completedArticlesChangedEvent, emit)
+    window.removeEventListener('storage', handleStorage)
+  }
 }

@@ -384,87 +384,91 @@ pre {
     background: var(--site-progress-fill);
   }
 
-  [data-article-post].is-complete {
+  .content-directory-item.is-complete {
     border-color: color-mix(in srgb, var(--site-line) 88%, rgba(255, 255, 255, 0.12));
     background: color-mix(in srgb, var(--site-surface) 18%, transparent);
     opacity: 0.7;
   }
 
-  [data-article-post]:not(.is-complete) [data-card-title] {
+  .content-directory-item:not(.is-complete) .content-directory-title {
     color: var(--site-link-hover);
   }
 
-  [data-article-post].is-complete [data-card-title] {
+  .content-directory-item.is-complete .content-directory-title {
     color: var(--site-ink-soft);
   }
 
-  [data-article-post] [data-article-post-complete-badge] {
+  .content-directory-item .content-directory-complete-badge {
     opacity: 0;
   }
 
-  [data-article-post].is-complete [data-article-post-complete-badge] {
+  .content-directory-item.is-complete .content-directory-complete-badge {
     opacity: 1;
   }
 
+  .content-directory-item .content-directory-mobile-complete-text {
+    display: none;
+  }
+
+  .content-directory-item.is-complete .content-directory-mobile-default-cta {
+    display: none;
+  }
+
+  .content-directory-item.is-complete .content-directory-mobile-complete-text {
+    display: inline-flex;
+  }
+
   @media (min-width: 48rem) {
-    [data-article-post].is-complete [data-article-post-default-cta] {
+    .content-directory-item.is-complete .content-directory-default-cta {
       opacity: 0;
       transform: translateX(0.25rem);
     }
 
-    [data-article-post].is-complete:hover [data-article-post-complete-badge],
-    [data-article-post].is-complete:focus-within [data-article-post-complete-badge] {
+    .content-directory-item.is-complete:hover .content-directory-complete-badge,
+    .content-directory-item.is-complete:focus-within .content-directory-complete-badge {
       opacity: 0;
       transform: scale(0.9);
     }
 
-    [data-article-post].is-complete:hover [data-article-post-complete-text],
-    [data-article-post].is-complete:focus-within [data-article-post-complete-text] {
+    .content-directory-item.is-complete:hover .content-directory-complete-text,
+    .content-directory-item.is-complete:focus-within .content-directory-complete-text {
       opacity: 1;
       transform: translateX(0);
       color: var(--site-link-hover);
     }
   }
 
-  [data-tree-filter].is-active {
-    @apply border-site-line-strong bg-site-accent/20 text-site-link-hover;
-  }
-
-  [data-toc-link].is-read {
+  .article-toc-link.is-read {
     color: var(--site-ink-soft);
     background: transparent;
     box-shadow: inset 2px 0 0 color-mix(in srgb, var(--site-line) 70%, transparent);
   }
 
-  [data-toc-link].is-active {
+  .article-toc-link.is-active {
     color: var(--site-link-hover);
     background: color-mix(in srgb, var(--site-accent) 5%, transparent);
     box-shadow: inset -2px 0 0 color-mix(in srgb, var(--site-link-hover) 78%, transparent);
   }
 
-  [data-reading-progress].is-complete [data-reading-progress-bar] {
+  .article-reading-progress.is-complete .article-reading-progress-bar {
     background: var(--site-progress-complete-gradient);
     box-shadow: var(--site-progress-complete-outline);
   }
 
-  [data-reading-progress].is-complete [data-reading-progress-value] {
+  .article-reading-progress.is-complete .article-reading-progress-value {
     color: var(--site-success);
   }
 
-  [data-reading-progress].is-complete [data-reading-progress-complete] {
-    display: grid;
-  }
-
-  [data-track-progress-root].is-complete [data-track-progress-bar] {
+  .track-progress-root.is-complete .track-progress-bar {
     background: var(--site-progress-complete-gradient);
     box-shadow: var(--site-progress-complete-outline);
   }
 
-  [data-track-progress-root].is-complete [data-track-progress-value] {
+  .track-progress-root.is-complete .track-progress-value {
     color: var(--site-success);
   }
 
-  [data-track-progress-root].is-complete [data-track-progress-status] {
+  .track-progress-root.is-complete .track-progress-status {
     color: var(--site-success);
   }
 }

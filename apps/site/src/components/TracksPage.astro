@@ -2,7 +2,7 @@
 import RouteIcon from '@lucide/astro/icons/route'
 
 import BaseLayout from '@/layouts/BaseLayout.astro'
-import { resolveLocaleHrefMap } from '@/lib/locale-config'
+import { getLocalePath, resolveLocaleHrefMap } from '@/lib/locale-config'
 import type { ResolvedEditorialRoadmap } from '@/lib/roadmaps'
 import { getPageTypeDescription, getPageTypeLabel } from '@/lib/section-manifest'
 import { getSiteCopy, type SiteLocale } from '@/lib/site-copy'
@@ -12,13 +12,16 @@ import CompactSection from '@/components/ui/CompactSection.astro'
 import PageHeader from '@/components/ui/PageHeader.astro'
 
 type Props = {
+  isHome?: boolean
   locale: SiteLocale
   roadmaps: ResolvedEditorialRoadmap[]
 }
 
-const { locale, roadmaps } = Astro.props
+const { isHome = false, locale, roadmaps } = Astro.props
 const copy = getSiteCopy(locale)
-const localeHrefs = resolveLocaleHrefMap((supportedLocale) => getTracksHref(supportedLocale))
+const localeHrefs = resolveLocaleHrefMap((supportedLocale) =>
+  isHome ? getLocalePath(supportedLocale) : getTracksHref(supportedLocale),
+)
 const title = getPageTypeLabel('tracks', locale)
 const description = getPageTypeDescription('tracks', locale)
 const items = roadmaps.map((roadmap) => ({
@@ -45,7 +48,7 @@ const items = roadmaps.map((roadmap) => ({
       filterLabel={copy.tracksIndex.filterLabel}
       fewerFiltersLabel={copy.directory.showLess}
       items={items}
-      client:load
+      client:idle
       layout="cards"
       moreFiltersLabel={copy.directory.more}
     />

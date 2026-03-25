@@ -3,6 +3,7 @@ node_modules/
 apps/site/.astro/
 dist/
 coverage/
+apps/site/test-results/
 .env
 .env.local
 .DS_Store

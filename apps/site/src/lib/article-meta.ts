@@ -1,38 +1,11 @@
 import type { CollectionEntry } from 'astro:content'
 import { getTopicRootGroupId } from '@template/content'
 
-import { getSiteLocale, type SiteLocale } from '@/lib/site-copy'
+import { getSiteCopy } from '@/lib/site-copy'
 
 type ArticleEntry = CollectionEntry<'articles'>
 type ArticleLevel = ArticleEntry['data']['level']
-
 const WORDS_PER_MINUTE = 220
-
-const LEVEL_LABELS: Record<SiteLocale, Record<ArticleLevel, string>> = {
-  en: {
-    advanced: 'Advanced',
-    beginner: 'Beginner',
-    intermediate: 'Intermediate',
-  },
-  'pt-br': {
-    advanced: 'Avancado',
-    beginner: 'Iniciante',
-    intermediate: 'Intermediario',
-  },
-}
-
-const CATEGORY_LABELS: Record<SiteLocale, Record<string, string>> = {
-  en: {
-    frontend: 'Frontend',
-    systems: 'Systems',
-    thinking: 'Thinking',
-  },
-  'pt-br': {
-    frontend: 'Frontend',
-    systems: 'Sistemas',
-    thinking: 'Pensamento',
-  },
-}
 
 export function getArticleReadingTimeMinutes(post: ArticleEntry) {
   const normalized = (post.body ?? '')
@@ -46,23 +19,22 @@ export function getArticleReadingTimeMinutes(post: ArticleEntry) {
 }
 
 export function getArticleLevelLabel(level: ArticleLevel, locale?: string | null) {
-  const normalizedLocale = getSiteLocale(locale)
-  return LEVEL_LABELS[normalizedLocale][level]
+  return getSiteCopy(locale).articleMeta.levelLabels[level]
 }
 
 export function getArticleCategoryLabel(post: ArticleEntry) {
-  const normalizedLocale = getSiteLocale(post.data.locale)
+  const copy = getSiteCopy(post.data.locale)
   const rootGroupId = getTopicRootGroupId(post.data.topicIds[0] ?? '')
 
-  if (rootGroupId && CATEGORY_LABELS[normalizedLocale][rootGroupId]) {
-    return CATEGORY_LABELS[normalizedLocale][rootGroupId]
+  if (rootGroupId && copy.articleMeta.categoryLabels[rootGroupId]) {
+    return copy.articleMeta.categoryLabels[rootGroupId]
   }
 
   return post.data.category
 }
 
 export function toHashtagLabel(value: string, locale?: string | null) {
-  const normalizedLocale = getSiteLocale(locale) === 'pt-br' ? 'pt-BR' : 'en-US'
+  const normalizedLocale = getSiteCopy(locale).locale.lowerCaseLocale
   const normalizedValue = value
     .trim()
     .normalize('NFD')

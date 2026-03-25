@@ -2,43 +2,45 @@
 import type { CollectionEntry } from 'astro:content'
 import TagsIcon from '@lucide/astro/icons/tags'
 
-import FilterableDirectory from '@/components/FilterableDirectory.svelte'
+import DirectoryList from '@/components/ui/DirectoryList.astro'
+import DirectoryPagination from '@/components/ui/DirectoryPagination.astro'
 import DirectoryIndexShell from '@/components/ui/DirectoryIndexShell.astro'
-import { getArticleHrefFromEntry } from '@/lib/article-links'
-import { sortArticlesByRecency } from '@/lib/article-tree'
-import { formatEditorialDate } from '@/lib/format-date'
-import { resolveLocaleHrefMap } from '@/lib/locale-config'
+import {
+  TOPIC_INDEX_PAGE_SIZE,
+  buildTopicGroupDirectoryItems,
+  paginateItems,
+} from '@/lib/directory'
+import { getLocalePath, resolveLocaleHrefMap } from '@/lib/locale-config'
 import { getPageTypeDescription, getPageTypeLabel } from '@/lib/section-manifest'
 import { getSiteCopy, type SiteLocale } from '@/lib/site-copy'
-import { siteStorageKeys } from '@/lib/storage-keys'
-import { getTopicIndexHref } from '@/lib/topic-links'
-import { getLocalizedArticleTopics, getOrderedAvailableTopicFilters } from '@/lib/topic-taxonomy'
+import { getActiveArticlesByLocale } from '@/lib/site-content'
+import { getTopicIndexHref, getTopicIndexPageHref } from '@/lib/topic-links'
+import { ui } from '@/lib/ui'
 
 type Props = {
+  isHome?: boolean
   locale: SiteLocale
-  posts: CollectionEntry<'articles'>[]
+  page?: number
+  posts?: CollectionEntry<'articles'>[]
+  previewCount?: number
 }
 
-const { locale, posts } = Astro.props
+const { isHome = false, locale, page = 1, posts = [], previewCount } = Astro.props
 const copy = getSiteCopy(locale)
 const title = getPageTypeLabel('topics', locale)
 const description = getPageTypeDescription('topics', locale)
-const localeHrefs = resolveLocaleHrefMap((supportedLocale) => getTopicIndexHref(supportedLocale))
-const dateLocale = locale === 'pt-br' ? 'pt-BR' : 'en-US'
-const sortedPosts = sortArticlesByRecency(posts)
-const availableFilters = getOrderedAvailableTopicFilters(sortedPosts, locale)
-const items = sortedPosts.map((post) => ({
-  badgeLabel: post.data.kind === 'note' ? copy.directory.noteBadge : undefined,
-  completedCtaLabel: copy.directory.readAgain,
-  completionId: post.data.articleId,
-  contentKind: post.data.kind,
-  ctaLabel: copy.directory.readMore,
-  description: post.data.description,
-  eyebrow: formatEditorialDate(post.data.pubDate, dateLocale),
-  href: getArticleHrefFromEntry(post),
-  tags: getLocalizedArticleTopics(post).map(({ id, label }) => ({ id, label })),
-  title: post.data.title,
-}))
+const localeHrefs = resolveLocaleHrefMap((supportedLocale) =>
+  isHome ? getLocalePath(supportedLocale) : getTopicIndexHref(supportedLocale),
+)
+const sourcePosts = posts.length > 0 ? posts : await getActiveArticlesByLocale(locale)
+const items = buildTopicGroupDirectoryItems(sourcePosts, locale)
+const isPreview = typeof previewCount === 'number'
+const paginatedItems = paginateItems(items, page, TOPIC_INDEX_PAGE_SIZE)
+const visibleItems = isPreview ? items.slice(0, previewCount) : paginatedItems.items
+const pageTitle = !isPreview && page > 1
+  ? `${title} · ${copy.directory.page} ${paginatedItems.currentPage}`
+  : title
+const isPaginatedArchivePage = !isPreview && paginatedItems.currentPage > 1
 ---
 
 <DirectoryIndexShell
@@ -46,18 +48,30 @@ const items = sortedPosts.map((post) => ({
   icon={TagsIcon}
   iconLabel={title}
   localeHrefs={localeHrefs}
-  title={title}
+  noindex={isPaginatedArchivePage}
+  pagefind={!isPaginatedArchivePage && !isPreview}
+  title={pageTitle}
 >
-  <FilterableDirectory
-    allItemsLabel={copy.directory.allItems}
-    articleItemsLabel={copy.directory.articleItems}
-    availableFilters={availableFilters}
-    completionStorageKey={siteStorageKeys.completedArticles}
-    filterLabel={copy.directory.filterByTopic}
-    filterQueryKey="topic"
-    items={items}
-    client:load
-    layout="rows"
-    noteItemsLabel={copy.directory.noteItems}
-  />
+  {visibleItems.length > 0 ? (
+    <DirectoryList items={visibleItems} layout="cards" />
+  ) : (
+    <p class={ui.bodyCopy}>{copy.articlesIndex.comingSoon}</p>
+  )}
+
+  {isPreview ? (
+    <div class="mt-6 flex flex-wrap justify-center gap-3">
+      <a class="inline-flex min-h-11 items-center justify-center rounded-xs border border-site-line bg-site-panel px-4 text-sm font-semibold text-site-ink transition-colors duration-150 hover:bg-site-hover hover:text-site-link-hover focus-visible:bg-site-hover focus-visible:text-site-link-hover focus-visible:outline-none" href={getTopicIndexHref(locale)}>
+        {copy.topicIndex.viewAllLabel}
+      </a>
+    </div>
+  ) : (
+    <DirectoryPagination
+      currentPage={paginatedItems.currentPage}
+      getHref={(targetPage) => getTopicIndexPageHref(locale, targetPage)}
+      nextLabel={copy.directory.nextPage}
+      pageCount={paginatedItems.pageCount}
+      pageLabel={copy.directory.page}
+      previousLabel={copy.directory.previousPage}
+    />
+  )}
 </DirectoryIndexShell>

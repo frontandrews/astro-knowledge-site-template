@@ -1,5 +1,8 @@
 <script lang="ts">
+  import type { EditorView } from '@codemirror/view'
   import { onMount, onDestroy } from 'svelte'
+  import { markChallengeSolved } from '@/lib/challenge-progress'
+  import { buildUrlWithQueryParam, encodeBase64UrlValue, readBase64QueryParam } from '@/lib/url-state'
 
   type TestCase = {
     description: string
@@ -15,44 +18,84 @@
     error?: string
   }
 
-  export let starterCode: string
-  export let testCases: TestCase[] = []
-  export let solutionLanguage: 'javascript' | 'typescript' | 'python' = 'typescript'
-  export let challengeId: string = ''
-  export let hints: string[] = []
-  export let complexity: { time: string; space: string } | null = null
+  type Props = {
+    challengeId?: string
+    complexity?: { time: string; space: string } | null
+    hints?: string[]
+    solutionLanguage?: 'javascript' | 'typescript' | 'python'
+    starterCode: string
+    testCases?: TestCase[]
+  }
 
-  let editorEl: HTMLDivElement
-  let editorView: any = null
-  let activeWorker: Worker | null = null
+  let {
+    starterCode,
+    testCases = [],
+    solutionLanguage = 'typescript',
+    challengeId = '',
+    hints = [],
+    complexity = null,
+  }: Props = $props()
 
-  const codeStorageKey = challengeId ? `challenge-code-${challengeId}` : ''
-  const savedCode = codeStorageKey ? (typeof localStorage !== 'undefined' ? localStorage.getItem(codeStorageKey) : null) : null
+  let editorEl = $state<HTMLDivElement | null>(null)
+  let editorView = $state<EditorView | null>(null)
+  let activeWorker = $state<Worker | null>(null)
 
-  // If a shared ?code= is present in the URL, use it as the initial code
-  const sharedCode =
-    typeof location !== 'undefined'
-      ? (() => {
-          try {
-            const raw = new URLSearchParams(location.search).get('code')
-            return raw ? atob(raw) : null
-          } catch {
-            return null
-          }
-        })()
-      : null
+  let code = $state('')
+  let results = $state<TestResult[]>([])
+  let running = $state(false)
+  let hasRun = $state(false)
+  let hasResolvedInitialCode = $state(false)
+  let compileError = $state('')
+  let mountError = $state('')
+  let runTimer = $state<ReturnType<typeof setTimeout> | null>(null)
+  let shareCopiedTimer = $state<ReturnType<typeof setTimeout> | null>(null)
+  let attemptCount = $state(0)
+  let unlockedHints = $state(0)
+  let solvedAtAttempt = $state<number | null>(null)
+  let shareCopied = $state(false)
 
-  let code = sharedCode ?? savedCode ?? starterCode
-  let results: TestResult[] = []
-  let running = false
-  let hasRun = false
-  let compileError = ''
-  let mountError = ''
-  let runTimer: ReturnType<typeof setTimeout> | null = null
-  let attemptCount = 0
-  let unlockedHints = 0
-  let solvedAtAttempt: number | null = null
-  let shareCopied = false
+  let supportsExecution = $derived(
+    solutionLanguage === 'javascript' || solutionLanguage === 'typescript',
+  )
+  let passCount = $derived(results.filter((result) => result.pass).length)
+  let failCount = $derived(results.filter((result) => !result.pass).length)
+  let allPass = $derived(hasRun && !compileError && failCount === 0 && passCount > 0)
+
+  function getCodeStorageKey() {
+    return challengeId ? `challenge-code-${challengeId}` : ''
+  }
+
+  function resolveInitialCode() {
+    const sharedCode = readBase64QueryParam('code')
+
+    if (sharedCode) {
+      return sharedCode
+    }
+
+    const codeStorageKey = getCodeStorageKey()
+
+    if (!codeStorageKey || typeof localStorage === 'undefined') {
+      return starterCode
+    }
+
+    try {
+      return localStorage.getItem(codeStorageKey) ?? starterCode
+    } catch {
+      return starterCode
+    }
+  }
+
+  function persistCode(nextCode: string) {
+    const codeStorageKey = getCodeStorageKey()
+
+    if (!codeStorageKey) {
+      return
+    }
+
+    try {
+      localStorage.setItem(codeStorageKey, nextCode)
+    } catch {}
+  }
 
   function getFunctionName(code: string): string {
     const match = code.match(/(?:export\s+)?(?:async\s+)?function\s+(\w+)/)
@@ -100,37 +143,75 @@
     return s
   }
 
+  function clearRunTimeout() {
+    if (runTimer) {
+      clearTimeout(runTimer)
+      runTimer = null
+    }
+  }
+
+  function clearShareCopiedTimeout() {
+    if (shareCopiedTimer) {
+      clearTimeout(shareCopiedTimer)
+      shareCopiedTimer = null
+    }
+  }
+
+  function disposeWorker(worker: Worker | null = activeWorker) {
+    worker?.terminate()
+
+    if (worker === activeWorker) {
+      activeWorker = null
+    }
+  }
+
   function buildWorkerScript(jsCode: string, fnName: string, cases: TestCase[]): string {
     return `
 ${jsCode}
 
 const __cases = ${JSON.stringify(cases)};
-const __results = __cases.map(({ description, input, expected }) => {
-  try {
-    const actual = ${fnName}(...input);
-    const pass = JSON.stringify(actual) === JSON.stringify(expected);
-    return { description, pass, actual, expected };
-  } catch (e) {
-    return { description, pass: false, error: String(e) };
-  }
+(async () => {
+  const __results = await Promise.all(__cases.map(async ({ description, input, expected }) => {
+    try {
+      const actual = await Promise.resolve(${fnName}(...input));
+      const pass = JSON.stringify(actual) === JSON.stringify(expected);
+      return { description, pass, actual, expected };
+    } catch (e) {
+      return { description, pass: false, error: String(e) };
+    }
+  }));
+
+  postMessage({ __type: 'test-results', results: __results });
+})().catch((error) => {
+  postMessage({
+    __type: 'worker-error',
+    error: error instanceof Error ? error.message : String(error),
+  });
 });
-postMessage({ __type: 'test-results', results: __results });
 `.trim()
   }
 
   onMount(async () => {
+    code = resolveInitialCode()
+    hasResolvedInitialCode = true
+
     try {
+      if (!editorEl) {
+        mountError = 'Editor indisponivel'
+        return
+      }
+
       const isTypeScript = solutionLanguage === 'typescript'
 
       const [
         { EditorState },
         { EditorView, lineNumbers, highlightActiveLine },
-        { javascript },
+        javascriptModule,
         { oneDark },
       ] = await Promise.all([
         import('@codemirror/state'),
         import('@codemirror/view'),
-        import('@codemirror/lang-javascript'),
+        supportsExecution ? import('@codemirror/lang-javascript') : Promise.resolve(null),
         import('@codemirror/theme-one-dark'),
       ])
 
@@ -140,15 +221,13 @@ postMessage({ __type: 'test-results', results: __results });
           extensions: [
             lineNumbers(),
             highlightActiveLine(),
-            javascript({ typescript: isTypeScript }),
+            ...(javascriptModule ? [javascriptModule.javascript({ typescript: isTypeScript })] : []),
             oneDark,
             EditorView.lineWrapping,
             EditorView.updateListener.of((update) => {
               if (update.docChanged) {
                 code = update.state.doc.toString()
-                if (codeStorageKey) {
-                  try { localStorage.setItem(codeStorageKey, code) } catch {}
-                }
+                persistCode(code)
               }
             }),
             EditorView.domEventHandlers({
@@ -177,11 +256,12 @@ postMessage({ __type: 'test-results', results: __results });
 
   function reset() {
     code = starterCode
+    const codeStorageKey = getCodeStorageKey()
+
     if (codeStorageKey) {
       try { localStorage.removeItem(codeStorageKey) } catch {}
     }
     if (editorView) {
-      const { EditorState } = editorView.state.constructor
       editorView.dispatch({
         changes: { from: 0, to: editorView.state.doc.length, insert: starterCode },
       })
@@ -192,13 +272,22 @@ postMessage({ __type: 'test-results', results: __results });
   }
 
   onDestroy(() => {
-    if (runTimer) clearTimeout(runTimer)
-    activeWorker?.terminate()
+    clearRunTimeout()
+    clearShareCopiedTimeout()
+    disposeWorker()
     editorView?.destroy()
   })
 
   function run() {
     if (running) return
+    if (!supportsExecution) {
+      results = []
+      compileError = 'Execucao interativa disponivel apenas para JavaScript e TypeScript.'
+      hasRun = true
+      return
+    }
+
+    clearRunTimeout()
 
     running = true
     hasRun = false
@@ -206,8 +295,7 @@ postMessage({ __type: 'test-results', results: __results });
     compileError = ''
     attemptCount += 1
 
-    activeWorker?.terminate()
-    activeWorker = null
+    disposeWorker()
 
     const fnName = getFunctionName(code)
 
@@ -249,22 +337,20 @@ postMessage({ __type: 'test-results', results: __results });
         running = false
         hasRun = true
         compileError = ''
-        if (runTimer) { clearTimeout(runTimer); runTimer = null }
-        worker.terminate()
-        activeWorker = null
+        clearRunTimeout()
+        disposeWorker(worker)
 
         const allPassed = results.length > 0 && results.every((r) => r.pass)
         if (allPassed) {
           if (solvedAtAttempt === null) solvedAtAttempt = attemptCount
-          if (challengeId) {
-            try {
-              localStorage.setItem(`challenge-solved-${challengeId}`, '1')
-              window.dispatchEvent(
-                new CustomEvent('challenge-solved', { detail: { challengeId } }),
-              )
-            } catch {}
-          }
+          markChallengeSolved(challengeId)
         }
+      } else if (event.data?.__type === 'worker-error') {
+        compileError = event.data.error ?? 'Erro de execucao'
+        running = false
+        hasRun = true
+        clearRunTimeout()
+        disposeWorker(worker)
       }
     }
 
@@ -275,9 +361,8 @@ postMessage({ __type: 'test-results', results: __results });
       compileError = line && line > 0 ? `Linha ${line}: ${msg}` : msg
       running = false
       hasRun = true
-      if (runTimer) { clearTimeout(runTimer); runTimer = null }
-      worker.terminate()
-      activeWorker = null
+      clearRunTimeout()
+      disposeWorker(worker)
     }
 
     runTimer = setTimeout(() => {
@@ -285,34 +370,39 @@ postMessage({ __type: 'test-results', results: __results });
         running = false
         hasRun = true
         compileError = 'Tempo limite excedido. Verifique se há loops infinitos.'
-        worker.terminate()
-        activeWorker = null
+        disposeWorker(worker)
       }
     }, 10000)
   }
-
-  $: passCount = results.filter((r) => r.pass).length
-  $: failCount = results.filter((r) => !r.pass).length
-  $: allPass = hasRun && !compileError && failCount === 0 && passCount > 0
 
   function unlockHint() {
     if (unlockedHints < hints.length) unlockedHints += 1
   }
 
-  function shareCode() {
+  async function shareCode() {
     try {
-      const encoded = btoa(unescape(encodeURIComponent(code)))
-      const url = new URL(location.href)
-      url.searchParams.set('code', encoded)
-      navigator.clipboard.writeText(url.toString()).then(() => {
-        shareCopied = true
-        setTimeout(() => { shareCopied = false }, 2000)
-      })
+      const url = buildUrlWithQueryParam('code', encodeBase64UrlValue(code))
+
+      if (!url || typeof navigator.clipboard?.writeText !== 'function') {
+        return
+      }
+
+      await navigator.clipboard.writeText(url.toString())
+      shareCopied = true
+      clearShareCopiedTimeout()
+      shareCopiedTimer = setTimeout(() => {
+        shareCopied = false
+        shareCopiedTimer = null
+      }, 2000)
     } catch {}
   }
 
   function ordinal(n: number): string {
     return `${n}ª`
+  }
+
+  function handleFallbackInput(event: Event) {
+    persistCode((event.currentTarget as HTMLTextAreaElement).value)
   }
 </script>
 
@@ -328,9 +418,9 @@ postMessage({ __type: 'test-results', results: __results });
               ? 'solution.js'
               : 'solution.py'}
         </span>
-        {#if code !== starterCode}
+        {#if hasResolvedInitialCode && code !== starterCode}
           <button
-            on:click={reset}
+            onclick={reset}
             title="Voltar ao código inicial"
             class="challenge-playground-toolbar-action inline-flex items-center gap-1.5 rounded px-2 py-1 text-xs transition-colors"
           >
@@ -349,9 +439,9 @@ postMessage({ __type: 'test-results', results: __results });
           </span>
         {/if}
         <button
-          on:click={run}
-          disabled={running}
-          title="Executar (Ctrl+Enter)"
+          onclick={run}
+          disabled={running || !supportsExecution}
+          title={supportsExecution ? 'Executar (Ctrl+Enter)' : 'Execucao interativa disponivel apenas para JavaScript e TypeScript'}
           class="challenge-playground-primary inline-flex items-center gap-2 rounded-md px-4 py-1.5 text-sm font-medium transition-opacity hover:opacity-90 active:opacity-75 disabled:opacity-60"
         >
           {#if running}
@@ -365,7 +455,7 @@ postMessage({ __type: 'test-results', results: __results });
               ></path>
             </svg>
             Executando...
-          {:else}
+          {:else if supportsExecution}
             <svg
               class="size-3.5"
               fill="none"
@@ -376,6 +466,8 @@ postMessage({ __type: 'test-results', results: __results });
               <polygon points="5 3 19 12 5 21 5 3" />
             </svg>
             Executar
+          {:else}
+            Execucao indisponivel
           {/if}
         </button>
       </div>
@@ -392,6 +484,7 @@ postMessage({ __type: 'test-results', results: __results });
       <textarea
         class="challenge-playground-fallback min-h-48 w-full resize-y p-4 font-mono text-sm outline-none"
         bind:value={code}
+        oninput={handleFallbackInput}
         spellcheck="false"
       ></textarea>
     {/if}
@@ -411,7 +504,7 @@ postMessage({ __type: 'test-results', results: __results });
           </span>
           {#if unlockedHints < hints.length}
             <button
-              on:click={unlockHint}
+              onclick={unlockHint}
               class="challenge-playground-toolbar-action challenge-playground-outline-action inline-flex items-center gap-1.5 rounded px-2.5 py-1 text-xs font-medium transition-colors"
             >
               <svg class="size-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -497,7 +590,7 @@ postMessage({ __type: 'test-results', results: __results });
                   {/if}
                 </div>
                 <button
-                  on:click={shareCode}
+                  onclick={shareCode}
                   title="Copiar link com sua solução"
                   class="challenge-playground-share inline-flex items-center gap-1.5 rounded px-2.5 py-1 text-xs font-medium transition-colors"
                 >

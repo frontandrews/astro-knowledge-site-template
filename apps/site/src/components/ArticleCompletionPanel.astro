@@ -1,6 +1,9 @@
 ---
+import { randomUUID } from 'node:crypto'
 import ArticleCompletionSummary from '@/components/ArticleCompletionSummary.astro'
+import ArticleCompletionPanelClient from '@/components/ArticleCompletionPanelClient.svelte'
 import { cn } from '@/lib/cn'
+import { articleCompletionPanelDomHooks, getDataHookAttributes, sharedDomHooks } from '@/lib/dom-hooks'
 import type { SiteLocale } from '@/lib/site-copy'
 import { ui } from '@/lib/ui'
 
@@ -33,12 +36,14 @@ const {
   relatedItems = [],
   track = null,
 } = Astro.props
+const controllerId = randomUUID()
 ---
 
 <div
   class={cn('overflow-hidden xl:hidden', className)}
-  data-article-completion-panel
-  data-completion-id={completionId ?? ''}
+  {...getDataHookAttributes(articleCompletionPanelDomHooks.root)}
+  {...getDataHookAttributes(articleCompletionPanelDomHooks.completionId, completionId ?? '')}
+  {...getDataHookAttributes(sharedDomHooks.controllerId, controllerId)}
   style="max-height: 0; opacity: 0; transform: translateY(0.5rem); pointer-events: none; transition: max-height 300ms ease, opacity 220ms ease, transform 300ms ease;"
 >
   <section
@@ -55,70 +60,6 @@ const {
       variant="default"
     />
   </section>
+
+  <ArticleCompletionPanelClient client:idle controllerId={controllerId} />
 </div>
-
-<script>
-  import {
-    completedArticlesChangedEvent,
-    markArticleUnread,
-    readCompletedArticles,
-  } from '@/lib/article-progress';
-  import { siteEvents } from '@/lib/site-config';
-  import { siteStorageKeys } from '@/lib/storage-keys';
-
-  const readingResetEvent = siteEvents.articleReadingReset;
-  const completionPanels = document.querySelectorAll('[data-article-completion-panel]');
-
-  for (const panel of completionPanels) {
-    if (!(panel instanceof HTMLElement)) continue;
-
-    const completionId = panel.dataset.completionId ?? '';
-    const markUnreadButton = panel.querySelector('[data-completion-mark-unread]');
-
-    const showPanel = () => {
-      panel.style.maxHeight = `${panel.scrollHeight}px`;
-      panel.style.opacity = '1';
-      panel.style.transform = 'translateY(0)';
-      panel.style.pointerEvents = 'auto';
-    };
-
-    const hidePanel = () => {
-      panel.style.maxHeight = '0';
-      panel.style.opacity = '0';
-      panel.style.transform = 'translateY(0.5rem)';
-      panel.style.pointerEvents = 'none';
-    };
-
-    const sync = () => {
-      const isComplete = Boolean(completionId && readCompletedArticles().includes(completionId));
-
-      if (isComplete) {
-        showPanel();
-        return;
-      }
-
-      hidePanel();
-    };
-
-    if (markUnreadButton instanceof HTMLButtonElement) {
-      markUnreadButton.addEventListener('click', () => {
-        if (!completionId) {
-          return;
-        }
-
-        markArticleUnread(completionId);
-        window.dispatchEvent(new CustomEvent(readingResetEvent, { detail: completionId }));
-      });
-    }
-
-    window.addEventListener(completedArticlesChangedEvent, sync);
-    window.addEventListener('resize', sync);
-    window.addEventListener('storage', (event) => {
-      if (event.key === siteStorageKeys.completedArticles) {
-        sync();
-      }
-    });
-
-    sync();
-  }
-</script>

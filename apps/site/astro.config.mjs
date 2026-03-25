@@ -20,9 +20,14 @@ export default defineConfig({
   output: 'static',
   site: resolveSiteUrl(process.env.PUBLIC_SITE_URL),
   vite: {
+    ssr: {
+      noExternal: ['bits-ui', /^bits-ui\//],
+    },
     resolve: {
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url)),
+        '@content': fileURLToPath(new URL('./.content', import.meta.url)),
+        'bits-ui': fileURLToPath(new URL('./node_modules/bits-ui/dist/index.js', import.meta.url)),
       },
     },
     plugins: [tailwindcss()],

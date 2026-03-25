@@ -11,4 +11,4 @@ export {
   type LearningPathBranch,
   type LearningPathLocale,
   type LearningPathPillar,
-} from '../../.content/roadmaps/learning-paths'
+} from '@content/roadmaps/learning-paths'

@@ -1,17 +1,27 @@
 import type { CollectionEntry } from 'astro:content'
-import { getCollection } from 'astro:content'
 import { TOPIC_GROUP_DEFINITIONS, getTopicGroupRouteSegment } from '@template/content'
 
 import { getChallengeSlugFromEntry } from '@/lib/challenge-links'
 import { getConceptSlugFromEntry } from '@/lib/concepts-links'
 import { getDefaultLocale } from '@/lib/locale-config'
-import { resolveEditorialRoadmaps, type ResolvedEditorialRoadmap } from '@/lib/roadmaps'
+import {
+  resolveEditorialRoadmaps,
+  type EditorialLocale,
+  type ResolvedEditorialRoadmap,
+} from '@/lib/roadmaps'
 import {
   getEnabledSections,
   type SectionLocale,
   type SectionPageType,
   type SiteSection,
 } from '@/lib/section-manifest'
+import {
+  getActiveArticlesByLocale,
+  getActiveChallengesByLocale,
+  getActiveConceptsByLocale,
+  getActiveGlossaryByLocale,
+  getArticleCollection,
+} from '@/lib/site-content'
 import { getAvailableTopicsInGroup, getTopicGroupArticles } from '@/lib/topic-taxonomy'
 
 type ArticleEntry = CollectionEntry<'articles'>
@@ -72,35 +82,13 @@ function getRoutableSections(locale: SectionLocale) {
   )
 }
 
-function getActiveArticles(posts: ArticleEntry[], locale: SectionLocale) {
-  return posts.filter((post) => post.data.locale === locale && post.data.status === 'active')
-}
-
-function getActiveConcepts(concepts: ConceptEntry[], locale: SectionLocale) {
-  return concepts.filter((concept) => concept.data.locale === locale && concept.data.status === 'active')
-}
-
-function getActiveGlossaryTerms(terms: GlossaryEntry[], locale: SectionLocale) {
-  return terms.filter((term) => term.data.locale === locale && term.data.status === 'active')
-}
-
-function getActiveChallenges(challenges: ChallengeEntry[], locale: SectionLocale) {
-  return challenges.filter(
-    (challenge) => challenge.data.locale === locale && challenge.data.status === 'active',
-  )
-}
-
 export async function getDynamicSectionIndexPaths(locale: SectionLocale) {
   const isDefaultLocale = locale === getDefaultLocale()
   const sections = getRoutableSections(locale)
-  const articles = await getCollection('articles')
-  const concepts = await getCollection('concepts')
-  const glossary = await getCollection('glossary')
-  const challenges = await getCollection('challenges')
-  const activeArticles = getActiveArticles(articles, locale)
-  const activeConcepts = getActiveConcepts(concepts, locale)
-  const activeGlossary = getActiveGlossaryTerms(glossary, locale)
-  const activeChallenges = getActiveChallenges(challenges, locale)
+  const articles = await getArticleCollection()
+  const activeConcepts = await getActiveConceptsByLocale(locale)
+  const activeGlossary = await getActiveGlossaryByLocale(locale)
+  const activeChallenges = await getActiveChallengesByLocale(locale)
 
   return sections.map<StaticPath<DynamicSectionIndexProps>>((section) => {
     const props: DynamicSectionIndexProps = {
@@ -110,9 +98,7 @@ export async function getDynamicSectionIndexPaths(locale: SectionLocale) {
     }
 
     if (section.pageType === 'tracks') {
-      props.roadmaps = resolveEditorialRoadmaps(locale === 'pt-br' ? 'pt-br' : 'en', articles)
-    } else if (section.pageType === 'topics') {
-      props.posts = activeArticles
+      props.roadmaps = resolveEditorialRoadmaps(locale as EditorialLocale, articles)
     } else if (section.pageType === 'concepts') {
       props.concepts = activeConcepts
     } else if (section.pageType === 'glossary') {
@@ -134,17 +120,15 @@ export async function getDynamicSectionIndexPaths(locale: SectionLocale) {
 export async function getDynamicSectionDetailPaths(locale: SectionLocale) {
   const isDefaultLocale = locale === getDefaultLocale()
   const sections = getRoutableSections(locale)
-  const articles = await getCollection('articles')
-  const concepts = await getCollection('concepts')
-  const glossary = await getCollection('glossary')
-  const challenges = await getCollection('challenges')
-  const activeConcepts = getActiveConcepts(concepts, locale)
-  const activeGlossary = getActiveGlossaryTerms(glossary, locale)
-  const activeChallenges = getActiveChallenges(challenges, locale)
+  const articles = await getArticleCollection()
+  const activeArticles = await getActiveArticlesByLocale(locale)
+  const activeConcepts = await getActiveConceptsByLocale(locale)
+  const activeGlossary = await getActiveGlossaryByLocale(locale)
+  const activeChallenges = await getActiveChallengesByLocale(locale)
 
   return sections.flatMap<StaticPath<DynamicSectionDetailProps>>((section) => {
     if (section.pageType === 'tracks') {
-      return resolveEditorialRoadmaps(locale === 'pt-br' ? 'pt-br' : 'en', articles).map((roadmap) => ({
+      return resolveEditorialRoadmaps(locale as EditorialLocale, articles).map((roadmap) => ({
         params: {
           ...(isDefaultLocale ? {} : { locale }),
           section: section.routes[locale],
@@ -162,8 +146,8 @@ export async function getDynamicSectionDetailPaths(locale: SectionLocale) {
 
     if (section.pageType === 'topics') {
       return TOPIC_GROUP_DEFINITIONS.flatMap((group) => {
-        const topics = getAvailableTopicsInGroup(articles, group.id, locale)
-        const posts = getTopicGroupArticles(articles, group.id, locale)
+        const topics = getAvailableTopicsInGroup(activeArticles, group.id, locale)
+        const posts = getTopicGroupArticles(activeArticles, group.id, locale)
 
         if (topics.length === 0 && posts.length === 0) {
           return []
@@ -182,10 +166,8 @@ export async function getDynamicSectionDetailPaths(locale: SectionLocale) {
               groupId: group.id,
               locale,
               pageType: section.pageType,
-              posts,
               sectionId: section.id,
               slug,
-              topics,
             },
           },
         ]

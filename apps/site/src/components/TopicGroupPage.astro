@@ -1,72 +1,63 @@
 ---
-import { getTopicRouteSegment, type TopicDefinition } from '@template/content'
-
-import FilterableDirectory from '@/components/FilterableDirectory.svelte'
+import DirectoryList from '@/components/ui/DirectoryList.astro'
+import DirectoryPagination from '@/components/ui/DirectoryPagination.astro'
 import DirectoryIndexShell from '@/components/ui/DirectoryIndexShell.astro'
-import { getArticleHrefFromEntry } from '@/lib/article-links'
-import { formatEditorialDate } from '@/lib/format-date'
+import {
+  TOPIC_GROUP_DIRECTORY_PAGE_SIZE,
+  buildArticleDirectoryItems,
+  paginateItems,
+} from '@/lib/directory'
 import { resolveLocaleHrefMap } from '@/lib/locale-config'
-import { getTopicGroupHref } from '@/lib/topic-links'
+import { getActiveArticlesByLocale } from '@/lib/site-content'
+import { getSiteCopy, type SiteLocale } from '@/lib/site-copy'
+import { getTopicGroupHref, getTopicGroupPageHref } from '@/lib/topic-links'
 import {
   getLocalizedTopicGroupLabel,
   getLocalizedTopicGroupSummary,
-  getLocalizedTopicLabel,
-  getLocalizedArticleTopicsInGroup,
+  getTopicGroupArticles,
   getTopicGroupBreadcrumb,
 } from '@/lib/topic-taxonomy'
 import type { CollectionEntry } from 'astro:content'
-import { siteStorageKeys } from '@/lib/storage-keys'
-import { getSiteCopy, type SiteLocale } from '@/lib/site-copy'
 
 type Props = {
   groupId: string
   locale: SiteLocale
-  posts: CollectionEntry<'articles'>[]
-  topics: TopicDefinition[]
+  page?: number
+  posts?: CollectionEntry<'articles'>[]
 }
 
-const { groupId, locale, posts, topics } = Astro.props
+const { groupId, locale, page = 1, posts = [] } = Astro.props
 const copy = getSiteCopy(locale)
 const title = getLocalizedTopicGroupLabel(groupId, locale)
 const description = getLocalizedTopicGroupSummary(groupId, locale)
 const localeHrefs = resolveLocaleHrefMap((supportedLocale) => getTopicGroupHref(groupId, supportedLocale))
-const dateLocale = locale === 'pt-br' ? 'pt-BR' : 'en-US'
-const filterItems = topics.map((topic) => ({
-  id: getTopicRouteSegment(topic.id, locale),
-  label: getLocalizedTopicLabel(topic.id, locale),
-}))
-const items = posts.map((post) => ({
-  badgeLabel: post.data.kind === 'note' ? copy.directory.noteBadge : undefined,
-  completedCtaLabel: copy.directory.readAgain,
-  completionId: post.data.articleId,
-  contentKind: post.data.kind,
-  ctaLabel: copy.directory.readMore,
-  description: post.data.description,
-  eyebrow: formatEditorialDate(post.data.pubDate, dateLocale),
-  href: getArticleHrefFromEntry(post),
-  tags: getLocalizedArticleTopicsInGroup(post, groupId, locale).map(({ id, label }) => ({ id, label })),
-  title: post.data.title,
-}))
+const sourcePosts = posts.length > 0 ? posts : getTopicGroupArticles(await getActiveArticlesByLocale(locale), groupId, locale)
+const items = buildArticleDirectoryItems(sourcePosts, locale, { groupId })
+const paginatedItems = paginateItems(items, page, TOPIC_GROUP_DIRECTORY_PAGE_SIZE)
+const pageTitle = page > 1 ? `${title} · ${copy.directory.page} ${paginatedItems.currentPage}` : title
+const isPaginatedArchivePage = paginatedItems.currentPage > 1
 ---
 
 <DirectoryIndexShell
   breadcrumbs={getTopicGroupBreadcrumb(groupId, locale)}
   description={description}
   localeHrefs={localeHrefs}
-  title={title}
+  noindex={isPaginatedArchivePage}
+  pagefind={!isPaginatedArchivePage}
+  title={pageTitle}
 >
-  <FilterableDirectory
-    allItemsLabel={copy.directory.allItems}
-    articleItemsLabel={copy.directory.articleItems}
-    availableFilters={filterItems}
-    completionStorageKey={siteStorageKeys.completedArticles}
-    filterLabel={copy.directory.filterBySubtopic}
-    filterQueryKey="sub"
-    fewerFiltersLabel={copy.directory.showLess}
-    items={items}
-    client:load
-    layout="rows"
-    moreFiltersLabel={copy.directory.more}
-    noteItemsLabel={copy.directory.noteItems}
+  {paginatedItems.items.length > 0 ? (
+    <DirectoryList items={paginatedItems.items} layout="rows" />
+  ) : (
+    <p class="m-0 text-base leading-7 text-site-ink-soft">{copy.articlesIndex.comingSoon}</p>
+  )}
+
+  <DirectoryPagination
+    currentPage={paginatedItems.currentPage}
+    getHref={(targetPage) => getTopicGroupPageHref(groupId, locale, targetPage)}
+    nextLabel={copy.directory.nextPage}
+    pageCount={paginatedItems.pageCount}
+    pageLabel={copy.directory.page}
+    previousLabel={copy.directory.previousPage}
   />
 </DirectoryIndexShell>

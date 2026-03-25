@@ -1,0 +1,114 @@
+---
+import { siteStorageKeys } from '@/lib/storage-keys'
+
+type LinkItem = {
+  href: string
+  isActive: boolean
+  label: string
+}
+
+type LocaleLinkItem = LinkItem & {
+  code: string
+  htmlLang: string
+  shortLabel: string
+}
+
+type Props = {
+  closeLabel: string
+  localeOptionActiveClass?: string
+  localeSwitchClass?: string
+  localeSwitcherLabel: string
+  localeLinks?: LocaleLinkItem[]
+  menuLabel: string
+  mobileLocaleOptionClass?: string
+  mobileNavActiveClass?: string
+  mobileNavLinkClass?: string
+  navLinks?: LinkItem[]
+  panelClass?: string
+  primaryNavLabel: string
+  showLocaleSwitcher?: boolean
+}
+
+const {
+  closeLabel,
+  localeOptionActiveClass = '',
+  localeSwitchClass = '',
+  localeSwitcherLabel,
+  localeLinks = [],
+  menuLabel,
+  mobileLocaleOptionClass = '',
+  mobileNavActiveClass = '',
+  mobileNavLinkClass = '',
+  navLinks = [],
+  panelClass = '',
+  primaryNavLabel,
+  showLocaleSwitcher = false,
+} = Astro.props
+
+const closeMenuOnClick = "this.closest('details')?.removeAttribute('open')"
+
+function getLinkClass(baseClass: string, isActive: boolean, activeClass: string) {
+  return isActive ? `${baseClass} ${activeClass}` : baseClass
+}
+
+function getLocaleChoiceHandler(code: string) {
+  return `try{localStorage.setItem(${JSON.stringify(siteStorageKeys.localePreference)},${JSON.stringify(code)})}catch{};this.closest('details')?.removeAttribute('open')`
+}
+---
+
+<details class="group nav:hidden">
+  <summary
+    aria-controls="mobile-site-nav"
+    class="inline-flex min-h-10 items-center rounded-full border border-site-line bg-site-panel px-3 py-2 text-sm font-semibold tracking-[0.04em] text-site-ink transition-colors duration-150 hover:text-site-link-hover focus-visible:text-site-link-hover focus-visible:outline-none list-none [&::-webkit-details-marker]:hidden"
+  >
+    <svg class="size-4 group-open:hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path d="M4 7h16" />
+      <path d="M4 12h16" />
+      <path d="M4 17h16" />
+    </svg>
+    <svg class="hidden size-4 group-open:block" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path d="m18 6-12 12" />
+      <path d="m6 6 12 12" />
+    </svg>
+    <span class="sr-only">{menuLabel} / {closeLabel}</span>
+  </summary>
+
+  <div class="w-full pt-3" id="mobile-site-nav">
+    <div class={panelClass}>
+      {navLinks.length > 0 ? (
+        <nav aria-label={primaryNavLabel} class="grid gap-1">
+          {navLinks.map((link) => (
+            <a
+              class={getLinkClass(mobileNavLinkClass, link.isActive, mobileNavActiveClass)}
+              href={link.href}
+              onclick={closeMenuOnClick}
+            >
+              {link.label}
+            </a>
+          ))}
+        </nav>
+      ) : null}
+
+      {showLocaleSwitcher ? (
+        <div class="grid gap-2 border-t border-site-line pt-3">
+          <p class="m-0 text-[0.72rem] font-bold uppercase tracking-[0.18em] text-site-line-strong">
+            {localeSwitcherLabel}
+          </p>
+          <div class={`${localeSwitchClass} w-fit flex-wrap`}>
+            {localeLinks.map((localeLink) => (
+              <a
+                class={getLinkClass(mobileLocaleOptionClass, localeLink.isActive, localeOptionActiveClass)}
+                href={localeLink.href}
+                hreflang={localeLink.htmlLang}
+                lang={localeLink.htmlLang}
+                onclick={getLocaleChoiceHandler(localeLink.code)}
+              >
+                {localeLink.shortLabel}
+              </a>
+            ))}
+          </div>
+        </div>
+      ) : null}
+    </div>
+  </div>
+</details>

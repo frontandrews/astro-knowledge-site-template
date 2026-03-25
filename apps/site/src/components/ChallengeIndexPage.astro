@@ -7,20 +7,23 @@ import DirectoryIndexShell from '@/components/ui/DirectoryIndexShell.astro'
 import InfoPanel from '@/components/ui/InfoPanel.astro'
 import { getChallengeLevelLabel, sortChallenges } from '@/lib/challenge-meta'
 import { getChallengeHrefFromEntry, getChallengeIndexHref } from '@/lib/challenge-links'
-import { resolveLocaleHrefMap } from '@/lib/locale-config'
+import { getLocalePath, resolveLocaleHrefMap } from '@/lib/locale-config'
 import { getPageTypeDescription, getPageTypeLabel } from '@/lib/section-manifest'
 import { getSiteCopy, type SiteLocale } from '@/lib/site-copy'
 
 type Props = {
   challenges: CollectionEntry<'challenges'>[]
+  isHome?: boolean
   locale: SiteLocale
 }
 
-const { challenges, locale } = Astro.props
+const { challenges, isHome = false, locale } = Astro.props
 const copy = getSiteCopy(locale)
 const title = getPageTypeLabel('challenges', locale)
 const description = getPageTypeDescription('challenges', locale)
-const localeHrefs = resolveLocaleHrefMap((supportedLocale) => getChallengeIndexHref(supportedLocale))
+const localeHrefs = resolveLocaleHrefMap((supportedLocale) =>
+  isHome ? getLocalePath(supportedLocale) : getChallengeIndexHref(supportedLocale),
+)
 const sortedChallenges = sortChallenges(challenges)
 const levelFilters = ['beginner', 'intermediate', 'advanced']
   .filter((level) => sortedChallenges.some((challenge) => challenge.data.level === level))
@@ -77,7 +80,7 @@ const items = sortedChallenges.map((challenge) => {
       filterLabel={copy.challengeIndex.filterLabel}
       fewerFiltersLabel={copy.challengeIndex.showLess}
       items={items}
-      client:load
+      client:idle
       layout="rows"
       moreFiltersLabel={copy.challengeIndex.more}
     />

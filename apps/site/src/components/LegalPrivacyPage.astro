@@ -1,6 +1,7 @@
 ---
 import StaticArticlePage from '@/components/ui/StaticArticlePage.astro'
 import { getLegalContactLinks } from '@/lib/legal-contact'
+import { getLegalPageCopy } from '@/lib/legal-page-copy'
 import {
   getLegalGoverningLaw,
   getLegalOperatorLocation,
@@ -18,7 +19,6 @@ type Props = {
 
 const { locale: requestedLocale = 'en' } = Astro.props
 const locale = getSiteLocale(requestedLocale)
-const isPortuguese = locale === 'pt-br'
 const { legalEmail, supportEmail } = getLegalContactLinks()
 const privacyContactEmail = legalEmail ?? supportEmail
 const operatorName = getLegalOperatorName(locale)
@@ -26,203 +26,75 @@ const operatorLocation = getLegalOperatorLocation(locale)
 const governingLaw = getLegalGoverningLaw(locale)
 const templateNotice = getLegalTemplateNotice(locale)
 const localeHrefs = resolveLocaleHrefMap((supportedLocale) => getPrivacyHref(supportedLocale))
+const copy = getLegalPageCopy(locale).privacy
+const copyContext = {
+  governingLaw,
+  operatorLocation,
+  operatorName,
+  siteName: siteConfig.site.name,
+}
 ---
 
 <StaticArticlePage
-  description={
-    isPortuguese
-      ? `Como ${siteConfig.site.name} trata dados pessoais, cookies e preferencias do site.`
-      : `How ${siteConfig.site.name} handles personal data, cookies, and site preferences.`
-  }
+  description={copy.description(siteConfig.site.name)}
   kicker="Legal"
   localeHrefs={localeHrefs}
-  title={isPortuguese ? 'Politica de Privacidade' : 'Privacy Policy'}
+  title={copy.title}
 >
   <blockquote>
     <p>
-      <strong>{isPortuguese ? 'Aviso de template.' : 'Template note.'}</strong> {templateNotice}
+      <strong>{copy.templateNoteLabel}</strong> {templateNotice}
     </p>
   </blockquote>
 
-  {isPortuguese ? (
+  <p>{copy.intro(siteConfig.site.name)}</p>
+
+  <h2>{copy.whoControls.title}</h2>
+  <p>
+    {copy.whoControls.body(copyContext)}
+    {privacyContactEmail ? (
+      <>
+        {' '}
+        {copy.whoControls.contactPrefix}{' '}
+        <a href={privacyContactEmail.href}>{privacyContactEmail.value}</a>.
+      </>
+    ) : null}
+  </p>
+
+  <h2>{copy.collectedData.title}</h2>
+  <ul>
+    {copy.collectedData.items?.map((item) => <li>{item}</li>)}
+  </ul>
+
+  <h2>{copy.howDataIsUsed.title}</h2>
+  <ul>
+    {copy.howDataIsUsed.items?.map((item) => <li>{item}</li>)}
+  </ul>
+
+  <h2>{copy.cookies.title}</h2>
+  <p>{copy.cookies.body(copyContext)}</p>
+
+  <h2>{copy.thirdPartyServices.title}</h2>
+  <p>{copy.thirdPartyServices.body(copyContext)}</p>
+
+  <h2>{copy.retention.title}</h2>
+  <p>{copy.retention.body(copyContext)}</p>
+
+  <h2>{copy.yourRights.title}</h2>
+  <p>{copy.yourRights.body(copyContext)}</p>
+
+  <h2>{copy.changes.title}</h2>
+  <p>{copy.changes.body(copyContext)}</p>
+
+  <h2>{copy.applicableLaw.title}</h2>
+  <p>{copy.applicableLaw.body(copyContext)}</p>
+
+  {privacyContactEmail && copy.contact ? (
     <>
+      <h2>{copy.contact.title}</h2>
       <p>
-        Esta Politica de Privacidade e um ponto de partida reutilizavel para projetos feitos com este
-        template. Ela explica como {siteConfig.site.name} pode coletar, usar, armazenar e compartilhar dados
-        pessoais quando alguem navega no site, assina atualizacoes ou usa recursos opcionais do produto.
+        {copy.contact.bodyPrefix} <a href={privacyContactEmail.href}>{privacyContactEmail.value}</a>.
       </p>
-
-      <h2>Quem controla seus dados</h2>
-      <p>
-        {operatorName} opera {siteConfig.site.name}. O operador esta baseado em {operatorLocation}.
-        {privacyContactEmail ? (
-          <>
-            {' '}
-            Para pedidos de privacidade ou duvidas sobre seus dados, entre em contato por{' '}
-            <a href={privacyContactEmail.href}>{privacyContactEmail.value}</a>.
-          </>
-        ) : null}
-      </p>
-
-      <h2>Que dados podem ser coletados</h2>
-      <ul>
-        <li>Dados de contato que a pessoa decidir enviar, como nome, email ou mensagens de suporte</li>
-        <li>Dados de conta ou autenticacao, se recursos de login estiverem habilitados</li>
-        <li>Dados de uso, como paginas visitadas, cliques, horarios e caminhos de navegacao</li>
-        <li>Dados tecnicos, como IP, navegador, tipo de dispositivo e sistema operacional</li>
-        <li>Dados de preferencia guardados no navegador, como locale, progresso ou estado da interface</li>
-        <li>Dados recebidos de provedores terceiros usados de forma ativa, como auth, pagamentos ou comentarios</li>
-      </ul>
-
-      <h2>Como os dados podem ser usados</h2>
-      <ul>
-        <li>Operar, manter e melhorar o site e os recursos relacionados</li>
-        <li>Memorizar preferencias e manter funcionando fluxos opcionais de conta ou progresso</li>
-        <li>Medir trafego, entender uso e melhorar navegacao ou qualidade do conteudo</li>
-        <li>Enviar newsletter, atualizacoes, mensagens transacionais ou comunicacoes de lancamento quando existir</li>
-        <li>Prevenir abuso, investigar incidentes e cumprir obrigacoes legais</li>
-      </ul>
-
-      <h2>Cookies, local storage e analytics</h2>
-      <p>
-        Este template pode usar cookies, local storage, scripts de analytics e tecnologias parecidas
-        para comportamento basico do site, preferencias, seguranca, medicao de trafego e fluxos
-        opcionais de marketing. Revise as ferramentas habilitadas antes de publicar.
-      </p>
-
-      <h2>Servicos de terceiros</h2>
-      <p>
-        Projetos criados a partir deste template podem se integrar com hospedagem, analytics, email,
-        auth, comentarios ou pagamentos. Esses provedores operam sob seus proprios termos e politicas
-        de privacidade.
-      </p>
-
-      <h2>Retencao e seguranca</h2>
-      <p>
-        Dados pessoais devem ser mantidos apenas pelo tempo necessario para o recurso, a obrigacao
-        legal ou a necessidade operacional envolvida. O operador tambem deve aplicar salvaguardas
-        tecnicas e organizacionais razoaveis, sabendo que nenhum sistema e totalmente seguro.
-      </p>
-
-      <h2>Seus direitos</h2>
-      <p>
-        Dependendo da lei aplicavel ao seu projeto, usuarios podem ter direitos de acesso, correcao,
-        exclusao, portabilidade, restricao ou oposicao a certos usos de dados pessoais. Revise esta
-        secao com base nas leis e nos provedores reais antes do lancamento.
-      </p>
-
-      <h2>Mudancas nesta politica</h2>
-      <p>
-        O operador pode atualizar esta politica quando produto, fornecedores ou exigencias legais
-        mudarem. A versao atual deve ficar publicada nesta pagina com data de vigencia quando isso for
-        exigido pela jurisdicao aplicavel.
-      </p>
-
-      <h2>Lei aplicavel</h2>
-      <p>
-        Esta politica-base assume conformidade com {governingLaw}. Troque esta secao pela base legal,
-        jurisdicao e obrigacoes de aviso que realmente se aplicam ao seu projeto.
-      </p>
-
-      {privacyContactEmail ? (
-        <>
-          <h2>Contato</h2>
-          <p>
-            Se voce tiver duvidas sobre esta politica ou sobre o tratamento de dados pessoais, entre em
-            contato por <a href={privacyContactEmail.href}>{privacyContactEmail.value}</a>.
-          </p>
-        </>
-      ) : null}
     </>
-  ) : (
-    <>
-      <p>
-        This Privacy Policy is a reusable starting point for projects built on this template. It
-        explains how {siteConfig.site.name} may collect, use, store, and share personal data when someone
-        browses the site, subscribes to updates, or uses optional product features.
-      </p>
-
-      <h2>Who controls your data</h2>
-      <p>
-        {operatorName} operates {siteConfig.site.name}. The operator is based in {operatorLocation}.
-        {privacyContactEmail ? (
-          <>
-            {' '}
-            For privacy requests or questions about your data, contact{' '}
-            <a href={privacyContactEmail.href}>{privacyContactEmail.value}</a>.
-          </>
-        ) : null}
-      </p>
-
-      <h2>What data may be collected</h2>
-      <ul>
-        <li>Contact details you choose to send, such as name, email, or support messages</li>
-        <li>Account or authentication data if login features are enabled</li>
-        <li>Usage data such as visited pages, clicks, timestamps, and navigation paths</li>
-        <li>Technical data such as IP address, browser, device type, and operating system</li>
-        <li>Preference data stored in the browser, such as locale, progress markers, or UI state</li>
-        <li>Data received from third-party providers you actively use, such as auth, payments, or comments</li>
-      </ul>
-
-      <h2>How data may be used</h2>
-      <ul>
-        <li>Run, maintain, and improve the site and any related features</li>
-        <li>Remember preferences and keep optional account or progress flows working</li>
-        <li>Measure traffic, understand usage, and improve navigation or content quality</li>
-        <li>Send newsletters, updates, transactional messages, or launch communications when enabled</li>
-        <li>Prevent abuse, investigate incidents, and comply with legal obligations</li>
-      </ul>
-
-      <h2>Cookies, local storage, and analytics</h2>
-      <p>
-        This template may use cookies, local storage, analytics scripts, or similar technologies for
-        core site behavior, preferences, security, traffic measurement, and optional marketing flows.
-        Review the exact tools you enable before publishing.
-      </p>
-
-      <h2>Third-party services</h2>
-      <p>
-        Projects built from this template may connect to third-party providers such as hosting,
-        analytics, email, auth, comments, or payment tools. Those providers operate under their own
-        terms and privacy policies.
-      </p>
-
-      <h2>Retention and security</h2>
-      <p>
-        Personal data should be kept only for as long as needed for the feature, legal obligation, or
-        operational purpose involved. Operators should also apply reasonable technical and
-        organizational safeguards, while recognizing that no system is perfectly secure.
-      </p>
-
-      <h2>Your rights</h2>
-      <p>
-        Depending on the law that applies to your project, users may have rights to access, correct,
-        delete, export, restrict, or object to certain uses of personal data. Review this section
-        against the actual laws and providers you use before launch.
-      </p>
-
-      <h2>Changes to this policy</h2>
-      <p>
-        The operator may update this policy as the product, vendors, or legal requirements change. The
-        current version should always be published on this page with an effective date if your
-        jurisdiction requires it.
-      </p>
-
-      <h2>Applicable law</h2>
-      <p>
-        This starter policy assumes compliance with {governingLaw}. Replace this section with the real
-        legal basis, jurisdiction, and notice requirements that apply to your project.
-      </p>
-
-      {privacyContactEmail ? (
-        <>
-          <h2>Contact</h2>
-          <p>
-            If you have questions about this policy or how personal data is handled, contact{' '}
-            <a href={privacyContactEmail.href}>{privacyContactEmail.value}</a>.
-          </p>
-        </>
-      ) : null}
-    </>
-  )}
+  ) : null}
 </StaticArticlePage>

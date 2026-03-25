@@ -2,16 +2,20 @@
   import { tick } from 'svelte'
 
   import { cn } from '@/lib/cn'
+  import { articleReadingDomHooks, getDataHookAttributes } from '@/lib/dom-hooks'
   import type { GiscusConfig } from '@/lib/giscus'
   import { ui } from '@/lib/ui'
 
-  export let config: GiscusConfig
-  export let openLabel = 'View comments'
-  export let title = 'Comments'
+  type Props = {
+    config: GiscusConfig
+    openLabel?: string
+    title?: string
+  }
 
-  let host: HTMLDivElement | null = null
-  let isOpen = false
-  let hasLoaded = false
+  let { config, openLabel = 'View comments', title = 'Comments' }: Props = $props()
+  let host = $state<HTMLDivElement | null>(null)
+  let isOpen = $state(false)
+  let hasLoaded = $state(false)
 
   async function openComments() {
     if (isOpen) {
@@ -47,7 +51,7 @@
 </script>
 
 {#if isOpen}
-  <section class={ui.articleSection} data-article-reading-end>
+  <section class={ui.articleSection} {...getDataHookAttributes(articleReadingDomHooks.end)}>
     <div class={ui.sectionHeader}>
       <div class="grid gap-1">
         <h2 class={ui.headingCompact}>{title}</h2>
@@ -57,10 +61,10 @@
     <div bind:this={host} class="giscus-comments pt-1.5"></div>
   </section>
 {:else}
-  <section class={cn(ui.articleSection, 'flex justify-center')} data-article-reading-end>
+  <section class={cn(ui.articleSection, 'flex justify-center')} {...getDataHookAttributes(articleReadingDomHooks.end)}>
     <button
       class={cn(ui.controlButton, 'px-4 py-3 text-[0.88rem] font-medium lg:px-4.5 lg:py-3.5 lg:text-[0.96rem]')}
-      on:click={openComments}
+      onclick={openComments}
       type="button"
     >
       {openLabel}

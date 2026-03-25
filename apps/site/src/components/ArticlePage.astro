@@ -1,6 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content'
-import { getCollection, render } from 'astro:content'
+import { render } from 'astro:content'
 import ArrowLeft from '@lucide/astro/icons/arrow-left'
 import ArrowRight from '@lucide/astro/icons/arrow-right'
 import ChevronLeft from '@lucide/astro/icons/chevron-left'
@@ -12,15 +12,18 @@ import ArticleSharePanel from '@/components/ArticleSharePanel.astro'
 import AuthorByline from '@/components/ui/AuthorByline.astro'
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import { getArticleCategoryLabel, getArticleLevelLabel, getArticleReadingTimeMinutes, toHashtagLabel } from '@/lib/article-meta'
+import { articleReadingDomHooks, getDataHookAttributes } from '@/lib/dom-hooks'
 import { getArticleEditorialContext } from '@/lib/roadmaps'
 import { formatEditorialDate } from '@/lib/format-date'
 import { getGiscusConfig } from '@/lib/giscus'
 import { getArticleHrefFromEntry, getArticlesIndexHref } from '@/lib/article-links'
-import { resolveLocalizedEntryHrefMap } from '@/lib/locale-config'
+import { getLocalePath, resolveLocalizedEntryHrefMap, resolveLocaleMap } from '@/lib/locale-config'
+import { createArticleSchema, createBreadcrumbSchema } from '@/lib/seo'
 import { translateSiteLabels } from '@/lib/site-labels'
+import { getActiveArticlesByLocale, getArticleCollection } from '@/lib/site-content'
 import { sortArticles } from '@/lib/article-tree'
 import { getLocalizedArticleTopics } from '@/lib/topic-taxonomy'
-import { getSiteCopy, getSiteLocale } from '@/lib/site-copy'
+import { getSiteCopy, getSiteDateLocale, getSiteLocale } from '@/lib/site-copy'
 import { ui } from '@/lib/ui'
 import ContentArticleHeader from '@/components/ui/ContentArticleHeader.astro'
 import { cn } from '@/lib/cn'
@@ -31,15 +34,15 @@ type Props = {
 
 const { post } = Astro.props
 const { Content, headings = [] } = await render(post)
-const allArticleEntries = await getCollection('articles')
+const allArticleEntries = await getArticleCollection()
 const localizedPosts = allArticleEntries.filter(
   (entry) => entry.data.articleId === post.data.articleId && entry.data.status === 'active',
 )
-const activePosts = sortArticles(
-  allArticleEntries.filter(
-    (entry) => entry.data.locale === post.data.locale && entry.data.status === 'active',
-  ),
-)
+const alternateLocaleHrefs = resolveLocaleMap((supportedLocale) => {
+  const localizedEntry = localizedPosts.find((entry) => entry.data.locale === supportedLocale)
+  return localizedEntry ? getArticleHrefFromEntry(localizedEntry) : null
+})
+const activePosts = sortArticles(await getActiveArticlesByLocale(post.data.locale))
 const localeHrefs = resolveLocalizedEntryHrefMap(
   localizedPosts,
   (entry) => getArticleHrefFromEntry(entry),
@@ -53,8 +56,8 @@ const copy = getSiteCopy(post.data.locale)
 const translatedTags = translateSiteLabels(post.data.tags, post.data.locale)
 const linkedTopics = getLocalizedArticleTopics(post)
 const locale = getSiteLocale(post.data.locale)
-const dateLocale = post.data.locale === 'pt-br' ? 'pt-BR' : 'en-US'
-const giscusConfig = getGiscusConfig(post.data.locale === 'pt-br' ? 'pt-br' : 'en')
+const dateLocale = getSiteDateLocale(post.data.locale)
+const giscusConfig = getGiscusConfig(post.data.locale)
 const formattedPubDate = formatEditorialDate(post.data.pubDate, dateLocale)
 const formattedUpdatedDate = post.data.updatedDate
   ? formatEditorialDate(post.data.updatedDate, dateLocale, {
@@ -125,12 +128,41 @@ const displayTags = [
 const articleUrl = new URL(Astro.url.pathname, Astro.site ?? Astro.url).toString()
 const hasTakeaways = post.data.takeaways.length > 0
 const hasPracticeChecklist = post.data.practiceChecklist.length > 0
+const articleStructuredData = [
+  createArticleSchema({
+    dateModified: post.data.updatedDate?.toISOString() ?? null,
+    datePublished: post.data.pubDate.toISOString(),
+    description: post.data.description,
+    keywords: [...translatedTags, ...linkedTopics.map((topic) => topic.label)],
+    locale,
+    title: post.data.title,
+    url: articleUrl,
+  }),
+  createBreadcrumbSchema({
+    items: [
+      {
+        name: copy.layout.home,
+        url: new URL(getLocalePath(locale), Astro.site ?? Astro.url).toString(),
+      },
+      {
+        name: copy.layout.articles,
+        url: new URL(getArticlesIndexHref(locale), Astro.site ?? Astro.url).toString(),
+      },
+      {
+        name: post.data.title,
+        url: articleUrl,
+      },
+    ],
+  }),
+]
 ---
 
 <BaseLayout
+  alternateLocaleHrefs={alternateLocaleHrefs}
   contentWidth="wide"
   description={post.data.description}
   localeHrefs={localeHrefs}
+  structuredData={articleStructuredData}
   title={post.data.title}
 >
   <article class="w-full pb-11">
@@ -193,7 +225,7 @@ const hasPracticeChecklist = post.data.practiceChecklist.length > 0
 
     <div class={ui.articleRailLayout}>
       <div class={ui.articleRailLayoutMain}>
-        <div class="article-prose" data-article-reading-content>
+        <div class="article-prose" {...getDataHookAttributes(articleReadingDomHooks.content)}>
           <Content />
         </div>
 
@@ -229,7 +261,7 @@ const hasPracticeChecklist = post.data.practiceChecklist.length > 0
           </section>
         ) : null}
 
-        <div aria-hidden="true" class="h-px" data-article-reading-end></div>
+        <div aria-hidden="true" class="h-px" {...getDataHookAttributes(articleReadingDomHooks.end)}></div>
 
         <ArticleCompletionPanel
           className="mt-6"
@@ -285,7 +317,7 @@ const hasPracticeChecklist = post.data.practiceChecklist.length > 0
         {giscusConfig ? (
           <ArticleComments
             config={giscusConfig}
-            openLabel={post.data.locale === 'pt-br' ? 'Ver comentarios' : 'View comments'}
+            openLabel={copy.article.openComments}
             title={copy.article.comments}
             client:idle
           />

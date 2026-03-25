@@ -77,6 +77,13 @@ export function getArticlesIndexHref(locale = 'en') {
   return getLocalePath(normalizedLocale, section)
 }
 
+export function getArticlesPageHref(locale = 'en', page = 1) {
+  const indexHref = getArticlesIndexHref(locale)
+  const normalizedPage = Number.isFinite(page) ? Math.max(1, Math.floor(page)) : 1
+
+  return normalizedPage <= 1 ? indexHref : `${indexHref}/page/${normalizedPage}`
+}
+
 export function getArticleLocaleFromPathname(pathname: string) {
   const [, maybeLocale] = pathname.split('/')
   return maybeLocale && isSupportedLocale(maybeLocale) && SUPPORTED_ARTICLE_LOCALE_SET.has(maybeLocale)

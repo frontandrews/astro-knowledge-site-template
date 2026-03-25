@@ -1,10 +1,13 @@
 ---
+import { randomUUID } from 'node:crypto'
 import ClipboardCopyIcon from '@lucide/astro/icons/clipboard-copy'
 import MessageCircleIcon from '@lucide/astro/icons/message-circle'
 import Share2Icon from '@lucide/astro/icons/share-2'
 
+import ArticleSharePanelClient from '@/components/ArticleSharePanelClient.svelte'
 import { getSiteCopy, type SiteLocale } from '@/lib/site-copy'
 import { cn } from '@/lib/cn'
+import { articleShareDomHooks, getDataHookAttributes, sharedDomHooks } from '@/lib/dom-hooks'
 import { ui } from '@/lib/ui'
 
 type Props = {
@@ -20,30 +23,20 @@ const shareText = `${title}\n\n${description}\n\n${url}`
 const whatsappHref = `https://wa.me/?text=${encodeURIComponent(shareText)}`
 const twitterHref = `https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`
 const linkedinHref = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`
-const labels =
-  locale === 'pt-br'
-    ? {
-        linkedin: 'Compartilhar no LinkedIn',
-        twitter: 'Compartilhar no X',
-        whatsapp: 'Compartilhar no WhatsApp',
-      }
-    : {
-        linkedin: 'Share on LinkedIn',
-        twitter: 'Share on X',
-        whatsapp: 'Share on WhatsApp',
-      }
 const iconButtonClass = ui.iconButton
+const controllerId = randomUUID()
 ---
 
 <section
   class={cn(ui.articleSection, 'grid gap-3 px-0 py-0')}
-  data-article-share
-  data-copy-link-error={copy.article.copyLinkError}
-  data-copy-link-success={copy.article.copyLinkSuccess}
-  data-share-description={description}
-  data-share-fallback={copy.article.shareFallback}
-  data-share-title={title}
-  data-share-url={url}
+  {...getDataHookAttributes(articleShareDomHooks.root)}
+  {...getDataHookAttributes(sharedDomHooks.controllerId, controllerId)}
+  {...getDataHookAttributes(articleShareDomHooks.copyLinkError, copy.article.copyLinkError)}
+  {...getDataHookAttributes(articleShareDomHooks.copyLinkSuccess, copy.article.copyLinkSuccess)}
+  {...getDataHookAttributes(articleShareDomHooks.description, description)}
+  {...getDataHookAttributes(articleShareDomHooks.fallback, copy.article.shareFallback)}
+  {...getDataHookAttributes(articleShareDomHooks.title, title)}
+  {...getDataHookAttributes(articleShareDomHooks.url, url)}
 >
   <div class="grid justify-items-center gap-3 py-3 text-center lg:gap-4 lg:py-4">
     <p class={ui.shareLabel}>
@@ -54,7 +47,7 @@ const iconButtonClass = ui.iconButton
       <button
         aria-label={copy.article.share}
         class={iconButtonClass}
-        data-share-native
+        {...getDataHookAttributes(articleShareDomHooks.nativeButton)}
         title={copy.article.share}
         type="button"
       >
@@ -62,42 +55,42 @@ const iconButtonClass = ui.iconButton
         <span class="sr-only">{copy.article.share}</span>
       </button>
       <a
-        aria-label={labels.twitter}
+        aria-label={copy.article.shareOnTwitter}
         class={iconButtonClass}
         href={twitterHref}
         rel="noreferrer"
         target="_blank"
-        title={labels.twitter}
+        title={copy.article.shareOnTwitter}
       >
         <span aria-hidden="true" class="text-[0.88rem] font-semibold tracking-[0.02em] lg:text-[0.96rem]">X</span>
-        <span class="sr-only">{labels.twitter}</span>
+        <span class="sr-only">{copy.article.shareOnTwitter}</span>
       </a>
       <a
-        aria-label={labels.linkedin}
+        aria-label={copy.article.shareOnLinkedIn}
         class={iconButtonClass}
         href={linkedinHref}
         rel="noreferrer"
         target="_blank"
-        title={labels.linkedin}
+        title={copy.article.shareOnLinkedIn}
       >
         <span aria-hidden="true" class="text-[0.9rem] font-semibold lowercase tracking-[-0.02em] lg:text-[0.98rem]">in</span>
-        <span class="sr-only">{labels.linkedin}</span>
+        <span class="sr-only">{copy.article.shareOnLinkedIn}</span>
       </a>
       <a
-        aria-label={labels.whatsapp}
+        aria-label={copy.article.shareOnWhatsApp}
         class={iconButtonClass}
         href={whatsappHref}
         rel="noreferrer"
         target="_blank"
-        title={labels.whatsapp}
+        title={copy.article.shareOnWhatsApp}
       >
         <MessageCircleIcon aria-hidden="true" class="size-4" />
-        <span class="sr-only">{labels.whatsapp}</span>
+        <span class="sr-only">{copy.article.shareOnWhatsApp}</span>
       </a>
       <button
         aria-label={copy.article.copyLink}
         class={iconButtonClass}
-        data-share-copy
+        {...getDataHookAttributes(articleShareDomHooks.copyButton)}
         title={copy.article.copyLink}
         type="button"
       >
@@ -110,74 +103,8 @@ const iconButtonClass = ui.iconButton
   <p
     aria-live="polite"
     class="hidden text-center text-sm leading-6 text-site-ink-soft lg:text-[0.96rem]"
-    data-share-feedback
+    {...getDataHookAttributes(articleShareDomHooks.feedback)}
   />
+
+  <ArticleSharePanelClient client:idle controllerId={controllerId} />
 </section>
-
-<script>
-  const shareRoots = document.querySelectorAll('[data-article-share]')
-
-  for (const root of shareRoots) {
-    if (!(root instanceof HTMLElement)) continue
-
-    const nativeButton = root.querySelector('[data-share-native]')
-    const copyButton = root.querySelector('[data-share-copy]')
-    const feedback = root.querySelector('[data-share-feedback]')
-
-    if (
-      !(nativeButton instanceof HTMLButtonElement) ||
-      !(copyButton instanceof HTMLButtonElement) ||
-      !(feedback instanceof HTMLElement)
-    ) {
-      continue
-    }
-
-    const shareTitle = root.dataset.shareTitle ?? document.title
-    const shareDescription = root.dataset.shareDescription ?? ''
-    const shareUrl = root.dataset.shareUrl ?? window.location.href
-    const shareFallback = root.dataset.shareFallback ?? 'Share is unavailable.'
-    const copyLinkSuccess = root.dataset.copyLinkSuccess ?? 'Link copied.'
-    const copyLinkError = root.dataset.copyLinkError ?? 'Unable to copy the link.'
-
-    const setFeedback = (message: string) => {
-      feedback.textContent = message
-      feedback.classList.remove('hidden')
-    }
-
-    const copyLink = async () => {
-      if (typeof navigator.clipboard?.writeText !== 'function') {
-        setFeedback(copyLinkError)
-        return false
-      }
-
-      await navigator.clipboard.writeText(shareUrl)
-      setFeedback(copyLinkSuccess)
-      return true
-    }
-
-    nativeButton.addEventListener('click', async () => {
-      if (typeof navigator.share !== 'function') {
-        setFeedback(shareFallback)
-        return
-      }
-
-      try {
-        await navigator.share({
-          text: shareDescription,
-          title: shareTitle,
-          url: shareUrl,
-        })
-      } catch (error) {
-        if (error instanceof DOMException && error.name === 'AbortError') {
-          return
-        }
-
-        setFeedback(shareFallback)
-      }
-    })
-
-    copyButton.addEventListener('click', () => {
-      void copyLink()
-    })
-  }
-</script>

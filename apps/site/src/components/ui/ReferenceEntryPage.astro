@@ -8,6 +8,7 @@ import { getSiteCopy, type SiteLocale } from '@/lib/site-copy'
 import { ui } from '@/lib/ui'
 
 type Props = {
+  alternateLocaleHrefs?: Record<string, string | null>
   createdMeta: string | null
   description: string
   locale: SiteLocale
@@ -18,6 +19,7 @@ type Props = {
 }
 
 const {
+  alternateLocaleHrefs = {},
   createdMeta,
   description,
   locale,
@@ -31,6 +33,7 @@ const copy = getSiteCopy(locale)
 ---
 
 <BaseLayout
+  alternateLocaleHrefs={alternateLocaleHrefs}
   description={description}
   localeHrefs={localeHrefs}
   title={title}

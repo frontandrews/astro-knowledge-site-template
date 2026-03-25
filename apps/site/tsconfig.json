@@ -5,6 +5,9 @@
       "@/*": [
         "./src/*"
       ],
+      "@content/*": [
+        "./.content/*"
+      ],
       "@template/content": [
         "../../packages/content/src/index.ts"
       ]

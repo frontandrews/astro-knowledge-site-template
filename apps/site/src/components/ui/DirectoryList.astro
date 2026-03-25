@@ -1,0 +1,106 @@
+---
+import ArrowRightIcon from '@/components/ui/icons/ArrowRightIcon.astro'
+import { cn } from '@/lib/cn'
+import { completionDomHooks, getDataHookAttributes } from '@/lib/dom-hooks'
+import { type DirectoryItem } from '@/lib/directory'
+import { directoryLinkVariants, directoryListVariants } from '@/lib/ui-variants'
+import { ui } from '@/lib/ui'
+
+type Props = {
+  items: DirectoryItem[]
+  layout?: 'cards' | 'rows'
+}
+
+const { items, layout = 'cards' } = Astro.props
+const listClass = directoryListVariants({ layout })
+const itemLinkClass = directoryLinkVariants({ layout })
+const rowItemClass = ui.linearRow
+---
+
+<div class={listClass}>
+  {items.map((item) =>
+    layout === 'rows' ? (
+      <article class={cn('content-directory-item', rowItemClass, 'relative')} {...getDataHookAttributes(completionDomHooks.item, item.completionId)}>
+        <a class={itemLinkClass} href={item.href}>
+          {item.completionId ? (
+            <span
+              aria-hidden="true"
+              class={cn('content-directory-complete-badge', ui.completionBadgeLinear)}
+              {...getDataHookAttributes(completionDomHooks.completeBadge)}
+            >
+              ✓
+            </span>
+          ) : null}
+          {item.eyebrow || item.badgeLabel ? (
+            <div class="flex flex-wrap items-center gap-2">
+              {item.eyebrow ? <p class={ui.metaQuiet}>{item.eyebrow}</p> : null}
+              {item.badgeLabel ? (
+                <>
+                  {item.eyebrow ? <span aria-hidden="true" class={ui.metaQuiet}>•</span> : null}
+                  <p class={ui.metaQuiet}>{item.badgeLabel}</p>
+                </>
+              ) : null}
+            </div>
+          ) : null}
+          <div class="grid gap-2 md:pr-20 lg:pr-24">
+            <h3 class={cn('content-directory-title', ui.linearItemTitle, 'transition-colors duration-150')} {...getDataHookAttributes(completionDomHooks.title)}>
+              {item.title}
+            </h3>
+          </div>
+          {item.description ? <p class={ui.cardDescription}>{item.description}</p> : null}
+          {item.ctaLabel ? (
+            <>
+              {item.completionId ? (
+                <>
+                  <span class={cn('content-directory-mobile-default-cta', ui.inlineCta, 'md:hidden')} {...getDataHookAttributes(completionDomHooks.mobileDefaultText)}>
+                    <span>{item.ctaLabel}</span>
+                    <ArrowRightIcon className="size-[0.88rem]" />
+                  </span>
+                  <span class={cn('content-directory-mobile-complete-text', ui.inlineCta, 'md:hidden')} {...getDataHookAttributes(completionDomHooks.mobileCompleteText)}>
+                    <span>{item.completedCtaLabel ?? item.ctaLabel}</span>
+                    <ArrowRightIcon className="size-[0.88rem]" />
+                  </span>
+                </>
+              ) : (
+                <span class={cn(ui.inlineCta, 'md:hidden')}>
+                  <span>{item.ctaLabel}</span>
+                  <ArrowRightIcon className="size-[0.88rem]" />
+                </span>
+              )}
+              <span class={ui.completionRailInlineMd}>
+                <span class={cn('content-directory-complete-text', ui.completionDesktopCta)} {...getDataHookAttributes(completionDomHooks.completeText)}>
+                  <span>{item.completedCtaLabel ?? item.ctaLabel}</span>
+                  <ArrowRightIcon className="size-[0.88rem]" />
+                </span>
+                <span class={cn('content-directory-default-cta', ui.completionDesktopCtaInteractive)} {...getDataHookAttributes(completionDomHooks.defaultText)}>
+                  <span>{item.ctaLabel}</span>
+                  <ArrowRightIcon className="size-[0.88rem]" />
+                </span>
+              </span>
+            </>
+          ) : null}
+        </a>
+      </article>
+    ) : (
+      <a class={cn('content-directory-item', itemLinkClass, 'relative')} href={item.href} {...getDataHookAttributes(completionDomHooks.item, item.completionId)}>
+        {item.completionId ? (
+          <span
+            aria-hidden="true"
+            class={cn('content-directory-complete-badge', ui.completionBadgeCard)}
+            {...getDataHookAttributes(completionDomHooks.completeBadge)}
+          >
+            ✓
+          </span>
+        ) : null}
+        <div class="grid gap-2">
+          <div class="flex items-center justify-between gap-4">
+            <h2 class={cn('content-directory-title', ui.linkCardTitle)} {...getDataHookAttributes(completionDomHooks.title)}>{item.title}</h2>
+            <ArrowRightIcon className="size-4 shrink-0 text-site-ink-muted transition-colors duration-150 group-hover:text-site-link-hover group-focus-within:text-site-link-hover" />
+          </div>
+          {item.description ? <p class={ui.cardDescription}>{item.description}</p> : null}
+          {item.meta ? <p class={ui.cardMeta}>{item.meta}</p> : null}
+        </div>
+      </a>
+    ),
+  )}
+</div>

@@ -2,8 +2,15 @@ import { siteConfig } from '@/lib/site-config'
 import { getDefaultLocale, normalizeSiteLocale } from '@/lib/locale-config'
 
 export type SiteLocale = string
+type ArticleLevel = 'advanced' | 'beginner' | 'intermediate'
+type ChallengeLevel = 'advanced' | 'beginner' | 'intermediate'
 
 type SiteCopy = {
+  locale: {
+    dateLocale: string
+    giscusLang: string
+    lowerCaseLocale: string
+  }
   article: {
     categoryLabel: string
     chatShare: string
@@ -35,10 +42,18 @@ type SiteCopy = {
     shareArticleTitle: string
     shareDescription: string
     shareFallback: string
+    shareOnLinkedIn: string
+    shareOnTwitter: string
+    shareOnWhatsApp: string
     shareTitle: string
     tableOfContents: string
     nextStep: string
+    openComments: string
     updatedPrefix: string
+  }
+  articleMeta: {
+    categoryLabels: Record<string, string>
+    levelLabels: Record<ArticleLevel, string>
   }
   footer: {
     description: string
@@ -65,12 +80,14 @@ type SiteCopy = {
   }
   articlesIndex: {
     allItems: string
+    browseTopicsLabel: string
     comingSoon: string
     copy: string
     filterLabel: string
     articleItems: string
     noteItems: string
     title: string
+    viewAllLabel: string
   }
   challengeIndex: {
     allItems: string
@@ -84,6 +101,8 @@ type SiteCopy = {
   challenge: {
     commonMistakes: string
     complexity: string
+    complexitySpaceLabel: string
+    complexityTimeLabel: string
     estimatedTime: string
     levelLabel: string
     nextChallenge: string
@@ -94,6 +113,9 @@ type SiteCopy = {
     solutionLanguage: string
     typeLabel: string
     whatToNotice: string
+  }
+  challengeMeta: {
+    levelLabels: Record<ChallengeLevel, string>
   }
   conceptsIndex: {
     copy: string
@@ -107,9 +129,11 @@ type SiteCopy = {
     filterByTopic: string
     articleItems: string
     more: string
+    nextPage: string
     noteItems: string
     noteBadge: string
     page: string
+    previousPage: string
     readAgain: string
     readMore: string
     relatedArticles: string
@@ -172,9 +196,40 @@ type SiteCopy = {
     devNotice: string
     title: string
   }
+  searchLauncher: {
+    close: string
+    emptyNoSections: string
+    emptyWithSections: string
+    error: string
+    hint: string
+    loading: string
+    noResults: string
+    placeholder: string
+    shortcut: string
+    title: string
+    unavailable: string
+  }
+  siteLabels: Record<string, string>
+  solutionReveal: {
+    buttonLabel: string
+    cancel: string
+    confirmSolved: string
+    confirmUnsolved: string
+    solutionLabel: string
+    solvedMessage: string
+    solvedTitle: string
+    unsolvedMessage: string
+    unsolvedTitle: string
+  }
+  trackProgress: {
+    continueTrack: string
+    nextLabel: string
+    ofLabel: string
+  }
   topicIndex: {
     copy: string
     title: string
+    viewAllLabel: string
   }
   tracksIndex: {
     copy: string
@@ -185,6 +240,11 @@ type SiteCopy = {
 
 const siteCopy: Record<string, SiteCopy> = {
   en: {
+    locale: {
+      dateLocale: 'en-US',
+      giscusLang: 'en',
+      lowerCaseLocale: 'en-US',
+    },
     article: {
       categoryLabel: 'Category',
       chatShare: 'Share in chat',
@@ -217,10 +277,26 @@ const siteCopy: Record<string, SiteCopy> = {
       shareArticleTitle: 'Share this page',
       shareDescription: 'Share this page directly from the site, open it in chat, or copy the link.',
       shareFallback: 'This browser could not open the share menu. Use copy link instead.',
+      shareOnLinkedIn: 'Share on LinkedIn',
+      shareOnTwitter: 'Share on X',
+      shareOnWhatsApp: 'Share on WhatsApp',
       shareTitle: 'Share this page',
       tableOfContents: 'On this page',
       nextStep: 'Next step',
+      openComments: 'View comments',
       updatedPrefix: 'Updated on',
+    },
+    articleMeta: {
+      categoryLabels: {
+        frontend: 'Frontend',
+        systems: 'Systems',
+        thinking: 'Thinking',
+      },
+      levelLabels: {
+        advanced: 'Advanced',
+        beginner: 'Beginner',
+        intermediate: 'Intermediate',
+      },
     },
     footer: {
       description: 'Organized content and easy-to-understand explanations for people who want to think better before they solve.',
@@ -283,12 +359,14 @@ const siteCopy: Record<string, SiteCopy> = {
     },
     articlesIndex: {
       allItems: 'All',
+      browseTopicsLabel: 'Browse topics',
       comingSoon: 'Coming soon',
       copy: 'Articles, notes, and tracks to help you understand better and decide with more clarity.',
       filterLabel: 'Choose a theme',
       articleItems: 'Articles',
       noteItems: 'Notes',
       title: 'Explaining the things people pretend to understand',
+      viewAllLabel: 'View all articles',
     },
     challengeIndex: {
       allItems: 'All',
@@ -302,6 +380,8 @@ const siteCopy: Record<string, SiteCopy> = {
     challenge: {
       commonMistakes: 'Common mistakes',
       complexity: 'Final complexity',
+      complexitySpaceLabel: 'Space',
+      complexityTimeLabel: 'Time',
       estimatedTime: 'Estimated time',
       levelLabel: 'Level',
       nextChallenge: 'Next challenge',
@@ -312,6 +392,13 @@ const siteCopy: Record<string, SiteCopy> = {
       solutionLanguage: 'Solution language',
       typeLabel: 'Type',
       whatToNotice: 'What to notice before coding',
+    },
+    challengeMeta: {
+      levelLabels: {
+        advanced: 'Advanced',
+        beginner: 'Beginner',
+        intermediate: 'Intermediate',
+      },
     },
     conceptsIndex: {
       copy: 'Master the most important concepts to grow your understanding.',
@@ -325,9 +412,11 @@ const siteCopy: Record<string, SiteCopy> = {
       filterByTopic: 'Filter by topic',
       articleItems: 'Articles',
       more: 'more',
+      nextPage: 'Next page',
       noteItems: 'Notes',
       noteBadge: 'Note',
       page: 'Page',
+      previousPage: 'Previous page',
       readAgain: 'Read again',
       readMore: 'Read more',
       relatedArticles: 'Related articles',
@@ -355,9 +444,63 @@ const siteCopy: Record<string, SiteCopy> = {
       devNotice: 'Search index is generated during build. Use preview/build to test Pagefind locally.',
       title: 'Search the site',
     },
+    searchLauncher: {
+      close: 'Close search',
+      emptyNoSections: 'No searchable sections are enabled right now.',
+      emptyWithSections: 'Type to search across {sections}.',
+      error: 'Search is currently unavailable.',
+      hint: 'Site search',
+      loading: 'Searching...',
+      noResults: 'No results found.',
+      placeholder: 'Search',
+      shortcut: 'Ctrl K',
+      title: 'Search',
+      unavailable: 'Search is only available in preview/build.',
+    },
+    siteLabels: {
+      'Thinking Like a Senior': 'Thinking Like a Senior',
+      'Problem Breakdown': 'Problem Breakdown',
+      'Trade-offs and Constraints': 'Trade-offs and Constraints',
+      'Code for Humans': 'Code for Humans',
+      'Runtime & Execution': 'Runtime & Execution',
+      'Event Loop and Execution Order': 'Event loop and execution order',
+      'Concurrency and Parallelism': 'Concurrency and parallelism',
+      'Memory Basics': 'Memory Basics',
+      'Problem Solving & Interview Thinking': 'Problem Solving & Interview Thinking',
+      'Approach and Framing': 'Approach and Framing',
+      'Pattern Recognition': 'Pattern Recognition',
+      'Communicating Solutions': 'Communicating Solutions',
+      'State & UI Thinking': 'State & UI Thinking',
+      'State Ownership': 'State Ownership',
+      'Effects and Side Effects': 'Effects without the mess',
+      'Server and Client Thinking': 'Server and Client Thinking',
+      'System Thinking': 'System Thinking',
+      'AI Systems and Retrieval': 'AI, retrieval, and context',
+      'Execution & Communication': 'Execution and communication',
+      'Estimation and Risk': 'Estimation and risk',
+      'Communication in Work and Interviews': 'Communication at work and in interviews',
+      'coding-interview': 'Coding interview',
+    },
+    solutionReveal: {
+      buttonLabel: 'View solution',
+      cancel: "I'll keep trying",
+      confirmSolved: 'View anyway',
+      confirmUnsolved: 'View anyway',
+      solutionLabel: 'Solution',
+      solvedMessage: 'You already solved this challenge. Want to see the reference solution?',
+      solvedTitle: 'Challenge solved!',
+      unsolvedMessage: "Viewing the solution now may reduce learning. It's worth trying a bit more.",
+      unsolvedTitle: "Haven't solved it yet?",
+    },
+    trackProgress: {
+      continueTrack: 'Continue on this track',
+      nextLabel: 'Next',
+      ofLabel: 'of',
+    },
     topicIndex: {
       copy: 'Content organized by theme. Explore articles and deepen your understanding without confusion.',
       title: 'Topics',
+      viewAllLabel: 'View all topics',
     },
     tracksIndex: {
       copy: 'Content organized in sequence to make your progress easier.',
@@ -366,6 +509,11 @@ const siteCopy: Record<string, SiteCopy> = {
     },
   },
   'pt-br': {
+    locale: {
+      dateLocale: 'pt-BR',
+      giscusLang: 'pt',
+      lowerCaseLocale: 'pt-BR',
+    },
     article: {
       categoryLabel: 'Categoria',
       chatShare: 'Compartilhar no chat',
@@ -398,10 +546,26 @@ const siteCopy: Record<string, SiteCopy> = {
       shareArticleTitle: 'Compartilhar esta página',
       shareDescription: 'Compartilhe esta página direto do site, abra no chat ou copie o link.',
       shareFallback: 'Este navegador não conseguiu abrir o menu de compartilhamento. Use copiar link.',
+      shareOnLinkedIn: 'Compartilhar no LinkedIn',
+      shareOnTwitter: 'Compartilhar no X',
+      shareOnWhatsApp: 'Compartilhar no WhatsApp',
       shareTitle: 'Compartilhar esta página',
       tableOfContents: 'Nesta página',
       nextStep: 'Próximo passo',
+      openComments: 'Ver comentarios',
       updatedPrefix: 'Atualizado em',
+    },
+    articleMeta: {
+      categoryLabels: {
+        frontend: 'Frontend',
+        systems: 'Sistemas',
+        thinking: 'Pensamento',
+      },
+      levelLabels: {
+        advanced: 'Avancado',
+        beginner: 'Iniciante',
+        intermediate: 'Intermediario',
+      },
     },
     footer: {
       description: 'Conteúdo organizado e explicações fáceis de entender pra quem quer pensar melhor antes de resolver.',
@@ -464,12 +628,14 @@ const siteCopy: Record<string, SiteCopy> = {
     },
     articlesIndex: {
       allItems: 'Tudo',
+      browseTopicsLabel: 'Explorar tópicos',
       comingSoon: 'Em breve',
       copy: 'Artigos, notas e trilhas para ajudar você a entender melhor e decidir com mais clareza.',
       filterLabel: 'Escolha um tema',
       articleItems: 'Artigos',
       noteItems: 'Notas',
       title: 'Explicando as coisas que as pessoas fingem entender',
+      viewAllLabel: 'Ver todos os artigos',
     },
     challengeIndex: {
       allItems: 'Tudo',
@@ -483,6 +649,8 @@ const siteCopy: Record<string, SiteCopy> = {
     challenge: {
       commonMistakes: 'Erros comuns',
       complexity: 'Complexidade final',
+      complexitySpaceLabel: 'Espaço',
+      complexityTimeLabel: 'Tempo',
       estimatedTime: 'Tempo estimado',
       levelLabel: 'Nivel',
       nextChallenge: 'Proximo desafio',
@@ -493,6 +661,13 @@ const siteCopy: Record<string, SiteCopy> = {
       solutionLanguage: 'Linguagem da solucao',
       typeLabel: 'Tipo',
       whatToNotice: 'O que perceber antes de codar',
+    },
+    challengeMeta: {
+      levelLabels: {
+        advanced: 'Avancado',
+        beginner: 'Iniciante',
+        intermediate: 'Intermediario',
+      },
     },
     conceptsIndex: {
       copy: 'Domine os conceitos mais importantes para evoluir seu conhecimento.',
@@ -506,9 +681,11 @@ const siteCopy: Record<string, SiteCopy> = {
       filterByTopic: 'Filtrar por tópico',
       articleItems: 'Artigos',
       more: 'mais',
+      nextPage: 'Próxima página',
       noteItems: 'Notas',
       noteBadge: 'Nota',
       page: 'Página',
+      previousPage: 'Página anterior',
       readAgain: 'Ler novamente',
       readMore: 'Ler mais',
       relatedArticles: 'Artigos relacionados',
@@ -536,9 +713,121 @@ const siteCopy: Record<string, SiteCopy> = {
       devNotice: 'O índice de busca é gerado no build. Use preview/build para testar o Pagefind localmente.',
       title: 'Buscar no site',
     },
+    searchLauncher: {
+      close: 'Fechar busca',
+      emptyNoSections: 'Nenhuma area pesquisavel esta habilitada.',
+      emptyWithSections: 'Digite para buscar em {sections}.',
+      error: 'A busca não está disponível no momento.',
+      hint: 'Busca no site',
+      loading: 'Buscando...',
+      noResults: 'Nenhum resultado encontrado.',
+      placeholder: 'Buscar',
+      shortcut: 'Ctrl K',
+      title: 'Buscar',
+      unavailable: 'A busca só fica disponível em preview/build.',
+    },
+    siteLabels: {
+      'Thinking Like a Senior': 'Pensar como senior',
+      'Problem Breakdown': 'Quebrar o problema',
+      'Trade-offs and Constraints': 'Trade-offs e limites',
+      'Code for Humans': 'Codigo para humanos',
+      'Runtime & Execution': 'Como o codigo roda',
+      'Event Loop and Execution Order': 'Event loop e ordem de execucao',
+      'Concurrency and Parallelism': 'Concorrencia e paralelismo',
+      'Memory Basics': 'Memoria',
+      'Problem Solving & Interview Thinking': 'Pensamento de entrevista e resolucao de problemas',
+      'Approach and Framing': 'Abordagem',
+      'Pattern Recognition': 'Reconhecer padroes',
+      'Communicating Solutions': 'Explicar solucoes',
+      'State & UI Thinking': 'Estado e interface',
+      'State Ownership': 'Estado',
+      'Effects and Side Effects': 'Effects sem bagunca',
+      'Server and Client Thinking': 'Cliente e servidor',
+      'Data & Persistence': 'Dados e armazenamento',
+      'Data Modeling': 'Modelagem de dados',
+      'SQL vs NoSQL': 'SQL vs NoSQL',
+      'Cache and Consistency': 'Cache e consistencia',
+      'System Thinking': 'Sistemas na pratica',
+      'Scalability and Bottlenecks': 'Escala e gargalos',
+      'API and Service Design': 'APIs e servicos',
+      'AI Systems and Retrieval': 'IA, busca e contexto',
+      'Debugging & Production Thinking': 'Debug e producao',
+      'Production Failures': 'Falhas em producao',
+      'Logs and Observability': 'Logs e observabilidade',
+      'Async and Race Bugs': 'Bugs assincronos e race conditions',
+      'Patterns That Actually Matter': 'Padroes que ajudam de verdade',
+      'Composition vs Abstraction': 'Composicao ou abstracao',
+      'Reuse vs Complexity': 'Reuso sem complicar',
+      'Avoiding Overengineering': 'Sem overengineering',
+      'Performance That Makes Sense': 'Performance sem achismo',
+      'Bottleneck Detection': 'Onde esta o gargalo',
+      'Rendering, Network, and CPU': 'Renderizacao, rede e CPU',
+      'Measurement Before Optimization': 'Medir antes de otimizar',
+      'Security Thinking': 'Seguranca na pratica',
+      'Trust Boundaries': 'Limites de confianca',
+      'Auth and Authorization': 'Autenticacao e permissao',
+      'Input and API Safety': 'Entradas e APIs mais seguras',
+      'Accessibility That Actually Matters': 'Acessibilidade que importa',
+      'Semantics and Structure': 'Semantica e estrutura',
+      'Keyboard and Focus': 'Teclado e foco',
+      'Accessible React Components': 'Componentes React acessiveis',
+      'Execution & Communication': 'Execucao e comunicacao',
+      'Ticket and Task Thinking': 'Tickets e tarefas',
+      'Estimation and Risk': 'Estimativa e risco',
+      'Communication in Work and Interviews': 'Comunicacao no trabalho e em entrevistas',
+      'Real-World Scenarios': 'Cenarios reais',
+      'Scalable API Scenarios': 'Cenarios de API em escala',
+      'Failure and Recovery Scenarios': 'Falha e recuperacao',
+      'AI Feature Scenarios': 'Cenarios com IA',
+      'AI Engineering': 'Engenharia de IA',
+      'Coding Challenges': 'Desafios de Codigo',
+      Delivery: 'Entrega',
+      Leadership: 'Lideranca',
+      'System Design': 'Design de Sistemas',
+      'Tech English': 'Ingles para Tech',
+      'Problem Solving': 'Resolucao de Problemas',
+      React: 'React',
+      JavaScript: 'JavaScript',
+      Node: 'Node',
+      javascript: 'JavaScript',
+      react: 'React',
+      node: 'Node',
+      async: 'assincrono',
+      'event loop': 'event loop',
+      state: 'estado',
+      rendering: 'renderizacao',
+      'coding-interview': 'entrevista de codigo',
+      'coding interview': 'entrevista de codigo',
+      'senior-thinking': 'pensamento senior',
+      'problem-solving': 'resolucao de problemas',
+      interviews: 'entrevistas',
+      rag: 'rag',
+      retrieval: 'retrieval',
+      llms: 'llms',
+      delivery: 'entrega',
+      communication: 'comunicacao',
+      risk: 'risco',
+    },
+    solutionReveal: {
+      buttonLabel: 'Ver solução',
+      cancel: 'Vou tentar mais',
+      confirmSolved: 'Ver mesmo assim',
+      confirmUnsolved: 'Ver mesmo assim',
+      solutionLabel: 'Solução',
+      solvedMessage: 'Você já resolveu este desafio. Quer ver a solução de referência?',
+      solvedTitle: 'Desafio resolvido!',
+      unsolvedMessage: 'Ver a solução agora pode reduzir o aprendizado. Vale a pena tentar mais um pouco.',
+      unsolvedTitle: 'Ainda não resolveu?',
+    },
+    trackProgress: {
+      continueTrack: 'Continue nesta trilha',
+      nextLabel: 'Próximo',
+      ofLabel: 'de',
+    },
     topicIndex: {
       copy: 'Conteúdos organizados por tema. Explore artigos e aprofunde seu entendimento sem confusão.',
       title: 'Tópicos',
+      viewAllLabel: 'Ver todos os tópicos',
     },
     tracksIndex: {
       copy: 'Conteúdo organizado em sequência pra facilitar seu progresso.',
@@ -556,4 +845,23 @@ export function getSiteCopy(value?: string | null) {
   const locale = getSiteLocale(value)
 
   return siteCopy[locale] ?? siteCopy[getDefaultLocale()]
+}
+
+export function getSiteDateLocale(value?: string | null) {
+  return getSiteCopy(value).locale.dateLocale
+}
+
+export function getSiteLowerCaseLocale(value?: string | null) {
+  return getSiteCopy(value).locale.lowerCaseLocale
+}
+
+export function getSiteGiscusLang(value?: string | null) {
+  return getSiteCopy(value).locale.giscusLang
+}
+
+export function getSearchLauncherEmptyState(value: string | null | undefined, sections: string) {
+  const copy = getSiteCopy(value)
+  return sections
+    ? copy.searchLauncher.emptyWithSections.replace('{sections}', sections)
+    : copy.searchLauncher.emptyNoSections
 }

@@ -11,4 +11,4 @@ export {
   SUPPORTED_ARTICLE_LOCALES,
   type ArticleLocale,
   type ArticleRegistryEntry,
-} from '../../.content/roadmaps/article-registry'
+} from '@content/roadmaps/article-registry'

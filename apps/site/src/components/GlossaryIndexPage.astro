@@ -5,23 +5,27 @@ import BookTextIcon from '@lucide/astro/icons/book-text'
 import FilterableDirectory from '@/components/FilterableDirectory.svelte'
 import DirectoryIndexShell from '@/components/ui/DirectoryIndexShell.astro'
 import { getGlossaryHrefFromEntry, getGlossaryIndexHref } from '@/lib/glossary-links'
-import { resolveLocaleHrefMap } from '@/lib/locale-config'
+import { getLocalePath, resolveLocaleHrefMap } from '@/lib/locale-config'
 import { getPageTypeDescription, getPageTypeLabel } from '@/lib/section-manifest'
 import { translateSiteLabels } from '@/lib/site-labels'
-import { getSiteCopy, type SiteLocale } from '@/lib/site-copy'
+import { getSiteCopy, getSiteDateLocale, type SiteLocale } from '@/lib/site-copy'
 
 type Props = {
+  isHome?: boolean
   locale: SiteLocale
   terms: CollectionEntry<'glossary'>[]
 }
 
-const { locale, terms } = Astro.props
+const { isHome = false, locale, terms } = Astro.props
 const copy = getSiteCopy(locale)
+const sortLocale = getSiteDateLocale(locale)
 const title = getPageTypeLabel('glossary', locale)
 const description = getPageTypeDescription('glossary', locale)
-const localeHrefs = resolveLocaleHrefMap((supportedLocale) => getGlossaryIndexHref(supportedLocale))
+const localeHrefs = resolveLocaleHrefMap((supportedLocale) =>
+  isHome ? getLocalePath(supportedLocale) : getGlossaryIndexHref(supportedLocale),
+)
 const sortedTerms = [...terms].sort((left, right) =>
-  left.data.title.localeCompare(right.data.title, locale === 'pt-br' ? 'pt-BR' : 'en-US', {
+  left.data.title.localeCompare(right.data.title, sortLocale, {
     sensitivity: 'base',
   }),
 )
@@ -31,7 +35,7 @@ const tagEntries = Array.from(
       .flatMap((term) =>
         translateSiteLabels(term.data.tags, locale).map((label, index) => [term.data.tags[index], label] as const),
       )
-      .sort((left, right) => left[1].localeCompare(right[1], locale === 'pt-br' ? 'pt-BR' : 'en-US', { sensitivity: 'base' })),
+      .sort((left, right) => left[1].localeCompare(right[1], sortLocale, { sensitivity: 'base' })),
   ).entries(),
 ).map(([id, label]) => ({ id, label }))
 const items = sortedTerms.map((term) => ({
@@ -58,7 +62,7 @@ const items = sortedTerms.map((term) => ({
     filterLabel={copy.directory.filterByTopic}
     filterQueryKey="tag"
     items={items}
-    client:load
+    client:idle
     layout="cards"
     noteItemsLabel={copy.directory.noteItems}
   />

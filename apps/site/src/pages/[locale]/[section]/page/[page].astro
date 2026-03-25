@@ -1,0 +1,21 @@
+---
+import ArticlesIndexPage from '@/components/ArticlesIndexPage.astro'
+import TopicIndexPage from '@/components/TopicIndexPage.astro'
+import { getLocalizedPaginatedIndexPaths } from '@/lib/paginated-section-pages'
+
+export async function getStaticPaths() {
+  return getLocalizedPaginatedIndexPaths()
+}
+
+const { locale, page, pageType } = Astro.props
+
+if (!pageType) {
+  return new Response(null, {
+    status: 404,
+    statusText: 'Not Found',
+  })
+}
+---
+
+{pageType === 'articles' ? <ArticlesIndexPage locale={locale} page={page} /> : null}
+{pageType === 'topics' ? <TopicIndexPage locale={locale} page={page} /> : null}

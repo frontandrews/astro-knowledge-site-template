@@ -5,7 +5,7 @@ import BrainIcon from '@lucide/astro/icons/brain'
 import FilterableDirectory from '@/components/FilterableDirectory.svelte'
 import DirectoryIndexShell from '@/components/ui/DirectoryIndexShell.astro'
 import { getConceptHrefFromEntry, getConceptsHref } from '@/lib/concepts-links'
-import { resolveLocaleHrefMap } from '@/lib/locale-config'
+import { getLocalePath, resolveLocaleHrefMap } from '@/lib/locale-config'
 import { getPageTypeDescription, getPageTypeLabel } from '@/lib/section-manifest'
 import {
   CONCEPT_DOMAINS,
@@ -19,12 +19,15 @@ import { getSiteCopy, type SiteLocale } from '@/lib/site-copy'
 
 type Props = {
   concepts: CollectionEntry<'concepts'>[]
+  isHome?: boolean
   locale: SiteLocale
 }
 
-const { concepts, locale } = Astro.props
+const { concepts, isHome = false, locale } = Astro.props
 const copy = getSiteCopy(locale)
-const localeHrefs = resolveLocaleHrefMap((supportedLocale) => getConceptsHref(supportedLocale))
+const localeHrefs = resolveLocaleHrefMap((supportedLocale) =>
+  isHome ? getLocalePath(supportedLocale) : getConceptsHref(supportedLocale),
+)
 const title = getPageTypeLabel('concepts', locale)
 const description = getPageTypeDescription('concepts', locale)
 const availableDomains = CONCEPT_DOMAINS.filter((domain) =>
@@ -80,7 +83,7 @@ const items = concepts.map((concept) => {
     filterLabel={copy.directory.filterByConcept}
     filterQueryKey="scope"
     items={items}
-    client:load
+    client:idle
     layout="cards"
     noteItemsLabel={copy.directory.noteItems}
   />

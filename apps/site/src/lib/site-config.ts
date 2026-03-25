@@ -16,6 +16,40 @@ import {
 
 type ConfigLocale = BrandLocale
 
+const FEED_METADATA: Record<string, (siteName: string) => { description: string; title: string }> = {
+  en: (siteName) => ({
+    description: `${siteName} in English, with articles, tracks, concepts, and reference content organized for study.`,
+    title: siteName,
+  }),
+  'pt-br': (siteName) => ({
+    description: `${siteName} em portugues, com artigos, trilhas, conceitos e referencias organizadas para estudo.`,
+    title: `${siteName} PT-BR`,
+  }),
+}
+
+const LEGAL_FALLBACKS = {
+  governingLaw: {
+    en: 'the laws applicable to the operator',
+    'pt-br': 'as leis aplicaveis ao operador',
+  },
+  governingVenue: {
+    en: 'the courts applicable to the operator',
+    'pt-br': 'o foro aplicavel ao operador',
+  },
+  operatorLocation: {
+    en: 'the operator jurisdiction',
+    'pt-br': 'a jurisdicao do operador',
+  },
+  operatorName: {
+    en: 'the site operator',
+    'pt-br': 'o operador do site',
+  },
+  templateNotice: {
+    en: 'This is a starter template legal page. Review and adapt the policy and terms before publishing this project to production.',
+    'pt-br': 'Este texto e um modelo inicial de template. Revise e adapte a politica e os termos antes de publicar este projeto em producao.',
+  },
+} as const
+
 function readPublicEnv(value: string | undefined) {
   const normalized = value?.trim()
 
@@ -41,8 +75,10 @@ function normalizeStorageNamespace(value: string | null) {
   return normalized && normalized.length > 0 ? normalized : brandConfig.site.storageNamespace
 }
 
-function getLocalizedFallback(locale: ConfigLocale, englishValue: string, portugueseValue: string) {
-  return normalizeSiteLocale(locale) === 'pt-br' ? portugueseValue : englishValue
+function getLocalizedFallback(locale: ConfigLocale, values: Record<string, string>) {
+  const normalizedLocale = normalizeSiteLocale(locale)
+
+  return values[normalizedLocale] ?? values[brandConfig.locales.default] ?? Object.values(values)[0]
 }
 
 function resolveLocalizedBrandText(locale: ConfigLocale, text: LocalizedBrandText) {
@@ -86,6 +122,7 @@ export const siteConfig = {
 
 export const siteUrls = {
   giscusTheme: new URL('/giscus-theme.css?v=1', `${siteConfig.site.siteUrl}/`).toString(),
+  socialImage: new URL('/og-image.svg', `${siteConfig.site.siteUrl}/`).toString(),
   sitemap: new URL('/sitemap-index.xml', `${siteConfig.site.siteUrl}/`).toString(),
 } as const
 
@@ -96,6 +133,7 @@ export const siteStorageKeys = {
 
 export const siteEvents = {
   articleReadingReset: `${siteConfig.site.storageNamespace}:article-reading-reset`,
+  challengeSolved: `${siteConfig.site.storageNamespace}:challenge-solved`,
   completedArticlesChanged: `${siteConfig.site.storageNamespace}:completed-articles-changed`,
 } as const
 
@@ -170,45 +208,26 @@ export function hasCommentsEnabled() {
 }
 
 export function getFeedMetadata(locale: ConfigLocale) {
-  if (normalizeSiteLocale(locale) === 'pt-br') {
-    return {
-      description: `${siteConfig.site.name} em portugues, com artigos, trilhas, conceitos e referencias organizadas para estudo.`,
-      title: `${siteConfig.site.name} PT-BR`,
-    }
-  }
-
-  return {
-    description: `${siteConfig.site.name} in English, with articles, tracks, concepts, and reference content organized for study.`,
-    title: siteConfig.site.name,
-  }
+  const normalizedLocale = normalizeSiteLocale(locale)
+  return (FEED_METADATA[normalizedLocale] ?? FEED_METADATA[brandConfig.locales.default])(siteConfig.site.name)
 }
 
 export function getLegalOperatorName(locale: ConfigLocale) {
-  return siteConfig.legal.ownerName
-    ?? getLocalizedFallback(locale, 'the site operator', 'o operador do site')
+  return siteConfig.legal.ownerName ?? getLocalizedFallback(locale, LEGAL_FALLBACKS.operatorName)
 }
 
 export function getLegalOperatorLocation(locale: ConfigLocale) {
-  return siteConfig.legal.ownerLocation
-    ?? getLocalizedFallback(locale, 'the operator jurisdiction', 'a jurisdicao do operador')
+  return siteConfig.legal.ownerLocation ?? getLocalizedFallback(locale, LEGAL_FALLBACKS.operatorLocation)
 }
 
 export function getLegalGoverningLaw(locale: ConfigLocale) {
-  return siteConfig.legal.governingLaw
-    ?? getLocalizedFallback(locale, 'the laws applicable to the operator', 'as leis aplicaveis ao operador')
+  return siteConfig.legal.governingLaw ?? getLocalizedFallback(locale, LEGAL_FALLBACKS.governingLaw)
 }
 
 export function getLegalVenue(locale: ConfigLocale) {
-  return siteConfig.legal.governingVenue
-    ?? getLocalizedFallback(
-      locale,
-      'the courts applicable to the operator',
-      'o foro aplicavel ao operador',
-    )
+  return siteConfig.legal.governingVenue ?? getLocalizedFallback(locale, LEGAL_FALLBACKS.governingVenue)
 }
 
 export function getLegalTemplateNotice(locale: ConfigLocale) {
-  return normalizeSiteLocale(locale) === 'pt-br'
-    ? 'Este texto e um modelo inicial de template. Revise e adapte a politica e os termos antes de publicar este projeto em producao.'
-    : 'This is a starter template legal page. Review and adapt the policy and terms before publishing this project to production.'
+  return getLocalizedFallback(locale, LEGAL_FALLBACKS.templateNotice)
 }

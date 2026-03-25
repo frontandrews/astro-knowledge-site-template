@@ -7,6 +7,10 @@ import {
   getHomeLandingCopy,
 } from '@/lib/site-config'
 import {
+  getLocalePath,
+  resolveLocaleHrefMap,
+} from '@/lib/locale-config'
+import {
   getEnabledSections,
   getSectionDescription,
   getSectionHref,
@@ -20,6 +24,7 @@ type Props = {
 
 const { locale } = Astro.props
 const landing = getHomeLandingCopy(locale)
+const localeHrefs = resolveLocaleHrefMap((supportedLocale) => getLocalePath(supportedLocale))
 const sectionCards = getEnabledSections()
   .map((section) => ({
     description: getSectionDescription(section.id, locale),
@@ -37,7 +42,7 @@ const sectionCards = getEnabledSections()
   )
 ---
 
-<BaseLayout description={landing.description} title={landing.title}>
+<BaseLayout description={landing.description} localeHrefs={localeHrefs} title={landing.title}>
   <PageHeader description={landing.description} title={landing.title}>
     <p class="m-0 text-[0.72rem] font-bold uppercase tracking-[0.18em] text-site-line-strong">
       {landing.eyebrow}

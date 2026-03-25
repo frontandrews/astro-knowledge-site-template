@@ -22,15 +22,17 @@ type Props = {
   pillar: LearningPathPillar
 }
 
+const PILLAR_PAGE_DESCRIPTION: Record<string, (title: string) => string> = {
+  en: (title) => `Articles and branches about ${title} to study with more structure.`,
+  'pt-br': (title) => `Artigos e ramificacoes de ${title} para estudar com mais estrutura.`,
+}
+
 const { branchSections, locale, pillar } = Astro.props
 const title = getLocalizedPillarLabel(pillar, locale)
 const localeHrefs = resolveLocaleHrefMap((supportedLocale) =>
   getArticlePillarHref(pillar.id, supportedLocale) ?? getArticlesIndexHref(supportedLocale),
 )
-const description =
-  locale === 'pt-br'
-    ? `Artigos e ramificacoes de ${title} para estudar com mais estrutura.`
-    : `Articles and branches about ${title} to study with more structure.`
+const description = (PILLAR_PAGE_DESCRIPTION[locale] ?? PILLAR_PAGE_DESCRIPTION.en)(title)
 const breadcrumbItems = getPillarBreadcrumb(pillar, locale)
 const items = branchSections.map((section) => ({
   href: getArticleBranchHref(pillar.id, section.branch.id, locale) ?? '#',
@@ -50,7 +52,6 @@ const items = branchSections.map((section) => ({
     <FilterableDirectory
       items={items}
       layout="cards"
-      client:load
     />
   </CompactSection>
 </BaseLayout>

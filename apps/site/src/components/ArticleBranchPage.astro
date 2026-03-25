@@ -9,7 +9,7 @@ import { getArticleBranchHref, getArticleHrefFromEntry, getArticlePillarHref, ge
 import { formatEditorialDate } from '@/lib/format-date'
 import { getBranchBreadcrumb, getLocalizedBranchLabel, getLocalizedPillarLabel } from '@/lib/article-taxonomy'
 import { resolveLocaleHrefMap } from '@/lib/locale-config'
-import { getSiteCopy, type SiteLocale } from '@/lib/site-copy'
+import { getSiteCopy, getSiteDateLocale, type SiteLocale } from '@/lib/site-copy'
 import { siteStorageKeys } from '@/lib/storage-keys'
 import PageHeader from '@/components/ui/PageHeader.astro'
 
@@ -18,6 +18,11 @@ type Props = {
   locale: SiteLocale
   pillar: LearningPathPillar
   posts: CollectionEntry<'articles'>[]
+}
+
+const BRANCH_PAGE_DESCRIPTION: Record<string, (title: string, pillarLabel: string) => string> = {
+  en: (title, pillarLabel) => `Articles about ${title} inside ${pillarLabel}.`,
+  'pt-br': (title, pillarLabel) => `Artigos de ${title} dentro de ${pillarLabel}.`,
 }
 
 const { branch, locale, pillar, posts } = Astro.props
@@ -31,11 +36,9 @@ const localeHrefs = resolveLocaleHrefMap((supportedLocale) =>
 )
 const description =
   posts[0]?.data.description ??
-  (locale === 'pt-br'
-    ? `Artigos de ${title} dentro de ${pillarLabel}.`
-    : `Articles about ${title} inside ${pillarLabel}.`)
+  (BRANCH_PAGE_DESCRIPTION[locale] ?? BRANCH_PAGE_DESCRIPTION.en)(title, pillarLabel)
 const breadcrumbItems = getBranchBreadcrumb(pillar, branch, locale)
-const dateLocale = locale === 'pt-br' ? 'pt-BR' : 'en-US'
+const dateLocale = getSiteDateLocale(locale)
 const items = posts.map((post) => ({
   badgeLabel: post.data.kind === 'note' ? copy.directory.noteBadge : undefined,
   completedCtaLabel: copy.directory.readAgain,
@@ -67,7 +70,7 @@ const items = posts.map((post) => ({
       layout="rows"
       moreFiltersLabel={copy.directory.more}
       noteItemsLabel={copy.directory.noteItems}
-      client:load
+      client:idle
     />
   </CompactSection>
 </BaseLayout>

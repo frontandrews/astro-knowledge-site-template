@@ -1,6 +1,6 @@
 import type { CollectionEntry } from 'astro:content'
 
-import { getArticleRoutePath } from '@/lib/article-registry'
+import { getArticleRoutePath, getArticleRoutePathFromEntryId } from '@/lib/article-registry'
 import { getArticlePillarHref, getArticlesIndexHref } from '@/lib/article-links'
 import {
   getLearningPathBranchById,
@@ -36,6 +36,7 @@ export function getArticleSlugFromEntryId(entryId: string) {
 
 export function getArticleCanonicalParams(post: ArticleEntry): ArticleCanonicalParams | null {
   const routePath = getArticleRoutePath(post.data.articleId, post.data.locale)
+    ?? getArticleRoutePathFromEntryId(post.id)
 
   if (!routePath) {
     return null

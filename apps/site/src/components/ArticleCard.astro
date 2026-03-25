@@ -2,6 +2,7 @@
 import type { CollectionEntry } from 'astro:content'
 import { getArticleHrefFromEntry } from '@/lib/article-links'
 import { cn } from '@/lib/cn'
+import { completionDomHooks, getDataHookAttributes } from '@/lib/dom-hooks'
 import { getSiteCopy } from '@/lib/site-copy'
 import { ui } from '@/lib/ui'
 import {
@@ -35,24 +36,25 @@ const {
   variant = 'minimal',
 } = Astro.props
 const href = getArticleHrefFromEntry(post)
-const copy = getSiteCopy(post.data.locale === 'pt-br' ? 'pt-br' : 'en')
+const copy = getSiteCopy(post.data.locale)
 const ctaLabel = copy.directory.readMore
 const completedCtaLabel = copy.directory.readAgain
 ---
 
 <article
-  class={cn(articleCardArticleVariants({ variant }), className)}
+  class={cn('content-directory-item', articleCardArticleVariants({ variant }), className)}
   data-article-card-category={categoryLabel}
-  data-article-post={post.data.articleId}
+  {...getDataHookAttributes(completionDomHooks.item, post.data.articleId)}
 >
   <a class={articleCardLinkVariants({ variant })} href={href}>
     <span
       aria-hidden="true"
       class={cn(
+        'content-directory-complete-badge',
         ui.completionBadgeCard,
         variant === 'linear' && ui.completionBadgeLinear,
       )}
-      data-article-post-complete-badge
+      {...getDataHookAttributes(completionDomHooks.completeBadge)}
     >
       ✓
     </span>
@@ -61,7 +63,7 @@ const completedCtaLabel = copy.directory.readAgain
         {eyebrow}
       </p>
     ) : null}
-    <h3 class={articleCardTitleVariants({ variant })} data-card-title>
+    <h3 class={cn('content-directory-title', articleCardTitleVariants({ variant }))} {...getDataHookAttributes(completionDomHooks.title)}>
       {post.data.title}
     </h3>
     {(variant === 'linear' || variant === 'rich') && subtitle ? (
@@ -69,13 +71,13 @@ const completedCtaLabel = copy.directory.readAgain
     ) : null}
     {variant === 'linear' ? (
       <>
-        <InlineArrowCta className="md:hidden" label={ctaLabel} />
+        <InlineArrowCta className="content-directory-mobile-default-cta md:hidden" label={ctaLabel} />
         <span class={ui.completionRailMd}>
-          <span class={ui.completionDesktopCta} data-article-post-complete-text>
+          <span class={cn('content-directory-complete-text', ui.completionDesktopCta)} {...getDataHookAttributes(completionDomHooks.completeText)}>
             <span>{completedCtaLabel}</span>
             <ArrowRightIcon className="size-[0.88rem]" />
           </span>
-          <span class={ui.completionDesktopCtaInteractive} data-article-post-default-cta>
+          <span class={cn('content-directory-default-cta', ui.completionDesktopCtaInteractive)} {...getDataHookAttributes(completionDomHooks.defaultText)}>
             <span>{ctaLabel}</span>
             <ArrowRightIcon className="size-[0.88rem]" />
           </span>

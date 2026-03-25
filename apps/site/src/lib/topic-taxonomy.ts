@@ -13,7 +13,7 @@ import {
   TOPIC_DEFINITIONS,
 } from '@template/content'
 
-import { getSiteLocale, type SiteLocale } from '@/lib/site-copy'
+import { getSiteCopy, getSiteLocale, type SiteLocale } from '@/lib/site-copy'
 import { getTopicGroupHref, getTopicHref, getTopicIndexHref } from '@/lib/topic-links'
 import { sortArticles } from '@/lib/article-tree'
 
@@ -101,11 +101,12 @@ export function getLocalizedArticleTopicsInGroup(post: ArticleEntry, groupId: st
 export function getTopicBreadcrumb(topicId: string, locale: SiteLocale): TopicBreadcrumbItem[] {
   const groupId = getTopicRootGroupId(topicId)
   const ancestorIds = getTopicAncestorIds(topicId)
+  const copy = getSiteCopy(locale)
 
   return [
     {
       href: getTopicIndexHref(locale),
-      label: locale === 'pt-br' ? 'Topicos' : 'Topics',
+      label: copy.layout.topics,
     },
     ...(groupId
       ? [
@@ -127,10 +128,11 @@ export function getTopicBreadcrumb(topicId: string, locale: SiteLocale): TopicBr
 }
 
 export function getTopicGroupBreadcrumb(groupId: string, locale: SiteLocale): TopicBreadcrumbItem[] {
+  const copy = getSiteCopy(locale)
   return [
     {
       href: getTopicIndexHref(locale),
-      label: locale === 'pt-br' ? 'Topicos' : 'Topics',
+      label: copy.layout.topics,
     },
     {
       href: null,

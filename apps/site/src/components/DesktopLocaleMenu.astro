@@ -1,0 +1,64 @@
+---
+import { cn } from '@/lib/cn'
+import { siteStorageKeys } from '@/lib/storage-keys'
+
+type LocaleLinkItem = {
+  code: string
+  href: string
+  htmlLang: string
+  isActive: boolean
+  label: string
+  shortLabel: string
+}
+
+type Props = {
+  activeClass?: string
+  currentLocaleCode: string
+  itemClass?: string
+  localeLinks?: LocaleLinkItem[]
+  menuClass?: string
+  triggerClass?: string
+  triggerLabel: string
+}
+
+const {
+  activeClass = '',
+  currentLocaleCode,
+  itemClass = '',
+  localeLinks = [],
+  menuClass = '',
+  triggerClass = '',
+  triggerLabel,
+} = Astro.props
+
+function getItemClass(isActive: boolean) {
+  return isActive ? `${itemClass} ${activeClass}` : itemClass
+}
+
+function getLocaleChoiceHandler(code: string) {
+  return `try{localStorage.setItem(${JSON.stringify(siteStorageKeys.localePreference)},${JSON.stringify(code)})}catch{};this.closest('details')?.removeAttribute('open')`
+}
+---
+
+<details class="relative">
+  <summary aria-label={triggerLabel} class={cn(triggerClass, 'list-none [&::-webkit-details-marker]:hidden')}>
+    <span>{currentLocaleCode}</span>
+    <svg class="size-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path d="m6 9 6 6 6-6" />
+    </svg>
+  </summary>
+
+  <div aria-label={triggerLabel} class={menuClass}>
+    {localeLinks.map((localeLink) => (
+      <a
+        class={getItemClass(localeLink.isActive)}
+        href={localeLink.href}
+        hreflang={localeLink.htmlLang}
+        lang={localeLink.htmlLang}
+        onclick={getLocaleChoiceHandler(localeLink.code)}
+      >
+        {localeLink.label}
+      </a>
+    ))}
+  </div>
+</details>

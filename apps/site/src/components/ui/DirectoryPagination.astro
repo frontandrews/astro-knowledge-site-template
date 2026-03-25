@@ -1,0 +1,46 @@
+---
+import { getPaginationWindow } from '@/lib/directory'
+import { cn } from '@/lib/cn'
+import { ui } from '@/lib/ui'
+
+type Props = {
+  currentPage: number
+  getHref: (page: number) => string
+  nextLabel: string
+  pageCount: number
+  pageLabel: string
+  previousLabel: string
+}
+
+const { currentPage, getHref, nextLabel, pageCount, pageLabel, previousLabel } = Astro.props
+const pages = getPaginationWindow(currentPage, pageCount)
+---
+
+{pageCount > 1 ? (
+  <nav aria-label={`${pageLabel} navigation`} class="mt-6 flex flex-wrap items-center justify-center gap-2">
+    {currentPage > 1 ? (
+      <a class={cn(ui.controlButton, 'min-h-10 px-4 text-sm font-semibold')} href={getHref(currentPage - 1)}>
+        {previousLabel}
+      </a>
+    ) : null}
+    {pages.map((page) => (
+      <a
+        aria-current={page === currentPage ? 'page' : undefined}
+        class={cn(
+          ui.controlButton,
+          'min-h-10 min-w-10 px-3 text-sm font-semibold',
+          page === currentPage && 'border-site-line-strong bg-site-hover text-site-link-hover',
+        )}
+        href={getHref(page)}
+      >
+        <span class="sr-only">{pageLabel} </span>
+        {page}
+      </a>
+    ))}
+    {currentPage < pageCount ? (
+      <a class={cn(ui.controlButton, 'min-h-10 px-4 text-sm font-semibold')} href={getHref(currentPage + 1)}>
+        {nextLabel}
+      </a>
+    ) : null}
+  </nav>
+) : null}

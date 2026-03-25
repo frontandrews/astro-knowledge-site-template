@@ -2,7 +2,11 @@
   // Keep the Svelte-side arrow local for now.
   // `@lucide/svelte` currently breaks `astro build` on Astro 6 in this project,
   // while `@lucide/astro` works correctly for Astro components.
-  export let className = 'size-4 shrink-0'
+  type Props = {
+    className?: string
+  }
+
+  let { className = 'size-4 shrink-0' }: Props = $props()
 </script>
 
 <svg

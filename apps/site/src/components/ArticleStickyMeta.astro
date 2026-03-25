@@ -1,6 +1,14 @@
 ---
+import { randomUUID } from 'node:crypto'
 import ArticleCompletionSummary from '@/components/ArticleCompletionSummary.astro'
+import ArticleStickyMetaClient from '@/components/ArticleStickyMetaClient.svelte'
 import { cn } from '@/lib/cn'
+import {
+  articleCompletionPanelDomHooks,
+  articleStickyMetaDomHooks,
+  getDataHookAttributes,
+  sharedDomHooks,
+} from '@/lib/dom-hooks'
 import { getSiteCopy, type SiteLocale } from '@/lib/site-copy'
 import { ui } from '@/lib/ui'
 
@@ -53,6 +61,7 @@ const {
 } = Astro.props
 
 const copy = getSiteCopy(locale)
+const controllerId = randomUUID()
 ---
 
 <aside class={cn('grid gap-4', className)}>
@@ -62,12 +71,13 @@ const copy = getSiteCopy(locale)
       ui.spotlightPanel,
       'xl:max-h-[calc(100vh-8.5rem)] xl:overflow-y-auto',
     )}
-    data-completion-id={completionId ?? ''}
-    data-show-completion-in-place={showCompletionInPlace ? 'true' : 'false'}
-    data-toc-root
+    {...getDataHookAttributes(sharedDomHooks.controllerId, controllerId)}
+    {...getDataHookAttributes(articleCompletionPanelDomHooks.completionId, completionId ?? '')}
+    {...getDataHookAttributes(articleStickyMetaDomHooks.showCompletionInPlace, showCompletionInPlace ? 'true' : 'false')}
+    {...getDataHookAttributes(articleStickyMetaDomHooks.root)}
   >
     {updatedMeta || (readingTimeMinutes && levelLabel && categoryLabel) || headings.length > 0 ? (
-      <div class="grid gap-3" data-toc-section>
+      <div class="grid gap-3" {...getDataHookAttributes(articleStickyMetaDomHooks.tocSection)}>
         {updatedMeta ? (
           <div class={cn(ui.metaQuiet, 'grid gap-1')}>
             {updatedMeta ? <p class="m-0">{copy.article.updatedPrefix} {updatedMeta}</p> : null}
@@ -87,15 +97,16 @@ const copy = getSiteCopy(locale)
         {headings.length > 0 ? (
           <>
             <p class={ui.eyebrow}>{copy.article.tableOfContents}</p>
-            <nav aria-label={copy.article.tableOfContents} class="grid gap-1" data-toc-nav>
+            <nav aria-label={copy.article.tableOfContents} class="grid gap-1">
               {headings.map((heading) => (
                 <a
                   class={cn(
+                    'article-toc-link',
                     'rounded-xs px-2 py-1.5 text-sm leading-6 text-site-ink-soft transition-colors duration-150 hover:bg-site-hover hover:text-site-link-hover focus-visible:bg-site-hover focus-visible:text-site-link-hover focus-visible:outline-none lg:text-[0.96rem]',
                     heading.depth > 2 && 'ml-3 text-[0.82rem] text-site-ink-muted lg:text-[0.9rem]',
                   )}
-                  data-toc-link
-                  data-toc-slug={heading.slug}
+                  {...getDataHookAttributes(articleStickyMetaDomHooks.tocLink)}
+                  {...getDataHookAttributes(articleStickyMetaDomHooks.tocSlug, heading.slug)}
                   href={`#${heading.slug}`}
                 >
                   {heading.text}
@@ -107,15 +118,15 @@ const copy = getSiteCopy(locale)
       </div>
     ) : null}
 
-    <div class="grid gap-2 border-t border-site-line pt-4" data-reading-progress>
+    <div class="article-reading-progress grid gap-2 border-t border-site-line pt-4" {...getDataHookAttributes(articleStickyMetaDomHooks.readingProgress)}>
       <div class="flex items-center gap-3">
         <div class={cn('min-w-0 flex-1', ui.progressTrack)}>
           <div
-            class={ui.progressBarSolid}
-            data-reading-progress-bar
+            class={cn('article-reading-progress-bar', ui.progressBarSolid)}
+            {...getDataHookAttributes(articleStickyMetaDomHooks.readingProgressBar)}
           />
         </div>
-        <p class={cn(ui.progressMeta, 'shrink-0 lg:text-[0.88rem]')} data-reading-progress-value>
+        <p class={cn('article-reading-progress-value', ui.progressMeta, 'shrink-0 lg:text-[0.88rem]')} {...getDataHookAttributes(articleStickyMetaDomHooks.readingProgressValue)}>
           0%
         </p>
       </div>
@@ -124,7 +135,7 @@ const copy = getSiteCopy(locale)
     {showCompletionInPlace ? (
       <div
         class="grid gap-3 overflow-hidden border-t border-site-line"
-        data-sticky-direction
+        {...getDataHookAttributes(articleStickyMetaDomHooks.stickyDirection)}
         style="max-height: 0; opacity: 0; transform: translateY(0.5rem); padding-top: 0; border-top-color: transparent; pointer-events: none; transition: max-height 300ms ease, opacity 220ms ease, transform 300ms ease, padding-top 300ms ease, border-top-color 220ms ease;"
       >
         <ArticleCompletionSummary
@@ -136,244 +147,7 @@ const copy = getSiteCopy(locale)
         />
       </div>
     ) : null}
+
+    <ArticleStickyMetaClient client:idle controllerId={controllerId} />
   </section>
 </aside>
-
-<script>
-  import { markArticleCompleted, markArticleUnread, readCompletedArticles } from '@/lib/article-progress';
-  import { siteEvents } from '@/lib/site-config';
-
-  const readingResetEvent = siteEvents.articleReadingReset;
-  const tocRoots = document.querySelectorAll('[data-toc-root]');
-
-  for (const root of tocRoots) {
-    if (!(root instanceof HTMLElement)) continue;
-
-    const shouldShowCompletionInPlace = root.dataset.showCompletionInPlace === 'true';
-    const links = Array.from(root.querySelectorAll('[data-toc-link]')).filter(
-      (link) => link instanceof HTMLAnchorElement,
-    );
-    const progressBar = root.querySelector('[data-reading-progress-bar]');
-    const progressValue = root.querySelector('[data-reading-progress-value]');
-    const progressSection = root.querySelector('[data-reading-progress]');
-    const markUnreadButton = root.querySelector('[data-completion-mark-unread]');
-    const stickyDirection = root.querySelector('[data-sticky-direction]');
-    const tocSection = root.querySelector('[data-toc-section]');
-    const readingContent = document.querySelector('[data-article-reading-content]');
-    const readingEnd = document.querySelector('[data-article-reading-end]');
-    const completionId = root.dataset.completionId ?? '';
-
-    const headingElements = links.map((link) => {
-      const slug = link.dataset.tocSlug;
-      return slug ? document.getElementById(slug) : null;
-    });
-    let ticking = false;
-    let hasCompletedReading = false;
-    let isResettingToUnread = false;
-    let resetUntil = 0;
-
-    const showStickyDirection = () => {
-      if (!shouldShowCompletionInPlace) {
-        return;
-      }
-      if (tocSection instanceof HTMLElement) {
-        tocSection.classList.add('hidden');
-      }
-      if (progressSection instanceof HTMLElement) {
-        progressSection.style.borderTopColor = 'transparent';
-        progressSection.style.paddingTop = '0.25rem';
-      }
-      if (stickyDirection instanceof HTMLElement) {
-        stickyDirection.style.maxHeight = '100rem';
-        stickyDirection.style.opacity = '1';
-        stickyDirection.style.transform = 'translateY(0)';
-        stickyDirection.style.paddingTop = '0.25rem';
-        stickyDirection.style.borderTopColor = 'transparent';
-        stickyDirection.style.pointerEvents = 'auto';
-      }
-    };
-
-    const hideStickyDirection = () => {
-      if (!shouldShowCompletionInPlace) {
-        if (tocSection instanceof HTMLElement) {
-          tocSection.classList.remove('hidden');
-        }
-        return;
-      }
-      if (tocSection instanceof HTMLElement) {
-        tocSection.classList.remove('hidden');
-      }
-      if (progressSection instanceof HTMLElement) {
-        progressSection.style.borderTopColor = 'var(--site-line)';
-        progressSection.style.paddingTop = '1rem';
-      }
-      if (!(stickyDirection instanceof HTMLElement)) return;
-      stickyDirection.style.maxHeight = '0';
-      stickyDirection.style.opacity = '0';
-      stickyDirection.style.transform = 'translateY(0.5rem)';
-      stickyDirection.style.paddingTop = '0';
-      stickyDirection.style.borderTopColor = 'transparent';
-      stickyDirection.style.pointerEvents = 'none';
-    };
-
-    const resetCompletionState = (shouldScrollToTop = false) => {
-      isResettingToUnread = true;
-      resetUntil = window.performance.now() + 700;
-      hasCompletedReading = false;
-      progressSection?.classList.remove('is-complete');
-
-      if (progressBar instanceof HTMLElement) {
-        progressBar.style.width = '0%';
-      }
-
-      if (progressValue instanceof HTMLElement) {
-        progressValue.textContent = '0%';
-      }
-
-      hideStickyDirection();
-
-      if (shouldScrollToTop) {
-        root.scrollTo({ top: 0, behavior: 'smooth' });
-
-        if (readingContent instanceof HTMLElement) {
-          const targetTop = Math.max(readingContent.offsetTop - 120, 0);
-          window.scrollTo({ top: targetTop, behavior: 'auto' });
-        }
-
-        if (window.location.hash) {
-          history.replaceState(null, '', window.location.pathname + window.location.search);
-        }
-      }
-
-      window.setTimeout(() => {
-        isResettingToUnread = false;
-        schedule();
-      }, 720);
-    };
-
-    if (markUnreadButton instanceof HTMLButtonElement) {
-      markUnreadButton.addEventListener('click', () => {
-        if (completionId) {
-          markArticleUnread(completionId);
-        }
-        resetCompletionState(true);
-        window.dispatchEvent(new CustomEvent(readingResetEvent, { detail: completionId }));
-      });
-    }
-
-    const applyState = () => {
-      ticking = false;
-      const resetActive = isResettingToUnread || window.performance.now() < resetUntil;
-
-      const threshold = Math.max(132, Math.min(window.innerHeight * 0.22, 180));
-      let activeIndex = -1;
-
-      headingElements.forEach((heading, index) => {
-        if (!heading) return;
-        if (heading.getBoundingClientRect().top <= threshold) {
-          activeIndex = index;
-        }
-      });
-
-      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 8) {
-        activeIndex = headingElements.length - 1;
-      }
-
-      if (resetActive) {
-        activeIndex = -1;
-      }
-
-      links.forEach((link, index) => {
-        const isActive = index === activeIndex;
-        const isRead = activeIndex > -1 && index < activeIndex;
-
-        link.classList.toggle('is-active', isActive);
-        link.classList.toggle('is-read', isRead);
-        link.setAttribute('aria-current', isActive ? 'true' : 'false');
-      });
-
-      if (readingContent instanceof HTMLElement && progressBar instanceof HTMLElement && progressValue instanceof HTMLElement) {
-        const markComplete = () => {
-          hasCompletedReading = true;
-          if (completionId) {
-            markArticleCompleted(completionId);
-          }
-          progressBar.style.width = '100%';
-          progressValue.textContent = '100%';
-          progressSection?.classList.add('is-complete');
-          showStickyDirection();
-          window.requestAnimationFrame(() => {
-            if (shouldShowCompletionInPlace && root.scrollHeight > root.clientHeight) {
-              root.scrollTo({ top: root.scrollHeight, behavior: 'smooth' });
-            }
-          });
-        };
-
-        if (hasCompletedReading) {
-          markComplete();
-          return;
-        }
-
-        const start = readingContent.offsetTop;
-        const end = readingEnd instanceof HTMLElement
-          ? readingEnd.offsetTop
-          : readingContent.offsetTop + readingContent.offsetHeight;
-        const current = window.scrollY + threshold;
-        const rawProgress = ((current - start) / Math.max(end - start, 1)) * 100;
-        const progress = Math.max(0, Math.min(100, rawProgress));
-        const rounded = Math.round(progress);
-        const lastHeadingIndex = headingElements.length - 1;
-        const lastHeadingSlug = links.at(-1)?.dataset.tocSlug ?? '';
-        const currentHash = window.location.hash.replace(/^#/, '');
-
-        if (resetActive) {
-          hideStickyDirection();
-          progressSection?.classList.remove('is-complete');
-          progressBar.style.width = '0%';
-          progressValue.textContent = '0%';
-          return;
-        }
-
-        const readingEndReached =
-          readingEnd instanceof HTMLElement &&
-          (readingEnd.getBoundingClientRect().top <= threshold || readingEnd.getBoundingClientRect().top <= window.innerHeight * 0.8);
-
-        if (readingEndReached) {
-          markComplete();
-          return;
-        }
-
-        if ((activeIndex === lastHeadingIndex && lastHeadingIndex >= 0) || currentHash === lastHeadingSlug || rounded >= 100) {
-          markComplete();
-          return;
-        }
-
-        progressSection?.classList.remove('is-complete');
-        hideStickyDirection();
-        progressBar.style.width = `${progress}%`;
-        progressValue.textContent = `${rounded}%`;
-      }
-    };
-
-    const schedule = () => {
-      if (ticking) return;
-      ticking = true;
-      window.requestAnimationFrame(applyState);
-    };
-
-    window.addEventListener('scroll', schedule, { passive: true });
-    window.addEventListener('resize', schedule);
-    window.addEventListener('hashchange', schedule);
-    window.addEventListener(readingResetEvent, (event) => {
-      if (!(event instanceof CustomEvent)) return;
-      if ((event.detail ?? '') !== completionId) return;
-      resetCompletionState(false);
-    });
-
-    if (completionId && readCompletedArticles().includes(completionId)) {
-      hasCompletedReading = true;
-    }
-
-    schedule();
-  }
-</script>

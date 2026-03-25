@@ -1,5 +1,3 @@
-import { getCollection } from 'astro:content'
-
 import { getArticleCanonicalParams } from '@/lib/article-taxonomy'
 import { getArticleSectionSegment, SUPPORTED_ARTICLE_LOCALES } from '@/lib/article-registry'
 import { sortArticles } from '@/lib/article-tree'
@@ -9,6 +7,7 @@ import {
   LEARNING_PATH_PILLARS,
 } from '@/lib/learning-paths'
 import { getDefaultLocale, getNonDefaultLocales } from '@/lib/locale-config'
+import { getActiveArticlesByLocale } from '@/lib/site-content'
 
 function getArticleLocales(includeDefault = false) {
   const supportedArticleLocales = new Set<string>(SUPPORTED_ARTICLE_LOCALES)
@@ -59,11 +58,9 @@ export function getDefaultArticleIndexPaths() {
 }
 
 export async function getLocalizedArticleNotePaths() {
-  const posts = await getCollection('articles')
-
-  return getArticleLocales().flatMap((locale) =>
-    posts
-      .filter((post) => post.data.locale === locale && post.data.status === 'active' && post.data.kind === 'note')
+  return (await Promise.all(getArticleLocales().map(async (locale) =>
+    (await getActiveArticlesByLocale(locale))
+      .filter((post) => post.data.kind === 'note')
       .map((post) => ({
         params: {
           locale,
@@ -76,7 +73,7 @@ export async function getLocalizedArticleNotePaths() {
           post,
         },
       })),
-  )
+  ))).flat()
 }
 
 export async function getDefaultArticleNotePaths() {
@@ -86,10 +83,10 @@ export async function getDefaultArticleNotePaths() {
     return []
   }
 
-  const posts = await getCollection('articles')
+  const posts = await getActiveArticlesByLocale(locale)
 
   return posts
-    .filter((post) => post.data.locale === locale && post.data.status === 'active' && post.data.kind === 'note')
+    .filter((post) => post.data.kind === 'note')
     .map((post) => ({
       params: {
         section: getArticleSectionSegment(locale),
@@ -104,10 +101,8 @@ export async function getDefaultArticleNotePaths() {
 }
 
 export async function getLocalizedArticlePillarPaths() {
-  const posts = await getCollection('articles')
-
-  return getArticleLocales().flatMap((locale) => {
-    const localizedPosts = posts.filter((post) => post.data.locale === locale && post.data.status === 'active')
+  return (await Promise.all(getArticleLocales().map(async (locale) => {
+    const localizedPosts = await getActiveArticlesByLocale(locale)
 
     return LEARNING_PATH_PILLARS.flatMap((pillar) => {
       const pillarPosts = sortArticles(localizedPosts.filter((post) => post.data.pillarId === pillar.id))
@@ -136,7 +131,7 @@ export async function getLocalizedArticlePillarPaths() {
         },
       ]
     })
-  })
+  }))).flat()
 }
 
 export async function getDefaultArticlePillarPaths() {
@@ -146,8 +141,7 @@ export async function getDefaultArticlePillarPaths() {
     return []
   }
 
-  const posts = await getCollection('articles')
-  const localizedPosts = posts.filter((post) => post.data.locale === locale && post.data.status === 'active')
+  const localizedPosts = await getActiveArticlesByLocale(locale)
 
   return LEARNING_PATH_PILLARS.flatMap((pillar) => {
     const pillarPosts = sortArticles(localizedPosts.filter((post) => post.data.pillarId === pillar.id))
@@ -178,11 +172,8 @@ export async function getDefaultArticlePillarPaths() {
 }
 
 export async function getLocalizedArticleCanonicalPaths() {
-  const posts = await getCollection('articles')
-
-  return getArticleLocales().flatMap((locale) =>
-    posts
-      .filter((post) => post.data.locale === locale && post.data.status === 'active')
+  return (await Promise.all(getArticleLocales().map(async (locale) =>
+    (await getActiveArticlesByLocale(locale))
       .flatMap((post) => {
         const params = getArticleCanonicalParams(post)
 
@@ -203,8 +194,8 @@ export async function getLocalizedArticleCanonicalPaths() {
             },
           },
         ]
-      }),
-  )
+      }))))
+    .flat()
 }
 
 export async function getDefaultArticleCanonicalPaths() {
@@ -214,10 +205,9 @@ export async function getDefaultArticleCanonicalPaths() {
     return []
   }
 
-  const posts = await getCollection('articles')
+  const posts = await getActiveArticlesByLocale(locale)
 
   return posts
-    .filter((post) => post.data.locale === locale && post.data.status === 'active')
     .flatMap((post) => {
       const params = getArticleCanonicalParams(post)
 
@@ -241,10 +231,8 @@ export async function getDefaultArticleCanonicalPaths() {
 }
 
 export async function getLocalizedArticleBranchPaths() {
-  const posts = await getCollection('articles')
-
-  return getArticleLocales().flatMap((locale) => {
-    const localizedPosts = posts.filter((post) => post.data.locale === locale && post.data.status === 'active')
+  return (await Promise.all(getArticleLocales().map(async (locale) => {
+    const localizedPosts = await getActiveArticlesByLocale(locale)
 
     return LEARNING_PATH_PILLARS.flatMap((pillar) =>
       pillar.branches.flatMap((branch) => {
@@ -274,7 +262,7 @@ export async function getLocalizedArticleBranchPaths() {
         ]
       }),
     )
-  })
+  }))).flat()
 }
 
 export async function getDefaultArticleBranchPaths() {
@@ -284,8 +272,7 @@ export async function getDefaultArticleBranchPaths() {
     return []
   }
 
-  const posts = await getCollection('articles')
-  const localizedPosts = posts.filter((post) => post.data.locale === locale && post.data.status === 'active')
+  const localizedPosts = await getActiveArticlesByLocale(locale)
 
   return LEARNING_PATH_PILLARS.flatMap((pillar) =>
     pillar.branches.flatMap((branch) => {

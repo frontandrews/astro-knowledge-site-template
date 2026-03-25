@@ -1,4 +1,4 @@
-import type { SiteLocale } from '@/lib/site-copy'
+import { getSiteCopy, type SiteLocale } from '@/lib/site-copy'
 
 type ChallengeLevel = 'beginner' | 'intermediate' | 'advanced'
 type ChallengeLanguage = 'javascript' | 'typescript' | 'python'
@@ -14,19 +14,7 @@ type ChallengeLike = {
 }
 
 export function getChallengeLevelLabel(level: ChallengeLevel, locale: SiteLocale) {
-  if (locale === 'pt-br') {
-    return {
-      advanced: 'Avancado',
-      beginner: 'Iniciante',
-      intermediate: 'Intermediario',
-    }[level]
-  }
-
-  return {
-    advanced: 'Advanced',
-    beginner: 'Beginner',
-    intermediate: 'Intermediate',
-  }[level]
+  return getSiteCopy(locale).challengeMeta.levelLabels[level]
 }
 
 export function getChallengeLanguageLabel(language: ChallengeLanguage) {

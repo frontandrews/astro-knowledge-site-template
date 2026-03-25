@@ -1,5 +1,6 @@
 ---
 import { cn } from '@/lib/cn'
+import { articleCompletionSummaryDomHooks, getDataHookAttributes } from '@/lib/dom-hooks'
 import { getSiteCopy, type SiteLocale } from '@/lib/site-copy'
 import { ui } from '@/lib/ui'
 
@@ -89,6 +90,6 @@ const quietActionClass = isCompact
   </div>
 ) : null}
 
-<button class={quietActionClass} data-completion-mark-unread type="button">
+<button class={quietActionClass} {...getDataHookAttributes(articleCompletionSummaryDomHooks.markUnread)} type="button">
   {copy.article.markUnread}
 </button>

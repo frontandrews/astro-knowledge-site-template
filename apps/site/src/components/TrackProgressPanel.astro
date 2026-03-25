@@ -1,7 +1,10 @@
 ---
+import { randomUUID } from 'node:crypto'
 import ArrowRightIcon from '@/components/ui/icons/ArrowRightIcon.astro'
+import TrackProgressPanelClient from '@/components/TrackProgressPanelClient.svelte'
 import { cn } from '@/lib/cn'
-import { getSiteCopy, type SiteLocale } from '@/lib/site-copy'
+import { getDataHookAttributes, sharedDomHooks, trackProgressDomHooks } from '@/lib/dom-hooks'
+import { getSiteCopy, getSiteLowerCaseLocale, type SiteLocale } from '@/lib/site-copy'
 import { ui } from '@/lib/ui'
 
 type TrackItem = {
@@ -27,32 +30,23 @@ const {
 } = Astro.props
 
 const copy = getSiteCopy(locale)
-const metaLine = `${items.length} ${copy.startHere.stepsLabel.toLocaleLowerCase(locale === 'pt-br' ? 'pt-BR' : 'en-US')} • ~${totalReadingMinutes} min`
-const ofLabel = locale === 'pt-br' ? 'de' : 'of'
+const metaLine = `${items.length} ${copy.startHere.stepsLabel.toLocaleLowerCase(getSiteLowerCaseLocale(locale))} • ~${totalReadingMinutes} min`
+const ofLabel = copy.trackProgress.ofLabel
 const initialHref = items[0]?.href ?? '#'
-const copyLabels =
-  locale === 'pt-br'
-    ? {
-        continueTrack: 'Continue nesta trilha',
-        nextLabel: 'Próximo',
-      }
-    : {
-        continueTrack: 'Continue on this track',
-        nextLabel: 'Next',
-      }
+const controllerId = randomUUID()
 ---
 
 <section
-  class={cn(ui.compactSection, className)}
-  data-track-progress-root
-  data-of-label={ofLabel}
-  data-progress-label={copy.startHere.progressLabel}
-  data-review-label={copy.startHere.reviewTrack}
-  data-step-label={copy.startHere.stepLabel}
-  data-track-completed-label={copy.startHere.trackCompleted}
-  data-track-continue-label={copyLabels.continueTrack}
-  data-track-next-label={copyLabels.nextLabel}
-  data-track-next-track-label={copy.startHere.nextTrack}
+  class={cn('track-progress-root', ui.compactSection, className)}
+  {...getDataHookAttributes(sharedDomHooks.controllerId, controllerId)}
+  {...getDataHookAttributes(trackProgressDomHooks.root)}
+  {...getDataHookAttributes(trackProgressDomHooks.ofLabel, ofLabel)}
+  {...getDataHookAttributes(trackProgressDomHooks.progressLabel, copy.startHere.progressLabel)}
+  {...getDataHookAttributes(trackProgressDomHooks.reviewLabel, copy.startHere.reviewTrack)}
+  {...getDataHookAttributes(trackProgressDomHooks.stepLabel, copy.startHere.stepLabel)}
+  {...getDataHookAttributes(trackProgressDomHooks.completedLabel, copy.startHere.trackCompleted)}
+  {...getDataHookAttributes(trackProgressDomHooks.continueLabel, copy.trackProgress.continueTrack)}
+  {...getDataHookAttributes(trackProgressDomHooks.nextTrackLabel, copy.startHere.nextTrack)}
 >
   <div class="grid gap-5 border-y border-site-line bg-transparent px-[0.45rem] py-5 lg:gap-6 lg:px-[0.55rem] lg:py-6">
     <div class="grid gap-2.5">
@@ -61,17 +55,17 @@ const copyLabels =
       </p>
       <div class="grid gap-2">
         <div class="flex items-center justify-between gap-4">
-          <p class="m-0 text-[0.9rem] font-medium text-site-ink lg:text-[0.98rem]" data-track-progress-status>
+          <p class="track-progress-status m-0 text-[0.9rem] font-medium text-site-ink lg:text-[0.98rem]" {...getDataHookAttributes(trackProgressDomHooks.progressStatus)}>
             {copy.startHere.progressLabel}: {copy.startHere.stepLabel} 1 {ofLabel} {items.length}
           </p>
-          <p class="m-0 text-[0.82rem] font-semibold text-site-ink-soft lg:text-[0.9rem]" data-track-progress-value>
+          <p class="track-progress-value m-0 text-[0.82rem] font-semibold text-site-ink-soft lg:text-[0.9rem]" {...getDataHookAttributes(trackProgressDomHooks.progressValue)}>
             0%
           </p>
         </div>
         <div class={ui.progressTrackStrong}>
           <div
-            class={ui.progressBar}
-            data-track-progress-bar
+            class={cn('track-progress-bar', ui.progressBar)}
+            {...getDataHookAttributes(trackProgressDomHooks.progressBar)}
           />
         </div>
       </div>
@@ -79,30 +73,30 @@ const copyLabels =
 
     <a
       class={ui.cardButton}
-      data-track-progress-cta
+      {...getDataHookAttributes(trackProgressDomHooks.cta)}
       href={initialHref}
     >
-      <span data-track-progress-cta-label>{copy.startHere.continueWhereLeftOff}</span>
+      <span {...getDataHookAttributes(trackProgressDomHooks.ctaLabel)}>{copy.startHere.continueWhereLeftOff}</span>
       <ArrowRightIcon className="size-[0.92rem]" />
     </a>
 
     <div class="grid gap-3 border-t border-site-line pt-4">
-      <p class={cn(ui.progressStatus, 'flex items-center gap-2')} data-track-overall-status>
-        <span aria-hidden="true" class="text-site-ink-muted" data-track-overall-icon>→</span>
-        <span data-track-overall-text>{copyLabels.continueTrack}</span>
+      <p class={cn(ui.progressStatus, 'flex items-center gap-2')}>
+        <span aria-hidden="true" class="text-site-ink-muted" {...getDataHookAttributes(trackProgressDomHooks.overallIcon)}>→</span>
+        <span {...getDataHookAttributes(trackProgressDomHooks.overallText)}>{copy.trackProgress.continueTrack}</span>
       </p>
 
       <div class="grid gap-2">
         <p class="m-0 text-[0.72rem] font-bold uppercase tracking-[0.18em] text-site-line-strong lg:text-[0.78rem]">
-          {copyLabels.nextLabel}
+          {copy.trackProgress.nextLabel}
         </p>
         <a
           class={ui.cardButton}
-          data-track-next-default-href={tracksHref}
-          data-track-next-link
+          {...getDataHookAttributes(trackProgressDomHooks.nextDefaultHref, tracksHref)}
+          {...getDataHookAttributes(trackProgressDomHooks.nextLink)}
           href={tracksHref}
         >
-          <span data-track-next-text>{copy.startHere.nextTrack}</span>
+          <span {...getDataHookAttributes(trackProgressDomHooks.nextText)}>{copy.startHere.nextTrack}</span>
           <ArrowRightIcon className="size-[0.92rem]" />
         </a>
       </div>
@@ -110,125 +104,17 @@ const copyLabels =
 
     <div class="hidden" aria-hidden="true">
       {items.map((item) => (
-        <a data-track-progress-item data-track-href={item.href} data-track-item={item.articleId} href={item.href}>
+        <a
+          {...getDataHookAttributes(trackProgressDomHooks.item)}
+          {...getDataHookAttributes(trackProgressDomHooks.itemHref, item.href)}
+          {...getDataHookAttributes(trackProgressDomHooks.itemId, item.articleId)}
+          href={item.href}
+        >
           {item.title}
         </a>
       ))}
     </div>
+
+    <TrackProgressPanelClient client:idle controllerId={controllerId} />
   </div>
 </section>
-
-<script>
-  import { completedArticlesChangedEvent, readCompletedArticles } from '@/lib/article-progress'
-  import { siteStorageKeys } from '@/lib/storage-keys'
-
-  const roots = document.querySelectorAll('[data-track-progress-root]')
-
-  for (const root of roots) {
-    if (!(root instanceof HTMLElement)) {
-      continue
-    }
-
-    const progressStatus = root.querySelector('[data-track-progress-status]')
-    const progressValue = root.querySelector('[data-track-progress-value]')
-    const progressBar = root.querySelector('[data-track-progress-bar]')
-    const cta = root.querySelector('[data-track-progress-cta]')
-    const ctaLabel = root.querySelector('[data-track-progress-cta-label]')
-    const nextLink = root.querySelector('[data-track-next-link]')
-    const nextText = root.querySelector('[data-track-next-text]')
-    const overallIcon = root.querySelector('[data-track-overall-icon]')
-    const overallText = root.querySelector('[data-track-overall-text]')
-    const itemLinks = [...root.querySelectorAll('[data-track-progress-item]')]
-    const totalSteps = itemLinks.length
-    const progressLabel = root.dataset.progressLabel ?? 'Progress'
-    const stepLabel = root.dataset.stepLabel ?? 'Step'
-    const ofLabel = root.dataset.ofLabel ?? 'of'
-    const continueLabel = ctaLabel?.textContent ?? 'Continue'
-    const reviewLabel = root.dataset.reviewLabel ?? 'Review'
-    const completedLabel = root.dataset.trackCompletedLabel ?? 'Completed'
-    const continueTrackLabel = root.dataset.trackContinueLabel ?? 'Keep going'
-    const nextTrackLabel = root.dataset.trackNextTrackLabel ?? 'Next track'
-
-    const syncTrackProgress = () => {
-      const completedArticleIds = new Set(readCompletedArticles())
-      let completedCount = 0
-      let firstUnreadHref = ''
-      let firstUnreadStep = totalSteps
-      let firstUnreadTitle = ''
-
-      itemLinks.forEach((item, index) => {
-        if (!(item instanceof HTMLElement)) {
-          return
-        }
-
-        const articleId = item.dataset.trackItem ?? ''
-        const isComplete = Boolean(articleId && completedArticleIds.has(articleId))
-
-        if (isComplete) {
-          completedCount += 1
-          return
-        }
-
-        if (!firstUnreadHref) {
-          firstUnreadHref = item.dataset.trackHref ?? ''
-          firstUnreadStep = index + 1
-          firstUnreadTitle = item.textContent?.trim() ?? ''
-        }
-      })
-
-      const isComplete = totalSteps > 0 && completedCount >= totalSteps
-      const percent = totalSteps > 0 ? Math.round((completedCount / totalSteps) * 100) : 0
-
-      root.classList.toggle('is-complete', isComplete)
-
-      if (progressStatus instanceof HTMLElement) {
-        progressStatus.textContent = isComplete
-          ? `${progressLabel}: ${completedLabel}`
-          : `${progressLabel}: ${stepLabel} ${firstUnreadStep} ${ofLabel} ${totalSteps}`
-      }
-
-      if (progressValue instanceof HTMLElement) {
-        progressValue.textContent = `${percent}%`
-      }
-
-      if (progressBar instanceof HTMLElement) {
-        progressBar.style.width = `${percent}%`
-      }
-
-      if (cta instanceof HTMLAnchorElement) {
-        cta.href = isComplete ? itemLinks[0]?.getAttribute('href') ?? '#' : firstUnreadHref || '#'
-      }
-
-      if (ctaLabel instanceof HTMLElement) {
-        ctaLabel.textContent = isComplete ? reviewLabel : continueLabel
-      }
-
-      if (nextLink instanceof HTMLAnchorElement) {
-        nextLink.href = isComplete ? nextLink.dataset.trackNextDefaultHref ?? '#' : firstUnreadHref || '#'
-      }
-
-      if (nextText instanceof HTMLElement) {
-        nextText.textContent = isComplete ? nextTrackLabel : firstUnreadTitle || continueLabel
-      }
-
-      if (overallIcon instanceof HTMLElement) {
-        overallIcon.textContent = isComplete ? '✓' : '→'
-        overallIcon.classList.toggle('text-site-success', isComplete)
-        overallIcon.classList.toggle('text-site-ink-muted', !isComplete)
-      }
-
-      if (overallText instanceof HTMLElement) {
-        overallText.textContent = isComplete ? completedLabel : continueTrackLabel
-      }
-
-    }
-
-    syncTrackProgress()
-    window.addEventListener(completedArticlesChangedEvent, syncTrackProgress)
-    window.addEventListener('storage', (event) => {
-      if (event.key === siteStorageKeys.completedArticles) {
-        syncTrackProgress()
-      }
-    })
-  }
-</script>
