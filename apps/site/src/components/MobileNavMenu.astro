@@ -56,10 +56,10 @@ function getLocaleChoiceHandler(code: string) {
 }
 ---
 
-<details class="group nav:hidden">
+<details class="group relative nav:hidden">
   <summary
     aria-controls="mobile-site-nav"
-    class="inline-flex min-h-10 items-center rounded-full border border-site-line bg-site-panel px-3 py-2 text-sm font-semibold tracking-[0.04em] text-site-ink transition-colors duration-150 hover:text-site-link-hover focus-visible:text-site-link-hover focus-visible:outline-none list-none [&::-webkit-details-marker]:hidden"
+    class="inline-flex min-h-10 items-center justify-center rounded-xs border border-site-line bg-site-panel px-3 py-2 text-sm font-semibold tracking-[0.04em] text-site-ink transition-colors duration-150 hover:bg-site-hover hover:text-site-link-hover focus-visible:bg-site-hover focus-visible:text-site-link-hover focus-visible:outline-none list-none [&::-webkit-details-marker]:hidden"
   >
     <svg class="size-4 group-open:hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
       <path d="M4 7h16" />
@@ -73,7 +73,10 @@ function getLocaleChoiceHandler(code: string) {
     <span class="sr-only">{menuLabel} / {closeLabel}</span>
   </summary>
 
-  <div class="w-full pt-3" id="mobile-site-nav">
+  <div
+    class="absolute right-0 top-[calc(100%+0.75rem)] z-30 w-[min(18rem,calc(100vw-1.5rem))]"
+    id="mobile-site-nav"
+  >
     <div class={panelClass}>
       {navLinks.length > 0 ? (
         <nav aria-label={primaryNavLabel} class="grid gap-1">

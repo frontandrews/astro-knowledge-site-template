@@ -184,7 +184,10 @@ const pageShellClass =
   contentWidth === 'wide'
     ? ui.pageShellWide
     : ui.pageShell
-const mobileNavPanelClass = cn(ui.panel, 'site-dropdown-shadow grid gap-3 p-3')
+const mobileNavPanelClass = cn(
+  ui.panel,
+  'site-dropdown-shadow grid gap-3 overflow-hidden rounded-[1.35rem] p-3',
+)
 const searchableSections = getEnabledSections()
   .map((section) => ({
     href: getSectionHref(section.id, currentLocale),
@@ -478,6 +481,8 @@ const structuredDataItems = [
     <script
       data-completed-articles-changed-event={siteEvents.completedArticlesChanged}
       data-completed-articles-key={siteStorageKeys.completedArticles}
+      data-mobile-complete-text-attr={completionDomHooks.mobileCompleteText.attr}
+      data-mobile-default-text-attr={completionDomHooks.mobileDefaultText.attr}
       data-completion-item-attr={completionDomHooks.item.attr}
       data-newsletter-email-id={layoutDomHooks.newsletterEmail.id}
       data-newsletter-mirror-attr={layoutDomHooks.newsletterMirror.attr}
@@ -490,6 +495,10 @@ const structuredDataItems = [
         currentScript instanceof HTMLScriptElement ? currentScript.dataset.completedArticlesKey ?? '' : ''
       const completionItemAttr =
         currentScript instanceof HTMLScriptElement ? currentScript.dataset.completionItemAttr ?? '' : ''
+      const mobileCompleteTextAttr =
+        currentScript instanceof HTMLScriptElement ? currentScript.dataset.mobileCompleteTextAttr ?? '' : ''
+      const mobileDefaultTextAttr =
+        currentScript instanceof HTMLScriptElement ? currentScript.dataset.mobileDefaultTextAttr ?? '' : ''
       const newsletterEmailId =
         currentScript instanceof HTMLScriptElement ? currentScript.dataset.newsletterEmailId ?? '' : ''
       const newsletterMirrorAttr =
@@ -516,7 +525,21 @@ const structuredDataItems = [
 
         document.querySelectorAll(selector).forEach((card) => {
           const articleId = card.getAttribute(completionItemAttr)
-          card.classList.toggle('is-complete', Boolean(articleId && completedSet.has(articleId)))
+          const isComplete = Boolean(articleId && completedSet.has(articleId))
+          card.classList.toggle('is-complete', isComplete)
+
+          const mobileDefaultText = mobileDefaultTextAttr ? card.querySelector(`[${mobileDefaultTextAttr}]`) : null
+          const mobileCompleteText = mobileCompleteTextAttr ? card.querySelector(`[${mobileCompleteTextAttr}]`) : null
+
+          if (mobileDefaultText instanceof HTMLElement) {
+            mobileDefaultText.classList.toggle('hidden', isComplete)
+            mobileDefaultText.classList.toggle('inline-flex', !isComplete)
+          }
+
+          if (mobileCompleteText instanceof HTMLElement) {
+            mobileCompleteText.classList.toggle('hidden', !isComplete)
+            mobileCompleteText.classList.toggle('inline-flex', isComplete)
+          }
         })
       }
 

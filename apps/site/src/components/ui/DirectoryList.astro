@@ -52,27 +52,43 @@ const rowItemClass = ui.linearRow
             <>
               {item.completionId ? (
                 <>
-                  <span class={cn('content-directory-mobile-default-cta', ui.inlineCta, 'md:hidden')} {...getDataHookAttributes(completionDomHooks.mobileDefaultText)}>
+                  <span
+                    aria-hidden="true"
+                    class={cn('content-directory-mobile-default-cta', ui.inlineCta, 'md:hidden')}
+                    {...getDataHookAttributes(completionDomHooks.mobileDefaultText)}
+                  >
                     <span>{item.ctaLabel}</span>
                     <ArrowRightIcon className="size-[0.88rem]" />
                   </span>
-                  <span class={cn('content-directory-mobile-complete-text', ui.inlineCta, 'md:hidden')} {...getDataHookAttributes(completionDomHooks.mobileCompleteText)}>
+                  <span
+                    aria-hidden="true"
+                    class={cn('content-directory-mobile-complete-text', ui.inlineCta, 'hidden md:hidden')}
+                    {...getDataHookAttributes(completionDomHooks.mobileCompleteText)}
+                  >
                     <span>{item.completedCtaLabel ?? item.ctaLabel}</span>
                     <ArrowRightIcon className="size-[0.88rem]" />
                   </span>
                 </>
               ) : (
-                <span class={cn(ui.inlineCta, 'md:hidden')}>
+                <span aria-hidden="true" class={cn(ui.inlineCta, 'md:hidden')}>
                   <span>{item.ctaLabel}</span>
                   <ArrowRightIcon className="size-[0.88rem]" />
                 </span>
               )}
               <span class={ui.completionRailInlineMd}>
-                <span class={cn('content-directory-complete-text', ui.completionDesktopCta)} {...getDataHookAttributes(completionDomHooks.completeText)}>
+                <span
+                  aria-hidden="true"
+                  class={cn('content-directory-complete-text', ui.completionDesktopCta)}
+                  {...getDataHookAttributes(completionDomHooks.completeText)}
+                >
                   <span>{item.completedCtaLabel ?? item.ctaLabel}</span>
                   <ArrowRightIcon className="size-[0.88rem]" />
                 </span>
-                <span class={cn('content-directory-default-cta', ui.completionDesktopCtaInteractive)} {...getDataHookAttributes(completionDomHooks.defaultText)}>
+                <span
+                  aria-hidden="true"
+                  class={cn('content-directory-default-cta', ui.completionDesktopCtaInteractive)}
+                  {...getDataHookAttributes(completionDomHooks.defaultText)}
+                >
                   <span>{item.ctaLabel}</span>
                   <ArrowRightIcon className="size-[0.88rem]" />
                 </span>

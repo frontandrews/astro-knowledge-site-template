@@ -11,7 +11,6 @@ import {
   articleCardTitleVariants,
   eyebrowVariants,
 } from '@/lib/ui-variants'
-import InlineArrowCta from '@/components/ui/InlineArrowCta.astro'
 import ArrowRightIcon from '@/components/ui/icons/ArrowRightIcon.astro'
 
 type Props = {
@@ -71,13 +70,36 @@ const completedCtaLabel = copy.directory.readAgain
     ) : null}
     {variant === 'linear' ? (
       <>
-        <InlineArrowCta className="content-directory-mobile-default-cta md:hidden" label={ctaLabel} />
+        <span
+          aria-hidden="true"
+          class={cn('content-directory-mobile-default-cta', ui.inlineCta, 'md:hidden')}
+          {...getDataHookAttributes(completionDomHooks.mobileDefaultText)}
+        >
+          <span>{ctaLabel}</span>
+          <ArrowRightIcon className="size-[0.88rem]" />
+        </span>
+        <span
+          aria-hidden="true"
+          class={cn('content-directory-mobile-complete-text', ui.inlineCta, 'hidden md:hidden')}
+          {...getDataHookAttributes(completionDomHooks.mobileCompleteText)}
+        >
+          <span>{completedCtaLabel}</span>
+          <ArrowRightIcon className="size-[0.88rem]" />
+        </span>
         <span class={ui.completionRailMd}>
-          <span class={cn('content-directory-complete-text', ui.completionDesktopCta)} {...getDataHookAttributes(completionDomHooks.completeText)}>
+          <span
+            aria-hidden="true"
+            class={cn('content-directory-complete-text', ui.completionDesktopCta)}
+            {...getDataHookAttributes(completionDomHooks.completeText)}
+          >
             <span>{completedCtaLabel}</span>
             <ArrowRightIcon className="size-[0.88rem]" />
           </span>
-          <span class={cn('content-directory-default-cta', ui.completionDesktopCtaInteractive)} {...getDataHookAttributes(completionDomHooks.defaultText)}>
+          <span
+            aria-hidden="true"
+            class={cn('content-directory-default-cta', ui.completionDesktopCtaInteractive)}
+            {...getDataHookAttributes(completionDomHooks.defaultText)}
+          >
             <span>{ctaLabel}</span>
             <ArrowRightIcon className="size-[0.88rem]" />
           </span>
