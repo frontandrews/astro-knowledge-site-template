@@ -140,9 +140,10 @@ const copy = getSiteCopy(locale)
 </aside>
 
 <script>
-  import { markGuideCompleted, markGuideUnread, readCompletedGuides } from '@/lib/completed-guides';
+  import { markArticleCompleted, markArticleUnread, readCompletedArticles } from '@/lib/article-progress';
+  import { siteEvents } from '@/lib/site-config';
 
-  const readingResetEvent = 'seniorpath:article-reading-reset';
+  const readingResetEvent = siteEvents.articleReadingReset;
   const tocRoots = document.querySelectorAll('[data-toc-root]');
 
   for (const root of tocRoots) {
@@ -253,7 +254,7 @@ const copy = getSiteCopy(locale)
     if (markUnreadButton instanceof HTMLButtonElement) {
       markUnreadButton.addEventListener('click', () => {
         if (completionId) {
-          markGuideUnread(completionId);
+          markArticleUnread(completionId);
         }
         resetCompletionState(true);
         window.dispatchEvent(new CustomEvent(readingResetEvent, { detail: completionId }));
@@ -295,7 +296,7 @@ const copy = getSiteCopy(locale)
         const markComplete = () => {
           hasCompletedReading = true;
           if (completionId) {
-            markGuideCompleted(completionId);
+            markArticleCompleted(completionId);
           }
           progressBar.style.width = '100%';
           progressValue.textContent = '100%';
@@ -369,7 +370,7 @@ const copy = getSiteCopy(locale)
       resetCompletionState(false);
     });
 
-    if (completionId && readCompletedGuides().includes(completionId)) {
+    if (completionId && readCompletedArticles().includes(completionId)) {
       hasCompletedReading = true;
     }
 

@@ -1,0 +1,52 @@
+---
+import CompactSection from '@/components/ui/CompactSection.astro'
+import LinkCard from '@/components/ui/LinkCard.astro'
+import PageHeader from '@/components/ui/PageHeader.astro'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import {
+  getHomeLandingCopy,
+} from '@/lib/site-config'
+import {
+  getEnabledSections,
+  getSectionDescription,
+  getSectionHref,
+  getSectionLabel,
+} from '@/lib/section-manifest'
+import type { SiteLocale } from '@/lib/site-copy'
+
+type Props = {
+  locale: SiteLocale
+}
+
+const { locale } = Astro.props
+const landing = getHomeLandingCopy(locale)
+const sectionCards = getEnabledSections()
+  .map((section) => ({
+    description: getSectionDescription(section.id, locale),
+    href: getSectionHref(section.id, locale),
+    title: getSectionLabel(section.id, locale),
+  }))
+  .filter(
+    (
+      card,
+    ): card is {
+      description: string
+      href: string
+      title: string
+    } => Boolean(card.href),
+  )
+---
+
+<BaseLayout description={landing.description} title={landing.title}>
+  <PageHeader description={landing.description} title={landing.title}>
+    <p class="m-0 text-[0.72rem] font-bold uppercase tracking-[0.18em] text-site-line-strong">
+      {landing.eyebrow}
+    </p>
+  </PageHeader>
+
+  <CompactSection className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+    {sectionCards.map((card) => (
+      <LinkCard description={card.description} href={card.href} title={card.title} />
+    ))}
+  </CompactSection>
+</BaseLayout>

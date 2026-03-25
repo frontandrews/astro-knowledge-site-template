@@ -4,25 +4,22 @@ import { ui } from '@/lib/ui'
 
 type Props = {
   description: string
-  englishHref?: string | null
   kicker?: string
-  portugueseHref?: string | null
+  localeHrefs?: Record<string, string | null>
   title: string
 }
 
 const {
   description,
-  englishHref = null,
   kicker,
-  portugueseHref = null,
+  localeHrefs = {},
   title,
 } = Astro.props
 ---
 
 <BaseLayout
   description={description}
-  englishHref={englishHref}
-  portugueseHref={portugueseHref}
+  localeHrefs={localeHrefs}
   title={title}
 >
   <section class={ui.section}>

@@ -1,7 +1,9 @@
-export function getTracksHref(locale = 'en', slug?: string | null) {
-  const baseHref = locale === 'pt-br' ? '/pt-br/trilhas' : '/tracks'
+import { getPageTypeHref } from '@/lib/section-manifest'
 
-  if (!slug) {
+export function getTracksHref(locale = 'en', slug?: string | null) {
+  const baseHref = getPageTypeHref('tracks', locale)
+
+  if (!baseHref || !slug) {
     return baseHref
   }
 

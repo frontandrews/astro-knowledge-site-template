@@ -1,14 +1,14 @@
 import type { CollectionEntry } from 'astro:content'
-import { getTopicRootGroupId } from '@seniorpath/content'
+import { getTopicRootGroupId } from '@template/content'
 
 import { getSiteLocale, type SiteLocale } from '@/lib/site-copy'
 
-type GuideEntry = CollectionEntry<'guides'>
-type GuideLevel = GuideEntry['data']['level']
+type ArticleEntry = CollectionEntry<'articles'>
+type ArticleLevel = ArticleEntry['data']['level']
 
 const WORDS_PER_MINUTE = 220
 
-const LEVEL_LABELS: Record<SiteLocale, Record<GuideLevel, string>> = {
+const LEVEL_LABELS: Record<SiteLocale, Record<ArticleLevel, string>> = {
   en: {
     advanced: 'Advanced',
     beginner: 'Beginner',
@@ -34,7 +34,7 @@ const CATEGORY_LABELS: Record<SiteLocale, Record<string, string>> = {
   },
 }
 
-export function getGuideReadingTimeMinutes(post: GuideEntry) {
+export function getArticleReadingTimeMinutes(post: ArticleEntry) {
   const normalized = (post.body ?? '')
     .replace(/`{3}[\s\S]*?`{3}/g, ' ')
     .replace(/`[^`]*`/g, ' ')
@@ -45,12 +45,12 @@ export function getGuideReadingTimeMinutes(post: GuideEntry) {
   return Math.max(1, Math.ceil(words / WORDS_PER_MINUTE))
 }
 
-export function getGuideLevelLabel(level: GuideLevel, locale?: string | null) {
+export function getArticleLevelLabel(level: ArticleLevel, locale?: string | null) {
   const normalizedLocale = getSiteLocale(locale)
   return LEVEL_LABELS[normalizedLocale][level]
 }
 
-export function getGuideCategoryLabel(post: GuideEntry) {
+export function getArticleCategoryLabel(post: ArticleEntry) {
   const normalizedLocale = getSiteLocale(post.data.locale)
   const rootGroupId = getTopicRootGroupId(post.data.topicIds[0] ?? '')
 

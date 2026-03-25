@@ -3,6 +3,7 @@ import SearchIcon from '@lucide/astro/icons/search'
 import XIcon from '@lucide/astro/icons/x'
 
 import { cn } from '@/lib/cn'
+import { getEnabledSections, getSectionHref, getSectionLabel } from '@/lib/section-manifest'
 import { getSiteCopy, type SiteLocale } from '@/lib/site-copy'
 import { ui } from '@/lib/ui'
 
@@ -13,12 +14,30 @@ type Props = {
 const { locale } = Astro.props
 const isDev = import.meta.env.DEV
 const siteCopy = getSiteCopy(locale)
+const searchableSections = getEnabledSections()
+  .map((section) => ({
+    href: getSectionHref(section.id, locale),
+    id: section.id,
+    label: getSectionLabel(section.id, locale),
+  }))
+  .filter(
+    (
+      section,
+    ): section is {
+      href: string
+      id: string
+      label: string
+    } => Boolean(section.href),
+  )
+const searchableList = searchableSections.map((section) => section.label.toLowerCase()).join(', ')
 const copy =
   locale === 'pt-br'
     ? {
         close: 'Fechar busca',
         error: 'A busca não está disponível no momento.',
-        empty: 'Digite para buscar em artigos, conceitos, termos e tópicos.',
+        empty: searchableList
+          ? `Digite para buscar em ${searchableList}.`
+          : 'Nenhuma area pesquisavel esta habilitada.',
         hint: 'Busca no site',
         loading: 'Buscando...',
         noResults: 'Nenhum resultado encontrado.',
@@ -30,7 +49,9 @@ const copy =
     : {
         close: 'Close search',
         error: 'Search is currently unavailable.',
-        empty: 'Type to search across articles, concepts, glossary terms, and topics.',
+        empty: searchableList
+          ? `Type to search across ${searchableList}.`
+          : 'No searchable sections are enabled right now.',
         hint: 'Site search',
         loading: 'Searching...',
         noResults: 'No results found.',
@@ -98,7 +119,7 @@ const searchResultLinkClass = ui.searchResultLink
   </div>
 </div>
 
-<script define:vars={{ copy, isDev, locale, searchResultLinkClass, siteCopy }} is:inline>
+<script define:vars={{ copy, isDev, locale, searchResultLinkClass, searchableSections, siteCopy }} is:inline>
   const searchTriggers = [...document.querySelectorAll('[data-search-trigger]')];
   const searchOverlay = document.querySelector('[data-search-overlay]');
   const searchInput = document.querySelector('[data-search-input]');
@@ -110,12 +131,11 @@ const searchResultLinkClass = ui.searchResultLink
   let searchTimer;
 
   const groupLabel = (url) => {
-    if (url.startsWith('/pt-br/artigos') || url.startsWith('/articles')) return siteCopy.layout.articles;
-    if (url.startsWith('/pt-br/conceitos') || url.startsWith('/concepts')) return siteCopy.layout.concepts;
-    if (url.startsWith('/pt-br/glossario') || url.startsWith('/glossary')) return siteCopy.layout.glossary;
-    if (url.startsWith('/pt-br/topicos') || url.startsWith('/topics')) return siteCopy.layout.topics;
-    if (url.startsWith('/pt-br/trilhas') || url.startsWith('/tracks')) return siteCopy.layout.tracks;
-    return siteCopy.directory.page;
+    const match = searchableSections.find((section) =>
+      url === section.href || url.startsWith(`${section.href}/`) || url.startsWith(`${section.href}?`),
+    );
+
+    return match?.label ?? siteCopy.directory.page;
   };
 
   const setOpen = (isOpen) => {

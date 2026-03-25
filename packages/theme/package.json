@@ -1,9 +1,0 @@
-{
-  "name": "@seniorpath/theme",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "exports": {
-    "./retroui.css": "./src/retroui.css"
-  }
-}

@@ -2,7 +2,7 @@
   import { onMount, tick } from 'svelte'
   import ArrowRightIcon from '@/components/ui/icons/ArrowRightIcon.svelte'
   import { cn } from '@/lib/cn'
-  import { readCompletedGuides, completedGuidesChangedEvent } from '@/lib/completed-guides'
+  import { readCompletedArticles, completedArticlesChangedEvent } from '@/lib/article-progress'
   import { ui } from '@/lib/ui'
   import { directoryLinkVariants, directoryListVariants, filterChipVariants } from '@/lib/ui-variants'
 
@@ -15,7 +15,7 @@
     badgeLabel?: string
     completedCtaLabel?: string
     completionId?: string
-    contentKind?: 'article' | 'guide'
+    contentKind?: 'article' | 'note'
     ctaLabel?: string
     description?: string
     eyebrow?: string
@@ -29,10 +29,10 @@
   export let filterLabel = ''
   export let sectionLabel = ''
   export let completionStorageKey: string | null = null
-  export let kind: 'guide-rows' | 'title-cards' = 'title-cards'
+  export let layout: 'rows' | 'cards' = 'cards'
   export let allItemsLabel = 'All'
-  export let guideItemsLabel = 'Articles'
-  export let articleItemsLabel = 'Notes'
+  export let articleItemsLabel = 'Articles'
+  export let noteItemsLabel = 'Notes'
   export let moreFiltersLabel = 'more'
   export let fewerFiltersLabel = 'Show less'
   export let moreFiltersHref: string | null = null
@@ -49,14 +49,14 @@
   ]
   const filterLabelClass = ui.filterLabel
   const itemEyebrowClass = ui.metaQuiet
-  const listClass = directoryListVariants({ kind })
-  const guideArticleClass = ui.linearRow
-  const itemLinkClass = directoryLinkVariants({ kind })
+  const listClass = directoryListVariants({ layout })
+  const rowItemClass = ui.linearRow
+  const itemLinkClass = directoryLinkVariants({ layout })
   let activeFilter: string | null = null
-  let activeType: 'all' | 'article' | 'guide' = 'all'
+  let activeType: 'all' | 'article' | 'note' = 'all'
   let showAllFilters = false
   let visibleCategoryCount = 0
-  let completedItemIds = new Set<string>(typeof window === 'undefined' ? [] : readCompletedGuides())
+  let completedItemIds = new Set<string>(typeof window === 'undefined' ? [] : readCompletedArticles())
   let filterMeasureContainer: HTMLDivElement | null = null
   let resizeObserver: ResizeObserver | null = null
   let measureRun = 0
@@ -65,7 +65,7 @@
   let previousCollapsedSignature = ''
 
   $: typeScopedItems = items.filter((item) =>
-    activeType === 'all' ? true : (item.contentKind ?? 'guide') === activeType,
+    activeType === 'all' ? true : (item.contentKind ?? 'article') === activeType,
   )
   $: typeScopedFilterIds = new Set(typeScopedItems.flatMap((item) => item.tags.map((tag) => tag.id)))
   $: filters =
@@ -75,7 +75,8 @@
           new Map(typeScopedItems.flatMap((item) => item.tags.map((tag) => [tag.id, tag.label]))).entries(),
         ).map(([id, label]) => ({ id, label }))
   $: hasTypeFilters =
-    items.some((item) => item.contentKind === 'article') && items.some((item) => item.contentKind !== 'article')
+    items.some((item) => item.contentKind === 'note') &&
+    items.some((item) => (item.contentKind ?? 'article') !== 'note')
   $: if (activeFilter && !filters.some((filter) => filter.id === activeFilter)) {
     activeFilter = null
   }
@@ -101,7 +102,7 @@
     activeFilter = activeFilter === id ? null : id
   }
 
-  function setActiveType(type: 'all' | 'article' | 'guide') {
+  function setActiveType(type: 'all' | 'article' | 'note') {
     activeType = type
   }
 
@@ -211,7 +212,7 @@
   onMount(() => {
     const cleanup: Array<() => void> = []
     const syncCompletedItems = () => {
-      completedItemIds = new Set(readCompletedGuides())
+      completedItemIds = new Set(readCompletedArticles())
     }
 
     if (completionStorageKey) {
@@ -227,10 +228,10 @@
         }
       }
 
-      window.addEventListener(completedGuidesChangedEvent, handleCompletedItemsChanged)
+      window.addEventListener(completedArticlesChangedEvent, handleCompletedItemsChanged)
       window.addEventListener('storage', handleStorage)
       cleanup.push(() => {
-        window.removeEventListener(completedGuidesChangedEvent, handleCompletedItemsChanged)
+        window.removeEventListener(completedArticlesChangedEvent, handleCompletedItemsChanged)
         window.removeEventListener('storage', handleStorage)
       })
     }
@@ -292,20 +293,20 @@
               <span>{allItemsLabel}</span>
             </button>
             <button
-              aria-pressed={activeType === 'guide'}
-              class={filterChipVariants({ active: activeType === 'guide' })}
-              onclick={() => setActiveType('guide')}
-              type="button"
-            >
-              <span>{guideItemsLabel}</span>
-            </button>
-            <button
               aria-pressed={activeType === 'article'}
               class={filterChipVariants({ active: activeType === 'article' })}
               onclick={() => setActiveType('article')}
               type="button"
             >
               <span>{articleItemsLabel}</span>
+            </button>
+            <button
+              aria-pressed={activeType === 'note'}
+              class={filterChipVariants({ active: activeType === 'note' })}
+              onclick={() => setActiveType('note')}
+              type="button"
+            >
+              <span>{noteItemsLabel}</span>
             </button>
             {#if filters.length > 0}
               <span aria-hidden="true" class="self-center text-sm text-site-ink-muted">|</span>
@@ -363,11 +364,11 @@
             <button class={filterChipVariants({ active: activeType === 'all' })} data-measure-chip="type" type="button">
               <span>{allItemsLabel}</span>
             </button>
-            <button class={filterChipVariants({ active: activeType === 'guide' })} data-measure-chip="type" type="button">
-              <span>{guideItemsLabel}</span>
-            </button>
             <button class={filterChipVariants({ active: activeType === 'article' })} data-measure-chip="type" type="button">
               <span>{articleItemsLabel}</span>
+            </button>
+            <button class={filterChipVariants({ active: activeType === 'note' })} data-measure-chip="type" type="button">
+              <span>{noteItemsLabel}</span>
             </button>
           {:else if filters.length > 0}
             <button class={filterChipVariants({ active: !activeFilter })} data-measure-chip="all" type="button">
@@ -396,14 +397,14 @@
 
 <div class={listClass}>
   {#each visibleItems as item}
-    {#if kind === 'guide-rows'}
-      <article class={cn(guideArticleClass, 'relative', isComplete(item) && 'is-complete')} data-guide-post={item.completionId}>
+    {#if layout === 'rows'}
+      <article class={cn(rowItemClass, 'relative', isComplete(item) && 'is-complete')} data-article-post={item.completionId}>
         <a class={itemLinkClass} href={item.href}>
           {#if item.completionId}
             <span
               aria-hidden="true"
               class={ui.completionBadgeLinear}
-              data-guide-post-complete-badge
+              data-article-post-complete-badge
             >
               ✓
             </span>
@@ -436,7 +437,7 @@
                 <ArrowRightIcon className="size-[0.88rem]" />
               </span>
               <span class={ui.completionRailLg}>
-                <span class={ui.completionDesktopCtaInteractive} data-guide-post-complete-text>
+                <span class={ui.completionDesktopCtaInteractive} data-article-post-complete-text>
                   <span>{getCompletedCtaLabel(item)}</span>
                   <ArrowRightIcon className="size-[0.88rem]" />
                 </span>
@@ -457,12 +458,12 @@
         </a>
       </article>
     {:else}
-      <a class={cn(itemLinkClass, 'relative', isComplete(item) && 'is-complete')} data-guide-post={item.completionId} href={item.href}>
+      <a class={cn(itemLinkClass, 'relative', isComplete(item) && 'is-complete')} data-article-post={item.completionId} href={item.href}>
         {#if item.completionId}
           <span
             aria-hidden="true"
             class={ui.completionBadgeCard}
-            data-guide-post-complete-badge
+            data-article-post-complete-badge
           >
             ✓
           </span>

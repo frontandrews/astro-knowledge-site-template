@@ -1,0 +1,14 @@
+---
+import LegalPrivacyPage from '@/components/LegalPrivacyPage.astro'
+import LegalTermsPage from '@/components/LegalTermsPage.astro'
+import { getDefaultLegalPagePaths } from '@/lib/legal-pages'
+
+export async function getStaticPaths() {
+  return getDefaultLegalPagePaths()
+}
+
+const { locale, pageId } = Astro.props
+---
+
+{pageId === 'privacy' ? <LegalPrivacyPage locale={locale} /> : null}
+{pageId === 'terms' ? <LegalTermsPage locale={locale} /> : null}

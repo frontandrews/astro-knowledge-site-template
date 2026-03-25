@@ -11,69 +11,113 @@ import PuzzleIcon from '@lucide/astro/icons/puzzle'
 import RouteIcon from '@lucide/astro/icons/route'
 import TagsIcon from '@lucide/astro/icons/tags'
 import XIcon from '@lucide/astro/icons/x'
-import { getArticlesIndexHref } from '@/lib/articles-links'
-import BrandIcon from '@/components/ui/icons/BrandIcon.astro'
-import { getChallengeIndexHref } from '@/lib/challenge-links'
+import BrandIcon from '@/brand/BrandIcon.astro'
 import SearchLauncher from '@/components/SearchLauncher.astro'
 import { cn } from '@/lib/cn'
-import { getConceptsHref } from '@/lib/concepts-links'
-import { getGuideIndexHref, getGuideLocaleFromPathname } from '@/lib/guide-links'
-import { getGlossaryIndexHref } from '@/lib/glossary-links'
+import {
+  getLocaleFeedHref,
+  getLocaleHrefMap,
+  getLocaleHtmlLang,
+  getLocaleLabel,
+  getLocalePath,
+  getLocaleShortLabel,
+  getPathLocale,
+  getSupportedLocaleDefinitions,
+} from '@/lib/locale-config'
 import { getPrivacyHref } from '@/lib/privacy-links'
+import {
+  getHomeDefaultSection,
+  getNewsletterActionUrl,
+  getSitePageTitle,
+  isFeatureEnabled,
+} from '@/lib/site-config'
+import {
+  getEnabledSections,
+  getSectionHref,
+  getSectionLabel,
+} from '@/lib/section-manifest'
 import { getSiteCopy } from '@/lib/site-copy'
 import { getTermsHref } from '@/lib/terms-links'
-import { getTracksHref } from '@/lib/tracks-links'
-import { getTopicIndexHref } from '@/lib/topic-links'
 import { ui } from '@/lib/ui'
 import type { SiteLocale } from '@/lib/site-copy'
 
 type Props = {
   contentWidth?: 'default' | 'wide'
   description: string
-  englishHref?: string | null
-  portugueseHref?: string | null
+  localeHrefs?: Record<string, string | null>
   title: string
 }
 
 const {
   contentWidth = 'default',
   description,
-  englishHref = null,
-  portugueseHref = null,
+  localeHrefs = {},
   title,
 } = Astro.props
 
-const pageTitle = `${title} | SeniorPath`
+const pageTitle = getSitePageTitle(title)
 const pathname = Astro.url.pathname
-const guideLocale = getGuideLocaleFromPathname(pathname) as SiteLocale
-const copy = getSiteCopy(guideLocale)
-const englishGuideIndexHref = englishHref ?? getGuideIndexHref('en')
-const portugueseGuideIndexHref = portugueseHref ?? getGuideIndexHref('pt-br')
-const homeHref = guideLocale === 'pt-br' ? '/pt-br' : '/'
-const tracksHref = getTracksHref(guideLocale)
-const conceptsHref = getConceptsHref(guideLocale)
-const challengesHref = getChallengeIndexHref(guideLocale)
-const topicsHref = getTopicIndexHref(guideLocale)
-const glossaryHref = getGlossaryIndexHref(guideLocale)
-const privacyHref = getPrivacyHref(guideLocale)
-const termsHref = getTermsHref(guideLocale)
-const rssHref = guideLocale === 'pt-br' ? '/pt-br/feed.xml' : '/feed.xml'
+const currentLocale = getPathLocale(pathname) as SiteLocale
+const copy = getSiteCopy(currentLocale)
+const localeHrefMap = getLocaleHrefMap(localeHrefs)
+const localeSwitchLinks = getSupportedLocaleDefinitions().map((locale) => ({
+  code: locale.code,
+  href: localeHrefMap[locale.code] ?? getLocalePath(locale.code),
+  htmlLang: locale.htmlLang,
+  isActive: locale.code === currentLocale,
+  label: getLocaleLabel(locale.code),
+  shortLabel: getLocaleShortLabel(locale.code),
+}))
+const homeHref = getLocalePath(currentLocale)
+const privacyHref = getPrivacyHref(currentLocale)
+const termsHref = getTermsHref(currentLocale)
+const rssHref = getLocaleFeedHref(currentLocale)
 const currentYear = new Date().getFullYear()
-const alternateLocale = guideLocale === 'pt-br' ? 'en' : 'pt-br'
-const localeRedirectHref = guideLocale === 'pt-br' ? englishGuideIndexHref : portugueseGuideIndexHref
-const currentLocaleCode = guideLocale === 'pt-br' ? 'PT' : 'EN'
-const challengesBadgeLabel = guideLocale === 'pt-br' ? 'Novo' : 'New'
-const articlesHref = getArticlesIndexHref(guideLocale)
-const isTracksPage = pathname === tracksHref || pathname.startsWith(`${tracksHref}/`)
-const isConceptsPage = pathname === conceptsHref || pathname.startsWith(`${conceptsHref}/`)
-const isChallengesPage = pathname === challengesHref || pathname.startsWith(`${challengesHref}/`)
-const isTopicsPage = pathname === topicsHref || pathname.startsWith(`${topicsHref}/`)
-const isGlossaryPage = pathname === glossaryHref || pathname.startsWith(`${glossaryHref}/`)
-const isArticlesPage = pathname === homeHref || pathname === articlesHref
-const configuredNewsletterAction = import.meta.env.PUBLIC_NEWSLETTER_URL?.trim() || null
-const newsletterFormAction = configuredNewsletterAction && configuredNewsletterAction.length > 0
-  ? configuredNewsletterAction
-  : null
+const currentLocaleCode = getLocaleShortLabel(currentLocale)
+const defaultHomeSection = getHomeDefaultSection()
+const hasSearch = isFeatureEnabled('search')
+const hasLocaleSwitcher = isFeatureEnabled('localeSwitcher')
+type ExploreLink = {
+  id: string
+  href: string
+  icon: typeof NewspaperIcon
+  isActive: boolean
+  label: string
+  pageType: string
+}
+const newsletterFormAction = getNewsletterActionUrl()
+const hasNewsletter = newsletterFormAction !== null
+const sectionIconByPageType = {
+  articles: NewspaperIcon,
+  challenges: PuzzleIcon,
+  concepts: BrainIcon,
+  glossary: BookTextIcon,
+  topics: TagsIcon,
+  tracks: RouteIcon,
+} as const
+const exploreLinks: ExploreLink[] = getEnabledSections().flatMap((section) => {
+  const href = getSectionHref(section.id, currentLocale)
+
+  if (!href) {
+    return []
+  }
+
+  const icon =
+    sectionIconByPageType[section.pageType as keyof typeof sectionIconByPageType] ?? NewspaperIcon
+  const isHomeSection = defaultHomeSection === section.id && pathname === homeHref
+
+  return [
+    {
+      id: section.id,
+      href,
+      icon,
+      isActive: isHomeSection || pathname === href || pathname.startsWith(`${href}/`),
+      label: getSectionLabel(section.id, currentLocale),
+      pageType: section.pageType,
+    },
+  ]
+})
+const hasExploreLinks = exploreLinks.length > 0
 const brandLinkClass =
   'inline-flex min-h-8 items-center gap-2 text-site-ink nav:min-h-10 nav:gap-3 lg:min-h-11 lg:gap-3.5'
 const brandIconWrapClass = 'inline-flex size-[1.6rem] items-center justify-center nav:size-8 lg:size-9'
@@ -93,8 +137,6 @@ const desktopDropdownMenuClass =
 const desktopExploreLinkClass = ui.navMenuRowLink
 const desktopLocaleTriggerClass =
   cn(ui.controlButton, 'min-h-9 cursor-pointer list-none gap-1 px-2.5 py-2 text-[0.78rem] font-semibold tracking-[0.08em] lg:min-h-10 lg:gap-1.5 lg:px-3 lg:text-[0.86rem] [&::-webkit-details-marker]:hidden')
-const desktopChallengesLinkClass = ui.navPillLink
-const desktopChallengesBadgeClass = ui.highlightBadge
 const pageShellClass =
   contentWidth === 'wide'
     ? ui.pageShellWide
@@ -102,7 +144,7 @@ const pageShellClass =
 ---
 
 <!doctype html>
-<html class="dark" lang={guideLocale === 'pt-br' ? 'pt-BR' : 'en'}>
+<html class="dark" lang={getLocaleHtmlLang(currentLocale)}>
   <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1" name="viewport" />
@@ -123,7 +165,7 @@ const pageShellClass =
     <link href={rssHref} rel="alternate" title={`${pageTitle} RSS`} type="application/rss+xml" />
     <slot name="head" />
   </head>
-  <body data-locale-alternate={alternateLocale} data-locale-redirect-href={localeRedirectHref}>
+  <body data-current-locale={currentLocale} data-locale-options={JSON.stringify(localeSwitchLinks)}>
     <header class="sticky top-0 z-20 mb-4 border-b border-site-line bg-site-bg">
       <div class={cn(ui.blogFrame, 'py-[0.55rem] nav:py-[0.85rem] lg:py-4')}>
         <div class="flex items-center justify-between gap-3 nav:gap-4">
@@ -135,69 +177,42 @@ const pageShellClass =
           </a>
           <div class="flex items-center gap-2">
             <div class="hidden nav:flex nav:items-center nav:gap-2">
-              <a class={cn(desktopChallengesLinkClass, isChallengesPage && 'text-site-link-hover')} href={challengesHref}>
-                <span>{copy.challengeIndex.title}</span>
-                <span class={desktopChallengesBadgeClass}>{challengesBadgeLabel}</span>
-              </a>
-              <details class="relative">
-                <summary class={desktopDropdownTriggerClass}>
-                  <span>{copy.header.explore}</span>
-                  <ChevronDownIcon class="size-4" />
-                </summary>
-                <div class={desktopDropdownMenuClass}>
-                  <a class={cn(desktopExploreLinkClass, isArticlesPage && mobileNavActiveClass)} href={articlesHref}>
-                    <NewspaperIcon class="size-4 shrink-0 text-site-link-hover" />
-                    {copy.layout.articles}
-                  </a>
-                  <a class={cn(desktopExploreLinkClass, isTracksPage && mobileNavActiveClass)} href={tracksHref}>
-                    <RouteIcon class="size-4 shrink-0 text-site-link-hover" />
-                    {copy.layout.tracks}
-                  </a>
-                  <a class={cn(desktopExploreLinkClass, isTopicsPage && mobileNavActiveClass)} href={topicsHref}>
-                    <TagsIcon class="size-4 shrink-0 text-site-link-hover" />
-                    {copy.layout.topics}
-                  </a>
-                  <a class={cn(desktopExploreLinkClass, isChallengesPage && mobileNavActiveClass)} href={challengesHref}>
-                    <PuzzleIcon class="size-4 shrink-0 text-site-link-hover" />
-                    {copy.challengeIndex.title}
-                  </a>
-                  <a class={cn(desktopExploreLinkClass, isConceptsPage && mobileNavActiveClass)} href={conceptsHref}>
-                    <BrainIcon class="size-4 shrink-0 text-site-link-hover" />
-                    {copy.layout.concepts}
-                  </a>
-                  <a class={cn(desktopExploreLinkClass, isGlossaryPage && mobileNavActiveClass)} href={glossaryHref}>
-                    <BookTextIcon class="size-4 shrink-0 text-site-link-hover" />
-                    {copy.layout.glossary}
-                  </a>
-                </div>
-              </details>
+              {hasExploreLinks ? (
+                <details class="relative">
+                  <summary class={desktopDropdownTriggerClass}>
+                    <span>{copy.header.explore}</span>
+                    <ChevronDownIcon class="size-4" />
+                  </summary>
+                  <div class={desktopDropdownMenuClass}>
+                    {exploreLinks.map((link) => (
+                      <a class={cn(desktopExploreLinkClass, link.isActive && mobileNavActiveClass)} href={link.href}>
+                        <link.icon class="size-4 shrink-0 text-site-link-hover" />
+                        {link.label}
+                      </a>
+                    ))}
+                  </div>
+                </details>
+              ) : null}
             </div>
-            <SearchLauncher locale={guideLocale} />
-            <div class="hidden nav:flex nav:items-center nav:gap-2">
+            {hasSearch ? <SearchLauncher locale={currentLocale} /> : null}
+            <div class={cn('hidden nav:flex nav:items-center nav:gap-2', !hasLocaleSwitcher && 'nav:hidden')}>
               <details class="relative">
                 <summary class={desktopLocaleTriggerClass}>
                   <span>{currentLocaleCode}</span>
                   <ChevronDownIcon class="size-4" />
                 </summary>
                 <div aria-label={copy.header.languageSwitcher} class={cn(ui.dropdownMenu, 'min-w-40')}>
-                  <a
-                    class={cn(mobileNavLinkClass, guideLocale === 'en' && mobileNavActiveClass)}
-                    href={englishGuideIndexHref}
-                    hreflang="en"
-                    lang="en"
-                    data-locale-choice="en"
-                  >
-                    English
-                  </a>
-                  <a
-                    class={cn(mobileNavLinkClass, guideLocale === 'pt-br' && mobileNavActiveClass)}
-                    href={portugueseGuideIndexHref}
-                    hreflang="pt-BR"
-                    lang="pt-BR"
-                    data-locale-choice="pt-br"
-                  >
-                    Português
-                  </a>
+                  {localeSwitchLinks.map((localeLink) => (
+                    <a
+                      class={cn(mobileNavLinkClass, localeLink.isActive && mobileNavActiveClass)}
+                      href={localeLink.href}
+                      hreflang={localeLink.htmlLang}
+                      lang={localeLink.htmlLang}
+                      data-locale-choice={localeLink.code}
+                    >
+                      {localeLink.label}
+                    </a>
+                  ))}
                 </div>
               </details>
             </div>
@@ -218,51 +233,35 @@ const pageShellClass =
         </div>
         <div class="hidden w-full pt-3 nav:hidden" data-mobile-nav-panel id="mobile-site-nav">
           <div class={cn(ui.panel, 'site-dropdown-shadow grid gap-3 p-3')}>
-            <nav aria-label={copy.header.primaryNav} class="grid gap-1">
-              <a class={cn(mobileNavLinkClass, isArticlesPage && mobileNavActiveClass)} href={articlesHref}>
-                {copy.layout.articles}
-              </a>
-              <a class={cn(mobileNavLinkClass, isTracksPage && mobileNavActiveClass)} href={tracksHref}>
-                {copy.layout.tracks}
-              </a>
-              <a class={cn(mobileNavLinkClass, isTopicsPage && mobileNavActiveClass)} href={topicsHref}>
-                {copy.layout.topics}
-              </a>
-              <a class={cn(mobileNavLinkClass, isChallengesPage && mobileNavActiveClass)} href={challengesHref}>
-                {copy.challengeIndex.title}
-              </a>
-              <a class={cn(mobileNavLinkClass, isConceptsPage && mobileNavActiveClass)} href={conceptsHref}>
-                {copy.layout.concepts}
-              </a>
-              <a class={cn(mobileNavLinkClass, isGlossaryPage && mobileNavActiveClass)} href={glossaryHref}>
-                {copy.layout.glossary}
-              </a>
-            </nav>
-            <div class="grid gap-2 border-t border-site-line pt-3">
-              <p class="m-0 text-[0.72rem] font-bold uppercase tracking-[0.18em] text-site-line-strong">
-                {copy.header.languageSwitcher}
-              </p>
-              <div class={cn(localeSwitchClass, 'w-fit')}>
-                <a
-                  class={cn(mobileLocaleOptionClass, guideLocale === 'en' && localeOptionActiveClass)}
-                  href={englishGuideIndexHref}
-                  hreflang="en"
-                  lang="en"
-                  data-locale-choice="en"
-                >
-                  EN
-                </a>
-                <a
-                  class={cn(mobileLocaleOptionClass, guideLocale === 'pt-br' && localeOptionActiveClass)}
-                  href={portugueseGuideIndexHref}
-                  hreflang="pt-BR"
-                  lang="pt-BR"
-                  data-locale-choice="pt-br"
-                >
-                  PT
-                </a>
+            {hasExploreLinks ? (
+              <nav aria-label={copy.header.primaryNav} class="grid gap-1">
+                {exploreLinks.map((link) => (
+                  <a class={cn(mobileNavLinkClass, link.isActive && mobileNavActiveClass)} href={link.href}>
+                    {link.label}
+                  </a>
+                ))}
+              </nav>
+            ) : null}
+            {hasLocaleSwitcher ? (
+              <div class="grid gap-2 border-t border-site-line pt-3">
+                <p class="m-0 text-[0.72rem] font-bold uppercase tracking-[0.18em] text-site-line-strong">
+                  {copy.header.languageSwitcher}
+                </p>
+                <div class={cn(localeSwitchClass, 'w-fit flex-wrap')}>
+                  {localeSwitchLinks.map((localeLink) => (
+                    <a
+                      class={cn(mobileLocaleOptionClass, localeLink.isActive && localeOptionActiveClass)}
+                      href={localeLink.href}
+                      hreflang={localeLink.htmlLang}
+                      lang={localeLink.htmlLang}
+                      data-locale-choice={localeLink.code}
+                    >
+                      {localeLink.shortLabel}
+                    </a>
+                  ))}
+                </div>
               </div>
-            </div>
+            ) : null}
           </div>
         </div>
       </div>
@@ -270,24 +269,24 @@ const pageShellClass =
     <main class={pageShellClass} data-pagefind-body>
       <slot />
     </main>
-    <section class="mt-4" aria-label={copy.footer.newsletterTitle}>
-      <div class={cn(ui.blogFrame, 'py-8 md:py-10')}>
-        <div
-          class={cn(
-            ui.panel,
-            ui.spotlightPanel,
-            'justify-items-center overflow-hidden px-5 py-5 text-center md:px-6 md:py-6',
-          )}
-        >
-          <div class="grid justify-items-center gap-2">
-            <h2 class="m-0 text-[1.08rem] font-semibold leading-[1.3] text-site-ink lg:text-[1.22rem]">
-              {copy.footer.newsletterTitle}
-            </h2>
-            <p class={cn(ui.bodyCopy, 'max-w-152')}>
-              {copy.footer.newsletterCopy}
-            </p>
-          </div>
-          {newsletterFormAction ? (
+    {hasNewsletter ? (
+      <section class="mt-4" aria-label={copy.footer.newsletterTitle}>
+        <div class={cn(ui.blogFrame, 'py-8 md:py-10')}>
+          <div
+            class={cn(
+              ui.panel,
+              ui.spotlightPanel,
+              'justify-items-center overflow-hidden px-5 py-5 text-center md:px-6 md:py-6',
+            )}
+          >
+            <div class="grid justify-items-center gap-2">
+              <h2 class="m-0 text-[1.08rem] font-semibold leading-[1.3] text-site-ink lg:text-[1.22rem]">
+                {copy.footer.newsletterTitle}
+              </h2>
+              <p class={cn(ui.bodyCopy, 'max-w-152')}>
+                {copy.footer.newsletterCopy}
+              </p>
+            </div>
             <form
               action={newsletterFormAction}
               class="mx-auto w-full max-w-lg"
@@ -327,10 +326,10 @@ const pageShellClass =
                 {copy.footer.newsletterDisclaimerAfterLinks}
               </p>
             </form>
-          ) : null}
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+    ) : null}
     <footer class="border-t-2 border-site-line-strong bg-site-surface">
       <div class={cn(ui.blogFrame, 'grid gap-6 py-10')}>
         <div class="grid gap-8 md:grid-cols-[minmax(0,1.5fr)_minmax(12rem,1fr)_minmax(12rem,1fr)]">
@@ -345,18 +344,15 @@ const pageShellClass =
           </div>
           <div class="grid content-start gap-3">
             <div class="grid gap-[0.85rem]">
-              <a class={ui.footerLink} href={articlesHref}>{copy.footer.learn}</a>
-              <a class={ui.footerLink} href={tracksHref}>{copy.footer.tracks}</a>
-              <a class={ui.footerLink} href={topicsHref}>{copy.footer.topics}</a>
-              <a class={ui.footerLink} href={challengesHref}>{copy.challengeIndex.title}</a>
-              <a class={ui.footerLink} href={conceptsHref}>{copy.layout.concepts}</a>
-              <a class={ui.footerLink} href={glossaryHref}>{copy.footer.glossary}</a>
+              {exploreLinks.map((link) => (
+                <a class={ui.footerLink} href={link.href}>{link.label}</a>
+              ))}
             </div>
           </div>
           <div class="grid content-start gap-3">
             <div class="grid gap-[0.85rem]">
               <a class={ui.footerLink} href={termsHref}>{copy.footer.terms}</a>
-              <a class={ui.footerLink} href={rssHref}>{copy.footer.rss}</a>
+              {exploreLinks.some((link) => link.pageType === 'articles') ? <a class={ui.footerLink} href={rssHref}>{copy.footer.rss}</a> : null}
               <a class={ui.footerLink} href={privacyHref}>{copy.footer.privacy}</a>
             </div>
           </div>
@@ -372,7 +368,7 @@ const pageShellClass =
 </html>
 
 <script>
-  import { completedGuidesChangedEvent, readCompletedGuides } from '@/lib/completed-guides'
+  import { completedArticlesChangedEvent, readCompletedArticles } from '@/lib/article-progress'
   import { readLocalStorageString, writeLocalStorageString } from '@/lib/local-storage'
   import { siteStorageKeys } from '@/lib/storage-keys'
 
@@ -385,17 +381,17 @@ const pageShellClass =
   const mobileNavLinks = [...document.querySelectorAll('#mobile-site-nav a')]
   const newsletterEmailInput = document.querySelector('#newsletter-email')
   const newsletterEmailMirror = document.querySelector('[data-newsletter-email-mirror]')
-  const syncCompletedGuideCards = () => {
-    const completedGuideIds = new Set(readCompletedGuides())
-    const guideCards = document.querySelectorAll('[data-guide-post]')
+  const syncCompletedArticleCards = () => {
+    const completedArticleIds = new Set(readCompletedArticles())
+    const articleCards = document.querySelectorAll('[data-article-post]')
 
-    guideCards.forEach((card) => {
+    articleCards.forEach((card) => {
       if (!(card instanceof HTMLElement)) {
         return
       }
 
-      const guideId = card.dataset.guidePost ?? ''
-      card.classList.toggle('is-complete', Boolean(guideId && completedGuideIds.has(guideId)))
+      const articleId = card.dataset.articlePost ?? ''
+      card.classList.toggle('is-complete', Boolean(articleId && completedArticleIds.has(articleId)))
     })
   }
 
@@ -456,23 +452,68 @@ const pageShellClass =
   })
 
   const savedLocalePreference = readLocalStorageString(siteStorageKeys.localePreference)
-  const currentLocale = document.documentElement.lang === 'pt-BR' ? 'pt-br' : 'en'
-  const alternateHref = document.body.getAttribute('data-locale-redirect-href')
-  const alternateLocale = document.body.getAttribute('data-locale-alternate')
-  const browserPrefersPortuguese =
-    navigator.language?.toLowerCase().startsWith('pt') ||
-    navigator.languages?.some((value) => value.toLowerCase().startsWith('pt'))
-  const preferredLocale = savedLocalePreference ?? (browserPrefersPortuguese ? 'pt-br' : 'en')
+  const currentLocale = document.body.getAttribute('data-current-locale') ?? 'en'
+  const localeOptionsRaw = JSON.parse(document.body.getAttribute('data-locale-options') ?? '[]')
+  const localeOptions = Array.isArray(localeOptionsRaw) ? localeOptionsRaw : []
+  let preferredLocale = savedLocalePreference
 
-  if (!savedLocalePreference && preferredLocale !== currentLocale && alternateHref && alternateLocale === preferredLocale) {
-    window.location.replace(alternateHref)
+  if (!preferredLocale) {
+    for (const option of localeOptions) {
+      if (!option || typeof option !== 'object') {
+        continue
+      }
+
+      const code = 'code' in option && typeof option.code === 'string' ? option.code : null
+
+      if (!code) {
+        continue
+      }
+
+      const languageNeedle = code.split('-')[0]?.toLowerCase()
+
+      if (!languageNeedle) {
+        continue
+      }
+
+      if (
+        navigator.languages?.some((value) => value.toLowerCase().startsWith(languageNeedle))
+        || navigator.language?.toLowerCase().startsWith(languageNeedle)
+      ) {
+        preferredLocale = code
+        break
+      }
+    }
   }
 
-  syncCompletedGuideCards()
-  window.addEventListener(completedGuidesChangedEvent, syncCompletedGuideCards)
+  let preferredOption = null
+
+  for (const option of localeOptions) {
+    if (!option || typeof option !== 'object') {
+      continue
+    }
+
+    const code = 'code' in option && typeof option.code === 'string' ? option.code : null
+
+    if (code === preferredLocale) {
+      preferredOption = option
+      break
+    }
+  }
+
+  if (
+    !savedLocalePreference
+    && preferredOption?.code
+    && preferredOption.code !== currentLocale
+    && typeof preferredOption.href === 'string'
+  ) {
+    window.location.replace(preferredOption.href)
+  }
+
+  syncCompletedArticleCards()
+  window.addEventListener(completedArticlesChangedEvent, syncCompletedArticleCards)
   window.addEventListener('storage', (event) => {
-    if (event.key === siteStorageKeys.completedGuides) {
-      syncCompletedGuideCards()
+    if (event.key === siteStorageKeys.completedArticles) {
+      syncCompletedArticleCards()
     }
   })
 

@@ -8,7 +8,17 @@ const distRoot = path.join(siteRoot, 'dist')
 const outputPath = path.join(distRoot, 'pagefind')
 
 async function* walkHtmlFiles(directory) {
-  const entries = await readdir(directory, { withFileTypes: true })
+  let entries
+
+  try {
+    entries = await readdir(directory, { withFileTypes: true })
+  } catch (error) {
+    if (error?.code === 'ENOENT') {
+      return
+    }
+
+    throw error
+  }
 
   for (const entry of entries) {
     const fullPath = path.join(directory, entry.name)
@@ -47,7 +57,17 @@ if (!index) {
 let indexedPages = 0
 
 for await (const filePath of walkHtmlFiles(distRoot)) {
-  const content = await readFile(filePath, 'utf8')
+  let content
+
+  try {
+    content = await readFile(filePath, 'utf8')
+  } catch (error) {
+    if (error?.code === 'ENOENT') {
+      continue
+    }
+
+    throw error
+  }
 
   if (!content.includes('data-pagefind-body')) {
     continue

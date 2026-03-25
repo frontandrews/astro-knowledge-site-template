@@ -1,0 +1,18 @@
+---
+import ArticleBranchPage from '@/components/ArticleBranchPage.astro'
+import { getDefaultArticleBranchPaths } from '@/lib/localized-article-pages'
+import { getSectionDisabledResponse } from '@/lib/section-gate'
+
+export async function getStaticPaths() {
+  return getDefaultArticleBranchPaths()
+}
+
+const { branch, locale, pillar, posts } = Astro.props
+const disabledResponse = getSectionDisabledResponse('articles')
+
+if (disabledResponse) {
+  return disabledResponse
+}
+---
+
+<ArticleBranchPage branch={branch} locale={locale} pillar={pillar} posts={posts} />

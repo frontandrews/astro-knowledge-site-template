@@ -1,0 +1,18 @@
+---
+import ArticlePage from '@/components/ArticlePage.astro'
+import { getLocalizedArticleCanonicalPaths } from '@/lib/localized-article-pages'
+import { getSectionDisabledResponse } from '@/lib/section-gate'
+
+export async function getStaticPaths() {
+  return getLocalizedArticleCanonicalPaths()
+}
+
+const { post } = Astro.props
+const disabledResponse = getSectionDisabledResponse('articles')
+
+if (disabledResponse) {
+  return disabledResponse
+}
+---
+
+<ArticlePage post={post} />

@@ -1,0 +1,37 @@
+---
+import ArticlesIndexPage from '@/components/ArticlesIndexPage.astro'
+import ChallengeIndexPage from '@/components/ChallengeIndexPage.astro'
+import ConceptsIndexPage from '@/components/ConceptsIndexPage.astro'
+import GlossaryIndexPage from '@/components/GlossaryIndexPage.astro'
+import TopicIndexPage from '@/components/TopicIndexPage.astro'
+import TracksPage from '@/components/TracksPage.astro'
+import { getDynamicSectionIndexPaths } from '@/lib/dynamic-section-pages'
+import { getDefaultArticleIndexPaths } from '@/lib/localized-article-pages'
+import { getDefaultLocale } from '@/lib/locale-config'
+
+export async function getStaticPaths() {
+  const defaultLocale = getDefaultLocale()
+
+  return [
+    ...getDefaultArticleIndexPaths(),
+    ...(await getDynamicSectionIndexPaths(defaultLocale)),
+  ]
+}
+
+const defaultLocale = getDefaultLocale()
+const { challenges = [], concepts = [], pageType, posts = [], roadmaps = [], terms = [] } = Astro.props
+
+if (!pageType) {
+  return new Response(null, {
+    status: 404,
+    statusText: 'Not Found',
+  })
+}
+---
+
+{pageType === 'articles' ? <ArticlesIndexPage locale={defaultLocale} /> : null}
+{pageType === 'tracks' ? <TracksPage locale={defaultLocale} roadmaps={roadmaps} /> : null}
+{pageType === 'topics' ? <TopicIndexPage locale={defaultLocale} posts={posts} /> : null}
+{pageType === 'concepts' ? <ConceptsIndexPage concepts={concepts} locale={defaultLocale} /> : null}
+{pageType === 'glossary' ? <GlossaryIndexPage locale={defaultLocale} terms={terms} /> : null}
+{pageType === 'challenges' ? <ChallengeIndexPage challenges={challenges} locale={defaultLocale} /> : null}

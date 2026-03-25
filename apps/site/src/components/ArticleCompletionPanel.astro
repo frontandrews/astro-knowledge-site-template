@@ -59,13 +59,14 @@ const {
 
 <script>
   import {
-    completedGuidesChangedEvent,
-    markGuideUnread,
-    readCompletedGuides,
-  } from '@/lib/completed-guides';
+    completedArticlesChangedEvent,
+    markArticleUnread,
+    readCompletedArticles,
+  } from '@/lib/article-progress';
+  import { siteEvents } from '@/lib/site-config';
   import { siteStorageKeys } from '@/lib/storage-keys';
 
-  const readingResetEvent = 'seniorpath:article-reading-reset';
+  const readingResetEvent = siteEvents.articleReadingReset;
   const completionPanels = document.querySelectorAll('[data-article-completion-panel]');
 
   for (const panel of completionPanels) {
@@ -89,7 +90,7 @@ const {
     };
 
     const sync = () => {
-      const isComplete = Boolean(completionId && readCompletedGuides().includes(completionId));
+      const isComplete = Boolean(completionId && readCompletedArticles().includes(completionId));
 
       if (isComplete) {
         showPanel();
@@ -105,15 +106,15 @@ const {
           return;
         }
 
-        markGuideUnread(completionId);
+        markArticleUnread(completionId);
         window.dispatchEvent(new CustomEvent(readingResetEvent, { detail: completionId }));
       });
     }
 
-    window.addEventListener(completedGuidesChangedEvent, sync);
+    window.addEventListener(completedArticlesChangedEvent, sync);
     window.addEventListener('resize', sync);
     window.addEventListener('storage', (event) => {
-      if (event.key === siteStorageKeys.completedGuides) {
+      if (event.key === siteStorageKeys.completedArticles) {
         sync();
       }
     });

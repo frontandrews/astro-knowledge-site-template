@@ -5,10 +5,20 @@ import sitemap from '@astrojs/sitemap'
 import tailwindcss from '@tailwindcss/vite'
 import { defineConfig } from 'astro/config'
 
+const defaultSiteUrl = 'https://example.com'
+
+function resolveSiteUrl(value) {
+  try {
+    return new URL(value || defaultSiteUrl).toString().replace(/\/$/, '')
+  } catch {
+    return defaultSiteUrl
+  }
+}
+
 export default defineConfig({
   integrations: [sitemap(), svelte()],
   output: 'static',
-  site: 'https://seniorpath.pro',
+  site: resolveSiteUrl(process.env.PUBLIC_SITE_URL),
   vite: {
     resolve: {
       alias: {

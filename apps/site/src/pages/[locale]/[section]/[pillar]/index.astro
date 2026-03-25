@@ -1,0 +1,18 @@
+---
+import ArticlePillarPage from '@/components/ArticlePillarPage.astro'
+import { getLocalizedArticlePillarPaths } from '@/lib/localized-article-pages'
+import { getSectionDisabledResponse } from '@/lib/section-gate'
+
+export async function getStaticPaths() {
+  return getLocalizedArticlePillarPaths()
+}
+
+const { branchSections, locale, pillar } = Astro.props
+const disabledResponse = getSectionDisabledResponse('articles')
+
+if (disabledResponse) {
+  return disabledResponse
+}
+---
+
+<ArticlePillarPage branchSections={branchSections} locale={locale} pillar={pillar} />

@@ -5,6 +5,8 @@ import BookTextIcon from '@lucide/astro/icons/book-text'
 import FilterableDirectory from '@/components/FilterableDirectory.svelte'
 import DirectoryIndexShell from '@/components/ui/DirectoryIndexShell.astro'
 import { getGlossaryHrefFromEntry, getGlossaryIndexHref } from '@/lib/glossary-links'
+import { resolveLocaleHrefMap } from '@/lib/locale-config'
+import { getPageTypeDescription, getPageTypeLabel } from '@/lib/section-manifest'
 import { translateSiteLabels } from '@/lib/site-labels'
 import { getSiteCopy, type SiteLocale } from '@/lib/site-copy'
 
@@ -15,6 +17,9 @@ type Props = {
 
 const { locale, terms } = Astro.props
 const copy = getSiteCopy(locale)
+const title = getPageTypeLabel('glossary', locale)
+const description = getPageTypeDescription('glossary', locale)
+const localeHrefs = resolveLocaleHrefMap((supportedLocale) => getGlossaryIndexHref(supportedLocale))
 const sortedTerms = [...terms].sort((left, right) =>
   left.data.title.localeCompare(right.data.title, locale === 'pt-br' ? 'pt-BR' : 'en-US', {
     sensitivity: 'base',
@@ -40,12 +45,11 @@ const items = sortedTerms.map((term) => ({
 ---
 
 <DirectoryIndexShell
-  description={copy.glossaryIndex.copy}
-  englishHref={getGlossaryIndexHref('en')}
+  description={description}
   icon={BookTextIcon}
-  iconLabel={copy.glossaryIndex.title}
-  portugueseHref={getGlossaryIndexHref('pt-br')}
-  title={copy.glossaryIndex.title}
+  iconLabel={title}
+  localeHrefs={localeHrefs}
+  title={title}
 >
   <FilterableDirectory
     allItemsLabel={copy.directory.allItems}
@@ -53,9 +57,9 @@ const items = sortedTerms.map((term) => ({
     articleItemsLabel={copy.directory.articleItems}
     filterLabel={copy.directory.filterByTopic}
     filterQueryKey="tag"
-    guideItemsLabel={copy.directory.guideItems}
     items={items}
     client:load
-    kind="title-cards"
+    layout="cards"
+    noteItemsLabel={copy.directory.noteItems}
   />
 </DirectoryIndexShell>

@@ -1,3 +1,6 @@
+import { getLocalePath, normalizeSiteLocale } from '@/lib/locale-config'
+import { getPageTypeHref } from '@/lib/section-manifest'
+
 type GlossaryEntryLike = {
   id: string
   data: {
@@ -6,11 +9,11 @@ type GlossaryEntryLike = {
 }
 
 export function getGlossaryIndexHref(locale = 'en') {
-  return locale === 'pt-br' ? '/pt-br/glossario' : '/glossary'
+  return getPageTypeHref('glossary', locale) ?? getLocalePath(locale)
 }
 
 export function getGlossaryHrefFromEntry(entry: GlossaryEntryLike) {
-  const locale = entry.data.locale === 'pt-br' ? 'pt-br' : 'en'
+  const locale = normalizeSiteLocale(entry.data.locale)
   const slug = entry.id.replace(/^\/+|\/+$/g, '').split('/').filter(Boolean).at(-1)
 
   return slug ? `${getGlossaryIndexHref(locale)}/${slug}` : getGlossaryIndexHref(locale)

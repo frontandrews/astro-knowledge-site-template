@@ -11,30 +11,27 @@ type BreadcrumbItem = {
 type Props = {
   breadcrumbs?: BreadcrumbItem[]
   description: string
-  englishHref?: string | null
   icon?: any
   iconLabel?: string
+  localeHrefs?: Record<string, string | null>
   pageHeaderClassName?: string
-  portugueseHref?: string | null
   title: string
 }
 
 const {
   breadcrumbs = [],
   description,
-  englishHref = null,
   icon: Icon = null,
   iconLabel = '',
+  localeHrefs = {},
   pageHeaderClassName = '',
-  portugueseHref = null,
   title,
 } = Astro.props
 ---
 
 <BaseLayout
   description={description}
-  englishHref={englishHref}
-  portugueseHref={portugueseHref}
+  localeHrefs={localeHrefs}
   title={title}
 >
   <PageHeader

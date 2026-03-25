@@ -10,9 +10,8 @@ import { ui } from '@/lib/ui'
 type Props = {
   createdMeta: string | null
   description: string
-  englishHref?: string | null
   locale: SiteLocale
-  portugueseHref?: string | null
+  localeHrefs?: Record<string, string | null>
   title: string
   updatedMeta?: string | null
   url: string
@@ -21,9 +20,8 @@ type Props = {
 const {
   createdMeta,
   description,
-  englishHref = null,
   locale,
-  portugueseHref = null,
+  localeHrefs = {},
   title,
   updatedMeta = null,
   url,
@@ -34,8 +32,7 @@ const copy = getSiteCopy(locale)
 
 <BaseLayout
   description={description}
-  englishHref={englishHref}
-  portugueseHref={portugueseHref}
+  localeHrefs={localeHrefs}
   title={title}
 >
   <article class="w-full pb-11">

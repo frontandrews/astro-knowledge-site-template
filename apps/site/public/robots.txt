@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://seniorpath.pro/sitemap-index.xml

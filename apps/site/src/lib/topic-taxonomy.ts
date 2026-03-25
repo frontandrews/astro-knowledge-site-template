@@ -11,13 +11,13 @@ import {
   getTopicSummary,
   TOPIC_GROUP_DEFINITIONS,
   TOPIC_DEFINITIONS,
-} from '@seniorpath/content'
+} from '@template/content'
 
 import { getSiteLocale, type SiteLocale } from '@/lib/site-copy'
 import { getTopicGroupHref, getTopicHref, getTopicIndexHref } from '@/lib/topic-links'
-import { sortGuides } from '@/lib/guide-tree'
+import { sortArticles } from '@/lib/article-tree'
 
-type GuideEntry = CollectionEntry<'guides'>
+type ArticleEntry = CollectionEntry<'articles'>
 
 export type TopicBreadcrumbItem = {
   href: string | null
@@ -58,7 +58,7 @@ export function getLocalizedTopicGroupSummary(groupId: string, locale: SiteLocal
   return getTopicGroupSummary(groupId, locale)
 }
 
-export function getGuideTopicIds(post: GuideEntry) {
+export function getArticleTopicIds(post: ArticleEntry) {
   return [...new Set(post.data.topicIds.filter((topicId) => Boolean(getTopicById(topicId))))]
 }
 
@@ -66,20 +66,20 @@ function getTopicTreeIds(parentId: string): string[] {
   return getTopicChildren(parentId).flatMap((topic) => [topic.id, ...getTopicTreeIds(topic.id)])
 }
 
-export function getLocalizedGuideTopics(post: GuideEntry) {
+export function getLocalizedArticleTopics(post: ArticleEntry) {
   const locale = getSiteLocale(post.data.locale)
 
-  return getGuideTopicIds(post).map((topicId) => ({
+  return getArticleTopicIds(post).map((topicId) => ({
     href: getTopicHref(topicId, locale),
     id: getTopicRouteSegment(topicId, locale),
     label: getLocalizedTopicLabel(topicId, locale),
   }))
 }
 
-export function getGuideTopicIdsInGroup(post: GuideEntry, groupId: string) {
+export function getArticleTopicIdsInGroup(post: ArticleEntry, groupId: string) {
   return [
     ...new Set(
-      getGuideTopicIds(post).flatMap((topicId) => {
+      getArticleTopicIds(post).flatMap((topicId) => {
         if (getTopicRootGroupId(topicId) !== groupId) {
           return []
         }
@@ -90,8 +90,8 @@ export function getGuideTopicIdsInGroup(post: GuideEntry, groupId: string) {
   ]
 }
 
-export function getLocalizedGuideTopicsInGroup(post: GuideEntry, groupId: string, locale: SiteLocale) {
-  return getGuideTopicIdsInGroup(post, groupId).map((topicId) => ({
+export function getLocalizedArticleTopicsInGroup(post: ArticleEntry, groupId: string, locale: SiteLocale) {
+  return getArticleTopicIdsInGroup(post, groupId).map((topicId) => ({
     href: getTopicHref(topicId, locale),
     id: getTopicRouteSegment(topicId, locale),
     label: getLocalizedTopicLabel(topicId, locale),
@@ -139,56 +139,55 @@ export function getTopicGroupBreadcrumb(groupId: string, locale: SiteLocale): To
   ]
 }
 
-export function getTopicGuides(posts: GuideEntry[], topicId: string, locale: SiteLocale) {
-  return sortGuides(
+export function getTopicArticles(posts: ArticleEntry[], topicId: string, locale: SiteLocale) {
+  return sortArticles(
     posts.filter(
-      (post) =>
-        post.data.locale === locale && post.data.status !== 'archived' && getGuideTopicIds(post).includes(topicId),
+      (post) => post.data.locale === locale && post.data.status !== 'archived' && getArticleTopicIds(post).includes(topicId),
     ),
   )
 }
 
-export function getTopicGroupGuides(posts: GuideEntry[], groupId: string, locale: SiteLocale) {
+export function getTopicGroupArticles(posts: ArticleEntry[], groupId: string, locale: SiteLocale) {
   const topicIds = new Set(getTopicTreeIds(groupId))
 
-  return sortGuides(
+  return sortArticles(
     posts.filter(
       (post) =>
         post.data.locale === locale &&
         post.data.status !== 'archived' &&
-        getGuideTopicIds(post).some((topicId) => topicIds.has(topicId)),
+        getArticleTopicIds(post).some((topicId) => topicIds.has(topicId)),
     ),
   )
 }
 
-function hasGuidesInTopicTree(posts: GuideEntry[], parentId: string, locale: SiteLocale): boolean {
-  if (TOPIC_DEFINITIONS.some((topic) => topic.id === parentId) && getTopicGuides(posts, parentId, locale).length > 0) {
+function hasArticlesInTopicTree(posts: ArticleEntry[], parentId: string, locale: SiteLocale): boolean {
+  if (TOPIC_DEFINITIONS.some((topic) => topic.id === parentId) && getTopicArticles(posts, parentId, locale).length > 0) {
     return true
   }
 
-  return getTopicChildren(parentId).some((topic) => hasGuidesInTopicTree(posts, topic.id, locale))
+  return getTopicChildren(parentId).some((topic) => hasArticlesInTopicTree(posts, topic.id, locale))
 }
 
-export function getAvailableTopicGroups(posts: GuideEntry[], locale: SiteLocale) {
-  return TOPIC_GROUP_DEFINITIONS.filter((group) => hasGuidesInTopicTree(posts, group.id, locale))
+export function getAvailableTopicGroups(posts: ArticleEntry[], locale: SiteLocale) {
+  return TOPIC_GROUP_DEFINITIONS.filter((group) => hasArticlesInTopicTree(posts, group.id, locale))
 }
 
-export function getAvailableChildTopics(posts: GuideEntry[], parentId: string, locale: SiteLocale) {
-  return getTopicChildren(parentId).filter((topic) => hasGuidesInTopicTree(posts, topic.id, locale))
+export function getAvailableChildTopics(posts: ArticleEntry[], parentId: string, locale: SiteLocale) {
+  return getTopicChildren(parentId).filter((topic) => hasArticlesInTopicTree(posts, topic.id, locale))
 }
 
-export function getAvailableTopicsInGroup(posts: GuideEntry[], groupId: string, locale: SiteLocale) {
+export function getAvailableTopicsInGroup(posts: ArticleEntry[], groupId: string, locale: SiteLocale) {
   return getTopicTreeIds(groupId)
     .map((topicId) => getTopicById(topicId))
     .filter((topic): topic is NonNullable<typeof topic> => Boolean(topic))
-    .filter((topic) => hasGuidesInTopicTree(posts, topic.id, locale))
+    .filter((topic) => hasArticlesInTopicTree(posts, topic.id, locale))
 }
 
-export function getOrderedAvailableTopicFilters(posts: GuideEntry[], locale: SiteLocale) {
+export function getOrderedAvailableTopicFilters(posts: ArticleEntry[], locale: SiteLocale) {
   const availableTopicIds = new Set(
     posts
       .filter((post) => post.data.locale === locale && post.data.status !== 'archived')
-      .flatMap((post) => getGuideTopicIds(post)),
+      .flatMap((post) => getArticleTopicIds(post)),
   )
 
   const priorityIds = TOPIC_EDITORIAL_ORDER.filter((topicId) => availableTopicIds.has(topicId))

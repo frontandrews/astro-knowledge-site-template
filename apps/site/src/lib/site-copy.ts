@@ -1,4 +1,7 @@
-export type SiteLocale = 'en' | 'pt-br'
+import { siteConfig } from '@/lib/site-config'
+import { getDefaultLocale, normalizeSiteLocale } from '@/lib/locale-config'
+
+export type SiteLocale = string
 
 type SiteCopy = {
   article: {
@@ -62,11 +65,11 @@ type SiteCopy = {
   }
   articlesIndex: {
     allItems: string
-    articleItems: string
     comingSoon: string
     copy: string
     filterLabel: string
-    guideItems: string
+    articleItems: string
+    noteItems: string
     title: string
   }
   challengeIndex: {
@@ -98,13 +101,13 @@ type SiteCopy = {
   }
   directory: {
     allItems: string
-    articleItems: string
     filterByConcept: string
     filterBySubtopic: string
     filterByTag: string
     filterByTopic: string
-    guideItems: string
+    articleItems: string
     more: string
+    noteItems: string
     noteBadge: string
     page: string
     readAgain: string
@@ -180,7 +183,7 @@ type SiteCopy = {
   }
 }
 
-const siteCopy: Record<SiteLocale, SiteCopy> = {
+const siteCopy: Record<string, SiteCopy> = {
   en: {
     article: {
       categoryLabel: 'Category',
@@ -239,11 +242,11 @@ const siteCopy: Record<SiteLocale, SiteCopy> = {
       startHere: 'Start Here',
       terms: 'Terms and conditions',
       tracks: 'Tracks',
-      title: 'SeniorPath',
+      title: siteConfig.site.name,
       topics: 'Topics',
     },
     header: {
-      brand: 'SeniorPath',
+      brand: siteConfig.site.name,
       closeMenu: 'Close menu',
       explore: 'Explore',
       menu: 'Menu',
@@ -280,11 +283,11 @@ const siteCopy: Record<SiteLocale, SiteCopy> = {
     },
     articlesIndex: {
       allItems: 'All',
-      articleItems: 'Notes',
       comingSoon: 'Coming soon',
-      copy: 'Articles, guides, and tracks to help you understand better and decide with more clarity.',
+      copy: 'Articles, notes, and tracks to help you understand better and decide with more clarity.',
       filterLabel: 'Choose a theme',
-      guideItems: 'Articles',
+      articleItems: 'Articles',
+      noteItems: 'Notes',
       title: 'Explaining the things people pretend to understand',
     },
     challengeIndex: {
@@ -316,13 +319,13 @@ const siteCopy: Record<SiteLocale, SiteCopy> = {
     },
     directory: {
       allItems: 'All',
-      articleItems: 'Notes',
       filterByConcept: 'Filter by concept',
       filterBySubtopic: 'Filter by subtopic',
       filterByTag: 'Filter by tag',
       filterByTopic: 'Filter by topic',
-      guideItems: 'Articles',
+      articleItems: 'Articles',
       more: 'more',
+      noteItems: 'Notes',
       noteBadge: 'Note',
       page: 'Page',
       readAgain: 'Read again',
@@ -420,11 +423,11 @@ const siteCopy: Record<SiteLocale, SiteCopy> = {
       startHere: 'Comece aqui',
       terms: 'Termos e condições',
       tracks: 'Trilhas',
-      title: 'SeniorPath',
+      title: siteConfig.site.name,
       topics: 'Tópicos',
     },
     header: {
-      brand: 'SeniorPath',
+      brand: siteConfig.site.name,
       closeMenu: 'Fechar menu',
       explore: 'Explorar',
       menu: 'Menu',
@@ -461,11 +464,11 @@ const siteCopy: Record<SiteLocale, SiteCopy> = {
     },
     articlesIndex: {
       allItems: 'Tudo',
-      articleItems: 'Notas',
       comingSoon: 'Em breve',
-      copy: 'Artigos, guias e trilhas para ajudar você a entender melhor e decidir com mais clareza.',
+      copy: 'Artigos, notas e trilhas para ajudar você a entender melhor e decidir com mais clareza.',
       filterLabel: 'Escolha um tema',
-      guideItems: 'Artigos',
+      articleItems: 'Artigos',
+      noteItems: 'Notas',
       title: 'Explicando as coisas que as pessoas fingem entender',
     },
     challengeIndex: {
@@ -497,13 +500,13 @@ const siteCopy: Record<SiteLocale, SiteCopy> = {
     },
     directory: {
       allItems: 'Tudo',
-      articleItems: 'Notas',
       filterByConcept: 'Filtrar por conceito',
       filterBySubtopic: 'Filtrar por subtema',
       filterByTag: 'Filtrar por tag',
       filterByTopic: 'Filtrar por tópico',
-      guideItems: 'Artigos',
+      articleItems: 'Artigos',
       more: 'mais',
+      noteItems: 'Notas',
       noteBadge: 'Nota',
       page: 'Página',
       readAgain: 'Ler novamente',
@@ -546,9 +549,11 @@ const siteCopy: Record<SiteLocale, SiteCopy> = {
 }
 
 export function getSiteLocale(value?: string | null): SiteLocale {
-  return value === 'pt-br' ? 'pt-br' : 'en'
+  return normalizeSiteLocale(value)
 }
 
 export function getSiteCopy(value?: string | null) {
-  return siteCopy[getSiteLocale(value)]
+  const locale = getSiteLocale(value)
+
+  return siteCopy[locale] ?? siteCopy[getDefaultLocale()]
 }

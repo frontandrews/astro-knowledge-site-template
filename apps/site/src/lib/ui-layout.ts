@@ -1,9 +1,9 @@
 export const uiLayout = {
   articleHeader: 'mx-auto mb-7 max-w-208 border-b border-article-rule pb-5 lg:max-w-4xl',
-  articleGuideRail: 'w-full xl:grid xl:grid-cols-[minmax(0,1fr)_55rem_minmax(0,1fr)]',
-  articleGuideRailAside:
+  articleRailLayout: 'w-full xl:grid xl:grid-cols-[minmax(0,1fr)_55rem_minmax(0,1fr)]',
+  articleRailLayoutAside:
     'hidden xl:col-start-3 xl:block xl:h-fit xl:w-72 xl:justify-self-end xl:translate-x-38 xl:sticky xl:top-28',
-  articleGuideRailMain: 'min-w-0 xl:col-start-2 xl:self-start',
+  articleRailLayoutMain: 'min-w-0 xl:col-start-2 xl:self-start',
   articleRail: 'relative mx-auto w-full max-w-4xl',
   articleSection: 'mx-auto mt-8 max-w-208 border-t border-article-rule pt-8 lg:max-w-4xl',
   articleShell: 'mx-auto mt-5 w-full max-w-208 pb-11 lg:max-w-4xl',

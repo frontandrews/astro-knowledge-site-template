@@ -1,6 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content'
-import { getGuideHrefFromEntry } from '@/lib/guide-links'
+import { getArticleHrefFromEntry } from '@/lib/article-links'
 import { cn } from '@/lib/cn'
 import { getSiteCopy } from '@/lib/site-copy'
 import { ui } from '@/lib/ui'
@@ -19,7 +19,7 @@ type Props = {
   eyebrow?: string
   eyebrowVariant?: 'caps' | 'sentence'
   meta?: string
-  post: CollectionEntry<'guides'>
+  post: CollectionEntry<'articles'>
   subtitle?: string
   variant?: 'linear' | 'minimal' | 'rich'
 }
@@ -34,7 +34,7 @@ const {
   subtitle = post.data.description,
   variant = 'minimal',
 } = Astro.props
-const href = getGuideHrefFromEntry(post)
+const href = getArticleHrefFromEntry(post)
 const copy = getSiteCopy(post.data.locale === 'pt-br' ? 'pt-br' : 'en')
 const ctaLabel = copy.directory.readMore
 const completedCtaLabel = copy.directory.readAgain
@@ -42,8 +42,8 @@ const completedCtaLabel = copy.directory.readAgain
 
 <article
   class={cn(articleCardArticleVariants({ variant }), className)}
-  data-guide-card-category={categoryLabel}
-  data-guide-post={post.data.guideId}
+  data-article-card-category={categoryLabel}
+  data-article-post={post.data.articleId}
 >
   <a class={articleCardLinkVariants({ variant })} href={href}>
     <span
@@ -52,7 +52,7 @@ const completedCtaLabel = copy.directory.readAgain
         ui.completionBadgeCard,
         variant === 'linear' && ui.completionBadgeLinear,
       )}
-      data-guide-post-complete-badge
+      data-article-post-complete-badge
     >
       ✓
     </span>
@@ -71,11 +71,11 @@ const completedCtaLabel = copy.directory.readAgain
       <>
         <InlineArrowCta className="md:hidden" label={ctaLabel} />
         <span class={ui.completionRailMd}>
-          <span class={ui.completionDesktopCta} data-guide-post-complete-text>
+          <span class={ui.completionDesktopCta} data-article-post-complete-text>
             <span>{completedCtaLabel}</span>
             <ArrowRightIcon className="size-[0.88rem]" />
           </span>
-          <span class={ui.completionDesktopCtaInteractive} data-guide-post-default-cta>
+          <span class={ui.completionDesktopCtaInteractive} data-article-post-default-cta>
             <span>{ctaLabel}</span>
             <ArrowRightIcon className="size-[0.88rem]" />
           </span>

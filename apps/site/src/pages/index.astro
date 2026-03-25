@@ -1,5 +1,6 @@
 ---
-import ArticlesIndexPage from '@/components/ArticlesIndexPage.astro'
+import LocalizedHomePage from '@/components/LocalizedHomePage.astro'
+import { getDefaultLocale } from '@/lib/locale-config'
 ---
 
-<ArticlesIndexPage locale="en" />
+<LocalizedHomePage locale={getDefaultLocale()} />

@@ -1,3 +1,6 @@
+import { brandConfig } from '@/brand/brand.config'
+import { getLocalePath, getLocalizedValue } from '@/lib/locale-config'
+
 export function getPrivacyHref(locale = 'en') {
-  return locale === 'pt-br' ? '/pt-br/politica-de-privacidade' : '/privacy'
+  return getLocalePath(locale, getLocalizedValue(brandConfig.legal.routes.privacy, locale))
 }

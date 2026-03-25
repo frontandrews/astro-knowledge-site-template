@@ -1,5 +1,8 @@
+import { getLocalePath, normalizeSiteLocale } from '@/lib/locale-config'
+import { getPageTypeHref } from '@/lib/section-manifest'
+
 export function getChallengeIndexHref(locale = 'en') {
-  return locale === 'pt-br' ? '/pt-br/desafios' : '/challenges'
+  return getPageTypeHref('challenges', locale) ?? getLocalePath(locale)
 }
 
 type ChallengeEntryLike = {
@@ -14,7 +17,7 @@ export function getChallengeSlugFromEntry(entry: ChallengeEntryLike) {
 }
 
 export function getChallengeHrefFromEntry(entry: ChallengeEntryLike) {
-  const locale = entry.data.locale === 'pt-br' ? 'pt-br' : 'en'
+  const locale = normalizeSiteLocale(entry.data.locale)
   const slug = getChallengeSlugFromEntry(entry)
 
   return slug ? `${getChallengeIndexHref(locale)}/${slug}` : getChallengeIndexHref(locale)

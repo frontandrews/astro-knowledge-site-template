@@ -1,0 +1,311 @@
+---
+import type { CollectionEntry } from 'astro:content'
+import { getCollection, render } from 'astro:content'
+import ArrowLeft from '@lucide/astro/icons/arrow-left'
+import ArrowRight from '@lucide/astro/icons/arrow-right'
+import ChevronLeft from '@lucide/astro/icons/chevron-left'
+import ChevronRight from '@lucide/astro/icons/chevron-right'
+import ArticleComments from '@/components/ArticleComments.svelte'
+import ArticleCompletionPanel from '@/components/ArticleCompletionPanel.astro'
+import ArticleStickyMeta from '@/components/ArticleStickyMeta.astro'
+import ArticleSharePanel from '@/components/ArticleSharePanel.astro'
+import AuthorByline from '@/components/ui/AuthorByline.astro'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import { getArticleCategoryLabel, getArticleLevelLabel, getArticleReadingTimeMinutes, toHashtagLabel } from '@/lib/article-meta'
+import { getArticleEditorialContext } from '@/lib/roadmaps'
+import { formatEditorialDate } from '@/lib/format-date'
+import { getGiscusConfig } from '@/lib/giscus'
+import { getArticleHrefFromEntry, getArticlesIndexHref } from '@/lib/article-links'
+import { resolveLocalizedEntryHrefMap } from '@/lib/locale-config'
+import { translateSiteLabels } from '@/lib/site-labels'
+import { sortArticles } from '@/lib/article-tree'
+import { getLocalizedArticleTopics } from '@/lib/topic-taxonomy'
+import { getSiteCopy, getSiteLocale } from '@/lib/site-copy'
+import { ui } from '@/lib/ui'
+import ContentArticleHeader from '@/components/ui/ContentArticleHeader.astro'
+import { cn } from '@/lib/cn'
+
+type Props = {
+  post: CollectionEntry<'articles'>
+}
+
+const { post } = Astro.props
+const { Content, headings = [] } = await render(post)
+const allArticleEntries = await getCollection('articles')
+const localizedPosts = allArticleEntries.filter(
+  (entry) => entry.data.articleId === post.data.articleId && entry.data.status === 'active',
+)
+const activePosts = sortArticles(
+  allArticleEntries.filter(
+    (entry) => entry.data.locale === post.data.locale && entry.data.status === 'active',
+  ),
+)
+const localeHrefs = resolveLocalizedEntryHrefMap(
+  localizedPosts,
+  (entry) => getArticleHrefFromEntry(entry),
+  (supportedLocale) => getArticlesIndexHref(supportedLocale),
+)
+const editorialContext = post.data.kind === 'note' ? null : getArticleEditorialContext(post, allArticleEntries)
+const currentPostIndex = activePosts.findIndex((entry) => entry.id === post.id)
+const previousPost = currentPostIndex > 0 ? activePosts[currentPostIndex - 1] : null
+const nextPost = currentPostIndex >= 0 && currentPostIndex < activePosts.length - 1 ? activePosts[currentPostIndex + 1] : null
+const copy = getSiteCopy(post.data.locale)
+const translatedTags = translateSiteLabels(post.data.tags, post.data.locale)
+const linkedTopics = getLocalizedArticleTopics(post)
+const locale = getSiteLocale(post.data.locale)
+const dateLocale = post.data.locale === 'pt-br' ? 'pt-BR' : 'en-US'
+const giscusConfig = getGiscusConfig(post.data.locale === 'pt-br' ? 'pt-br' : 'en')
+const formattedPubDate = formatEditorialDate(post.data.pubDate, dateLocale)
+const formattedUpdatedDate = post.data.updatedDate
+  ? formatEditorialDate(post.data.updatedDate, dateLocale, {
+      month: 'long',
+    })
+  : null
+const displayHeadings = headings.filter((heading) => heading.depth === 2 || heading.depth === 3)
+const readingTimeMinutes = getArticleReadingTimeMinutes(post)
+const levelLabel = getArticleLevelLabel(post.data.level, post.data.locale)
+const categoryLabel = getArticleCategoryLabel(post)
+const postIndexByArticleId = new Map(activePosts.map((entry, index) => [entry.data.articleId, index]))
+const topicIds = new Set(post.data.topicIds)
+const topicRelatedPosts = activePosts
+  .filter((entry) => entry.data.articleId !== post.data.articleId)
+  .map((entry) => ({
+    entry,
+    score: entry.data.topicIds.filter((topicId) => topicIds.has(topicId)).length,
+  }))
+  .filter((entry) => entry.score > 0)
+  .sort((a, b) => {
+    if (b.score !== a.score) return b.score - a.score
+    return (postIndexByArticleId.get(a.entry.data.articleId) ?? 0) - (postIndexByArticleId.get(b.entry.data.articleId) ?? 0)
+  })
+  .map(({ entry }) => entry)
+const explicitRelatedPosts = post.data.relationships.flatMap((articleId) => {
+  const relatedEntry = activePosts.find((entry) => entry.data.articleId === articleId)
+  return relatedEntry ? [relatedEntry] : []
+})
+const mergedRelatedPosts = [...topicRelatedPosts, ...explicitRelatedPosts].filter(
+  (entry, index, items) => items.findIndex((candidate) => candidate.data.articleId === entry.data.articleId) === index,
+)
+const fallbackNextStep = mergedRelatedPosts[0] ?? null
+const nextStep = editorialContext?.nextArticle
+  ? {
+      articleId: editorialContext.nextArticle.articleId,
+      href: editorialContext.nextArticle.href,
+      title: editorialContext.nextArticle.post.data.title,
+    }
+  : fallbackNextStep
+    ? {
+        articleId: fallbackNextStep.data.articleId,
+        href: getArticleHrefFromEntry(fallbackNextStep),
+        title: fallbackNextStep.data.title,
+      }
+    : null
+const relatedItems = mergedRelatedPosts
+  .filter((entry) => entry.data.articleId !== nextStep?.articleId)
+  .slice(0, 3)
+  .map((entry) => ({
+    href: getArticleHrefFromEntry(entry),
+    title: entry.data.title,
+  }))
+const completionTrack = editorialContext
+  ? {
+      href: editorialContext.roadmap.href,
+      stepIndex: editorialContext.stepIndex,
+      title: editorialContext.roadmap.title,
+      totalSteps: editorialContext.totalSteps,
+    }
+  : null
+const displayTags = [
+  ...new Set(
+    [...new Set([...linkedTopics.map((topic) => topic.label), ...translatedTags])]
+      .map((label) => toHashtagLabel(label, post.data.locale))
+      .filter((label): label is string => Boolean(label)),
+  ),
+]
+const articleUrl = new URL(Astro.url.pathname, Astro.site ?? Astro.url).toString()
+const hasTakeaways = post.data.takeaways.length > 0
+const hasPracticeChecklist = post.data.practiceChecklist.length > 0
+---
+
+<BaseLayout
+  contentWidth="wide"
+  description={post.data.description}
+  localeHrefs={localeHrefs}
+  title={post.data.title}
+>
+  <article class="w-full pb-11">
+    <ContentArticleHeader
+      createdMeta={formattedPubDate}
+      description={post.data.description}
+      title={post.data.title}
+    >
+      <AuthorByline />
+      {displayTags.length > 0 ? (
+        <div class={cn(ui.metaQuiet, 'mt-3 flex flex-wrap gap-x-3 gap-y-1')}>
+          {displayTags.map((tag) => (
+            <span>{tag}</span>
+          ))}
+        </div>
+      ) : null}
+
+      {editorialContext ? (
+        <div class="mt-5 grid gap-4 border-t border-article-rule pt-4">
+          <div class="grid gap-1">
+            <p class={ui.eyebrow}>{copy.startHere.roadmapEyebrow}</p>
+            <h2 class={ui.headingCompact}>{editorialContext.roadmap.title}</h2>
+            <p class={ui.bodyCopy}>
+              {copy.startHere.stepLabel} {editorialContext.stepIndex} / {editorialContext.totalSteps}
+            </p>
+          </div>
+          <div class="flex flex-wrap gap-3">
+            <a class={ui.actionLink} href={editorialContext.roadmap.href}>
+              {copy.startHere.backToRoadmap}
+            </a>
+            {editorialContext.previousArticle ? (
+              <a class={ui.actionLink} href={editorialContext.previousArticle.href}>
+                {copy.startHere.previousArticle}
+              </a>
+            ) : null}
+            {editorialContext.nextArticle ? (
+              <a class={ui.actionLink} href={editorialContext.nextArticle.href}>
+                {copy.startHere.nextArticle}
+              </a>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
+    </ContentArticleHeader>
+
+    <ArticleStickyMeta
+      categoryLabel={categoryLabel}
+      className={cn(ui.compactSection, 'my-5 xl:hidden')}
+      completionId={post.data.articleId}
+      headings={displayHeadings}
+      levelLabel={levelLabel}
+      locale={locale}
+      nextStep={nextStep ? { href: nextStep.href, title: nextStep.title } : null}
+      readingTimeMinutes={readingTimeMinutes}
+      relatedItems={relatedItems}
+      showCompletionInPlace={false}
+      track={completionTrack}
+      updatedMeta={formattedUpdatedDate}
+    />
+
+    <div class={ui.articleRailLayout}>
+      <div class={ui.articleRailLayoutMain}>
+        <div class="article-prose" data-article-reading-content>
+          <Content />
+        </div>
+
+        {hasTakeaways || hasPracticeChecklist ? (
+          <section class={cn(ui.articleSection, 'grid gap-4 md:grid-cols-2')}>
+            {hasTakeaways ? (
+              <section class={cn(ui.panel, 'grid gap-3 p-5')}>
+                <div class="grid gap-1.5">
+                  <p class={ui.eyebrow}>{copy.article.quickSummary}</p>
+                  <h2 class={ui.headingCompact}>{copy.article.quickSummaryTitle}</h2>
+                </div>
+                <ul class="grid gap-2 pl-5 text-[0.98rem] leading-7 text-site-ink-soft">
+                  {post.data.takeaways.map((item) => (
+                    <li>{item}</li>
+                  ))}
+                </ul>
+              </section>
+            ) : null}
+
+            {hasPracticeChecklist ? (
+              <section class={cn(ui.panel, 'grid gap-3 p-5')}>
+                <div class="grid gap-1.5">
+                  <p class={ui.eyebrow}>{copy.article.practiceChecklist}</p>
+                  <h2 class={ui.headingCompact}>{copy.article.practiceChecklistTitle}</h2>
+                </div>
+                <ul class="grid gap-2 pl-5 text-[0.98rem] leading-7 text-site-ink-soft">
+                  {post.data.practiceChecklist.map((item) => (
+                    <li>{item}</li>
+                  ))}
+                </ul>
+              </section>
+            ) : null}
+          </section>
+        ) : null}
+
+        <div aria-hidden="true" class="h-px" data-article-reading-end></div>
+
+        <ArticleCompletionPanel
+          className="mt-6"
+          completionId={post.data.articleId}
+          locale={locale}
+          nextStep={nextStep ? { href: nextStep.href, title: nextStep.title } : null}
+          relatedItems={relatedItems}
+          track={completionTrack}
+        />
+
+        <ArticleSharePanel
+          description={post.data.description}
+          locale={locale}
+          title={post.data.title}
+          url={articleUrl}
+        />
+
+        {previousPost || nextPost ? (
+          <section class={cn(ui.articleSection, 'grid gap-4 md:grid-cols-2 md:items-stretch')}>
+            {nextPost ? (
+              <a
+                class={cn(ui.navCardLink, 'justify-between md:order-3')}
+                href={getArticleHrefFromEntry(nextPost)}
+              >
+                <span class="grid gap-1 content-start text-left md:ml-auto md:justify-items-end md:text-right">
+                  <span class={cn(ui.eyebrowSentence, 'inline-flex items-center gap-1.5 leading-none md:justify-self-end')}>
+                    <span class="leading-none">{copy.startHere.nextArticle}</span>
+                    <ArrowRight aria-hidden="true" class="size-3.5 shrink-0 md:hidden" />
+                  </span>
+                  <span class={ui.linkCardTitle}>{nextPost.data.title}</span>
+                </span>
+                <ChevronRight aria-hidden="true" class="hidden size-6 shrink-0 text-article-body md:block" />
+              </a>
+            ) : <div class="md:order-3" />}
+            {previousPost ? (
+              <a
+                class={cn(ui.navCardLink, 'text-left md:order-1')}
+                href={getArticleHrefFromEntry(previousPost)}
+              >
+                <ChevronLeft aria-hidden="true" class="hidden size-6 shrink-0 text-article-body md:block" />
+                <span class="grid gap-1 content-start">
+                  <span class={cn(ui.eyebrowSentence, 'inline-flex items-center gap-1.5 leading-none')}>
+                    <ArrowLeft aria-hidden="true" class="size-3.5 shrink-0 md:hidden" />
+                    <span class="leading-none">{copy.startHere.previousArticle}</span>
+                  </span>
+                  <span class={ui.linkCardTitle}>{previousPost.data.title}</span>
+                </span>
+              </a>
+            ) : <div class="md:order-1" />}
+          </section>
+        ) : null}
+
+        {giscusConfig ? (
+          <ArticleComments
+            config={giscusConfig}
+            openLabel={post.data.locale === 'pt-br' ? 'Ver comentarios' : 'View comments'}
+            title={copy.article.comments}
+            client:idle
+          />
+        ) : null}
+      </div>
+
+      <div class={ui.articleRailLayoutAside}>
+        <ArticleStickyMeta
+          categoryLabel={categoryLabel}
+          completionId={post.data.articleId}
+          headings={displayHeadings}
+          levelLabel={levelLabel}
+          locale={locale}
+          nextStep={nextStep ? { href: nextStep.href, title: nextStep.title } : null}
+          readingTimeMinutes={readingTimeMinutes}
+          relatedItems={relatedItems}
+          track={completionTrack}
+          updatedMeta={formattedUpdatedDate}
+        />
+      </div>
+    </div>
+  </article>
+</BaseLayout>

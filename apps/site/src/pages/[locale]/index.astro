@@ -1,8 +1,15 @@
 ---
+import LocalizedHomePage from '@/components/LocalizedHomePage.astro'
+import { getNonDefaultLocales } from '@/lib/locale-config'
+
 export async function getStaticPaths() {
-  return [{ params: { locale: 'pt-br' } }]
+  return getNonDefaultLocales().map((locale) => ({
+    params: { locale },
+    props: { locale },
+  }))
 }
-import ArticlesIndexPage from '@/components/ArticlesIndexPage.astro'
+
+const { locale } = Astro.props
 ---
 
-<ArticlesIndexPage locale="pt-br" />
+<LocalizedHomePage locale={locale} />

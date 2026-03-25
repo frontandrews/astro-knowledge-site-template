@@ -5,6 +5,8 @@ import BrainIcon from '@lucide/astro/icons/brain'
 import FilterableDirectory from '@/components/FilterableDirectory.svelte'
 import DirectoryIndexShell from '@/components/ui/DirectoryIndexShell.astro'
 import { getConceptHrefFromEntry, getConceptsHref } from '@/lib/concepts-links'
+import { resolveLocaleHrefMap } from '@/lib/locale-config'
+import { getPageTypeDescription, getPageTypeLabel } from '@/lib/section-manifest'
 import {
   CONCEPT_DOMAINS,
   getAvailableConceptGroups,
@@ -21,9 +23,10 @@ type Props = {
 }
 
 const { concepts, locale } = Astro.props
-const englishHref = getConceptsHref('en')
-const portugueseHref = getConceptsHref('pt-br')
 const copy = getSiteCopy(locale)
+const localeHrefs = resolveLocaleHrefMap((supportedLocale) => getConceptsHref(supportedLocale))
+const title = getPageTypeLabel('concepts', locale)
+const description = getPageTypeDescription('concepts', locale)
 const availableDomains = CONCEPT_DOMAINS.filter((domain) =>
   concepts.some((concept) => concept.data.domainId === domain.id),
 )
@@ -64,12 +67,11 @@ const items = concepts.map((concept) => {
 ---
 
 <DirectoryIndexShell
-  description={copy.conceptsIndex.copy}
-  englishHref={englishHref}
+  description={description}
   icon={BrainIcon}
-  iconLabel={copy.conceptsIndex.title}
-  portugueseHref={portugueseHref}
-  title={copy.conceptsIndex.title}
+  iconLabel={title}
+  localeHrefs={localeHrefs}
+  title={title}
 >
   <FilterableDirectory
     allItemsLabel={copy.directory.allItems}
@@ -77,9 +79,9 @@ const items = concepts.map((concept) => {
     articleItemsLabel={copy.directory.articleItems}
     filterLabel={copy.directory.filterByConcept}
     filterQueryKey="scope"
-    guideItemsLabel={copy.directory.guideItems}
     items={items}
     client:load
-    kind="title-cards"
+    layout="cards"
+    noteItemsLabel={copy.directory.noteItems}
   />
 </DirectoryIndexShell>

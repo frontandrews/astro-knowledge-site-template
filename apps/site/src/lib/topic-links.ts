@@ -1,7 +1,9 @@
-import { getTopicGroupRouteSegment, getTopicRouteSegment } from '@seniorpath/content'
+import { getTopicGroupRouteSegment, getTopicRouteSegment } from '@template/content'
+import { getLocalePath } from '@/lib/locale-config'
+import { getPageTypeHref } from '@/lib/section-manifest'
 
 export function getTopicIndexHref(locale = 'en') {
-  return locale === 'pt-br' ? '/pt-br/topicos' : '/topics'
+  return getPageTypeHref('topics', locale) ?? getLocalePath(locale)
 }
 
 export function getTopicGroupHref(groupId: string, locale = 'en') {

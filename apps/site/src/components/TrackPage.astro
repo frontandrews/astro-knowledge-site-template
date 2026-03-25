@@ -1,13 +1,14 @@
 ---
-import type { ResolvedEditorialRoadmap } from '@/lib/editorial-roadmaps'
+import type { ResolvedEditorialRoadmap } from '@/lib/roadmaps'
 import RouteIcon from '@lucide/astro/icons/route'
 
 import ArticleCard from '@/components/ArticleCard.astro'
 import ArticleSharePanel from '@/components/ArticleSharePanel.astro'
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import TrackProgressPanel from '@/components/TrackProgressPanel.astro'
-import { getGuideLevelLabel, getGuideReadingTimeMinutes } from '@/lib/article-meta'
+import { getArticleReadingTimeMinutes } from '@/lib/article-meta'
 import { formatEditorialDate } from '@/lib/format-date'
+import { resolveLocaleHrefMap } from '@/lib/locale-config'
 import { getSiteCopy, type SiteLocale } from '@/lib/site-copy'
 import { getTracksHref } from '@/lib/tracks-links'
 import CompactSection from '@/components/ui/CompactSection.astro'
@@ -21,44 +22,34 @@ type Props = {
 
 const { locale, roadmap } = Astro.props
 const copy = getSiteCopy(locale)
-const englishHref = getTracksHref('en', roadmap.slugs.en)
-const portugueseHref = getTracksHref('pt-br', roadmap.slugs['pt-br'])
+const roadmapSlugs = roadmap.slugs as Record<string, string | undefined>
+const localeHrefs = resolveLocaleHrefMap((supportedLocale) =>
+  getTracksHref(supportedLocale, roadmapSlugs[supportedLocale] ?? null)
+  ?? getTracksHref(supportedLocale),
+)
+const tracksHref = getTracksHref(locale) ?? '/'
 const dateLocale = locale === 'pt-br' ? 'pt-BR' : 'en-US'
 const shareUrl = Astro.url.href
-const levelOrder = {
-  beginner: 0,
-  intermediate: 1,
-  advanced: 2,
-} as const
 const trackItems = roadmap.articleNodes.map((node, index) => ({
-  guideId: node.guideId,
+  articleId: node.articleId,
   href: node.href,
   stepLabel: String(index + 1),
   title: node.post.data.title,
 }))
-const totalReadingMinutes = roadmap.articleNodes.reduce((sum, node) => sum + getGuideReadingTimeMinutes(node.post), 0)
-const highestLevel =
-  roadmap.articleNodes.reduce(
-    (current, node) =>
-      levelOrder[node.post.data.level] > levelOrder[current] ? node.post.data.level : current,
-    roadmap.articleNodes[0]?.post.data.level ?? 'beginner',
-  )
-const levelLabel = getGuideLevelLabel(highestLevel, locale)
+const totalReadingMinutes = roadmap.articleNodes.reduce((sum, node) => sum + getArticleReadingTimeMinutes(node.post), 0)
 ---
 
 <BaseLayout
   description={roadmap.summary}
-  englishHref={englishHref}
-  portugueseHref={portugueseHref}
+  localeHrefs={localeHrefs}
   title={roadmap.title}
 >
   <PageHeader description={roadmap.summary} icon={RouteIcon} iconLabel={copy.layout.tracks} title={roadmap.title} />
 
   <TrackProgressPanel
     items={trackItems}
-    levelLabel={levelLabel}
     locale={locale}
-    tracksHref={getTracksHref(locale)}
+    tracksHref={tracksHref}
     totalReadingMinutes={totalReadingMinutes}
   />
 

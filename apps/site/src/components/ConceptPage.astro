@@ -10,9 +10,10 @@ import {
   getLocalizedConceptDomainLabel,
   getLocalizedConceptGroupLabel,
 } from '@/lib/concept-taxonomy'
+import { getArticleHrefFromEntry } from '@/lib/article-links'
 import { formatEditorialDate } from '@/lib/format-date'
-import { getGuideHrefFromEntry } from '@/lib/guide-links'
-import { getSiteCopy, type SiteLocale } from '@/lib/site-copy'
+import { resolveLocalizedEntryHrefMap } from '@/lib/locale-config'
+import { getSiteCopy, getSiteLocale, type SiteLocale } from '@/lib/site-copy'
 import { ui } from '@/lib/ui'
 import ArticleSection from '@/components/ui/ArticleSection.astro'
 import ReferenceEntryPage from '@/components/ui/ReferenceEntryPage.astro'
@@ -25,33 +26,26 @@ type Props = {
 const { concept } = Astro.props
 const { Content } = await render(concept)
 const allConcepts = await getCollection('concepts')
-const allGuides = await getCollection('guides')
-const alternateConcept = allConcepts.find(
-  (entry) => entry.data.conceptId === concept.data.conceptId && entry.data.locale !== concept.data.locale,
+const allArticles = await getCollection('articles')
+const localizedConcepts = allConcepts.filter(
+  (entry) => entry.data.conceptId === concept.data.conceptId && entry.data.status === 'active',
 )
-const relatedGuides = allGuides.filter(
+const relatedArticles = allArticles.filter(
   (entry) =>
     entry.data.locale === concept.data.locale &&
-    entry.data.status !== 'archived' &&
-    concept.data.relatedGuideIds.includes(entry.data.guideId),
+    entry.data.status === 'active' &&
+    concept.data.relatedArticleIds.includes(entry.data.articleId),
 )
-const locale = concept.data.locale === 'pt-br' ? 'pt-br' : 'en'
+const locale = getSiteLocale(concept.data.locale)
 const siteLocale: SiteLocale = locale
 const copy = getSiteCopy(locale)
 const domainSegment = getConceptDomainRouteSegment(concept.data.domainId, siteLocale)
 const groupSegment = getConceptGroupRouteSegment(concept.data.domainId, concept.data.groupId, siteLocale)
-const englishHref =
-  concept.data.locale === 'en'
-    ? getConceptHrefFromEntry(concept)
-    : alternateConcept
-      ? getConceptHrefFromEntry(alternateConcept)
-      : null
-const portugueseHref =
-  concept.data.locale === 'pt-br'
-    ? getConceptHrefFromEntry(concept)
-    : alternateConcept
-      ? getConceptHrefFromEntry(alternateConcept)
-      : null
+const localeHrefs = resolveLocalizedEntryHrefMap(
+  localizedConcepts,
+  (entry) => getConceptHrefFromEntry(entry),
+  (supportedLocale) => getConceptsHref(supportedLocale),
+)
 const dateLocale = locale === 'pt-br' ? 'pt-BR' : 'en-US'
 const formattedPubDate = formatEditorialDate(concept.data.pubDate, dateLocale)
 const formattedUpdatedDate = concept.data.updatedDate
@@ -59,10 +53,10 @@ const formattedUpdatedDate = concept.data.updatedDate
       month: 'long',
     })
   : null
-const relatedGuideItems = relatedGuides.map((guide) => ({
-  href: getGuideHrefFromEntry(guide),
+const relatedArticleItems = relatedArticles.map((article) => ({
+  href: getArticleHrefFromEntry(article),
   tags: [],
-  title: guide.data.title,
+  title: article.data.title,
 }))
 const articleUrl = new URL(Astro.url.pathname, Astro.site ?? Astro.url).toString()
 const conceptScopeTags = [
@@ -80,23 +74,22 @@ const conceptScopeTags = [
 <ReferenceEntryPage
   createdMeta={formattedPubDate}
   description={concept.data.description}
-  englishHref={englishHref}
   locale={locale}
-  portugueseHref={portugueseHref}
+  localeHrefs={localeHrefs}
   title={concept.data.title}
   updatedMeta={formattedUpdatedDate}
   url={articleUrl}
 >
   <Content />
   <Fragment slot="afterContent">
-    {relatedGuides.length > 0 ? (
+    {relatedArticles.length > 0 ? (
       <ArticleSection
         bodyClass="mt-4"
         title={copy.directory.relatedArticles}
       >
           <FilterableDirectory
-            items={relatedGuideItems}
-            kind="title-cards"
+            items={relatedArticleItems}
+            layout="cards"
           />
       </ArticleSection>
     ) : null}

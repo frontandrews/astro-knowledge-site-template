@@ -5,7 +5,7 @@ import { getSiteCopy, type SiteLocale } from '@/lib/site-copy'
 import { ui } from '@/lib/ui'
 
 type TrackItem = {
-  guideId: string
+  articleId: string
   href: string
   title: string
 }
@@ -13,7 +13,6 @@ type TrackItem = {
 type Props = {
   className?: string
   items: TrackItem[]
-  levelLabel: string
   locale: SiteLocale
   tracksHref: string
   totalReadingMinutes: number
@@ -22,14 +21,13 @@ type Props = {
 const {
   className = '',
   items,
-  levelLabel,
   locale,
   tracksHref,
   totalReadingMinutes,
 } = Astro.props
 
 const copy = getSiteCopy(locale)
-const metaLine = `${items.length} ${copy.startHere.stepsLabel.toLocaleLowerCase(locale === 'pt-br' ? 'pt-BR' : 'en-US')} • ~${totalReadingMinutes} min • ${levelLabel}`
+const metaLine = `${items.length} ${copy.startHere.stepsLabel.toLocaleLowerCase(locale === 'pt-br' ? 'pt-BR' : 'en-US')} • ~${totalReadingMinutes} min`
 const ofLabel = locale === 'pt-br' ? 'de' : 'of'
 const initialHref = items[0]?.href ?? '#'
 const copyLabels =
@@ -112,7 +110,7 @@ const copyLabels =
 
     <div class="hidden" aria-hidden="true">
       {items.map((item) => (
-        <a data-track-progress-item data-track-href={item.href} data-track-item={item.guideId} href={item.href}>
+        <a data-track-progress-item data-track-href={item.href} data-track-item={item.articleId} href={item.href}>
           {item.title}
         </a>
       ))}
@@ -121,7 +119,7 @@ const copyLabels =
 </section>
 
 <script>
-  import { completedGuidesChangedEvent, readCompletedGuides } from '@/lib/completed-guides'
+  import { completedArticlesChangedEvent, readCompletedArticles } from '@/lib/article-progress'
   import { siteStorageKeys } from '@/lib/storage-keys'
 
   const roots = document.querySelectorAll('[data-track-progress-root]')
@@ -152,7 +150,7 @@ const copyLabels =
     const nextTrackLabel = root.dataset.trackNextTrackLabel ?? 'Next track'
 
     const syncTrackProgress = () => {
-      const completedGuideIds = new Set(readCompletedGuides())
+      const completedArticleIds = new Set(readCompletedArticles())
       let completedCount = 0
       let firstUnreadHref = ''
       let firstUnreadStep = totalSteps
@@ -163,8 +161,8 @@ const copyLabels =
           return
         }
 
-        const guideId = item.dataset.trackItem ?? ''
-        const isComplete = Boolean(guideId && completedGuideIds.has(guideId))
+        const articleId = item.dataset.trackItem ?? ''
+        const isComplete = Boolean(articleId && completedArticleIds.has(articleId))
 
         if (isComplete) {
           completedCount += 1
@@ -226,9 +224,9 @@ const copyLabels =
     }
 
     syncTrackProgress()
-    window.addEventListener(completedGuidesChangedEvent, syncTrackProgress)
+    window.addEventListener(completedArticlesChangedEvent, syncTrackProgress)
     window.addEventListener('storage', (event) => {
-      if (event.key === siteStorageKeys.completedGuides) {
+      if (event.key === siteStorageKeys.completedArticles) {
         syncTrackProgress()
       }
     })

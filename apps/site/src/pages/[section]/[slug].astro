@@ -1,0 +1,59 @@
+---
+import ArticlePage from '@/components/ArticlePage.astro'
+import ChallengePage from '@/components/ChallengePage.astro'
+import ConceptPage from '@/components/ConceptPage.astro'
+import GlossaryTermPage from '@/components/GlossaryTermPage.astro'
+import TopicGroupPage from '@/components/TopicGroupPage.astro'
+import TrackPage from '@/components/TrackPage.astro'
+import { getArticleHrefFromEntry } from '@/lib/article-links'
+import { getDynamicSectionDetailPaths } from '@/lib/dynamic-section-pages'
+import { getDefaultArticleNotePaths } from '@/lib/localized-article-pages'
+import { getDefaultLocale } from '@/lib/locale-config'
+
+export async function getStaticPaths() {
+  const defaultLocale = getDefaultLocale()
+
+  return [
+    ...(await getDefaultArticleNotePaths()),
+    ...(await getDynamicSectionDetailPaths(defaultLocale)),
+  ]
+}
+
+const defaultLocale = getDefaultLocale()
+const {
+  challenge,
+  concept,
+  groupId,
+  pageType,
+  post,
+  posts = [],
+  roadmap,
+  term,
+  topics = [],
+} = Astro.props
+
+if (!pageType) {
+  return new Response(null, {
+    status: 404,
+    statusText: 'Not Found',
+  })
+}
+
+if (pageType === 'articles' && post) {
+  const canonicalHref = getArticleHrefFromEntry(post)
+  const currentPath = Astro.url.pathname.replace(/\/+$/, '') || '/'
+
+  if (canonicalHref !== currentPath) {
+    return Astro.redirect(canonicalHref, 301)
+  }
+}
+---
+
+{pageType === 'articles' && post ? <ArticlePage post={post} /> : null}
+{pageType === 'tracks' && roadmap ? <TrackPage locale={defaultLocale} roadmap={roadmap} /> : null}
+{pageType === 'topics' && groupId ? (
+  <TopicGroupPage groupId={groupId} locale={defaultLocale} posts={posts} topics={topics} />
+) : null}
+{pageType === 'concepts' && concept ? <ConceptPage concept={concept} /> : null}
+{pageType === 'glossary' && term ? <GlossaryTermPage term={term} /> : null}
+{pageType === 'challenges' && challenge ? <ChallengePage challenge={challenge} /> : null}

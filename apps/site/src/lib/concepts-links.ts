@@ -1,4 +1,6 @@
 import { getConceptDomainRouteSegment, getConceptGroupRouteSegment } from '@/lib/concept-taxonomy'
+import { getLocalePath, normalizeSiteLocale } from '@/lib/locale-config'
+import { getPageTypeHref } from '@/lib/section-manifest'
 
 type ConceptEntryLike = {
   id: string
@@ -15,7 +17,7 @@ export function getConceptsHref(
   groupSegment?: string | null,
   slug?: string | null,
 ) {
-  const baseHref = locale === 'pt-br' ? '/pt-br/conceitos' : '/concepts'
+  const baseHref = getPageTypeHref('concepts', locale) ?? getLocalePath(locale)
 
   if (!slug) {
     if (!domainSegment) {
@@ -37,7 +39,7 @@ export function getConceptSlugFromEntry(entry: ConceptEntryLike) {
 }
 
 export function getConceptHrefFromEntry(entry: ConceptEntryLike) {
-  const locale = entry.data.locale === 'pt-br' ? 'pt-br' : 'en'
+  const locale = normalizeSiteLocale(entry.data.locale)
   const domainSegment = getConceptDomainRouteSegment(entry.data.domainId, locale)
   const groupSegment = getConceptGroupRouteSegment(entry.data.domainId, entry.data.groupId, locale)
   const slug = getConceptSlugFromEntry(entry)

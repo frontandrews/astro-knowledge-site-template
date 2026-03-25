@@ -5,11 +5,8 @@
       "@/*": [
         "./src/*"
       ],
-      "@seniorpath/content": [
+      "@template/content": [
         "../../packages/content/src/index.ts"
-      ],
-      "@seniorpath/theme": [
-        "../../packages/theme/src/retroui.css"
       ]
     }
   },

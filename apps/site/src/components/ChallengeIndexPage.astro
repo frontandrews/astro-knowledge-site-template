@@ -7,6 +7,8 @@ import DirectoryIndexShell from '@/components/ui/DirectoryIndexShell.astro'
 import InfoPanel from '@/components/ui/InfoPanel.astro'
 import { getChallengeLevelLabel, sortChallenges } from '@/lib/challenge-meta'
 import { getChallengeHrefFromEntry, getChallengeIndexHref } from '@/lib/challenge-links'
+import { resolveLocaleHrefMap } from '@/lib/locale-config'
+import { getPageTypeDescription, getPageTypeLabel } from '@/lib/section-manifest'
 import { getSiteCopy, type SiteLocale } from '@/lib/site-copy'
 
 type Props = {
@@ -16,6 +18,9 @@ type Props = {
 
 const { challenges, locale } = Astro.props
 const copy = getSiteCopy(locale)
+const title = getPageTypeLabel('challenges', locale)
+const description = getPageTypeDescription('challenges', locale)
+const localeHrefs = resolveLocaleHrefMap((supportedLocale) => getChallengeIndexHref(supportedLocale))
 const sortedChallenges = sortChallenges(challenges)
 const levelFilters = ['beginner', 'intermediate', 'advanced']
   .filter((level) => sortedChallenges.some((challenge) => challenge.data.level === level))
@@ -59,12 +64,11 @@ const items = sortedChallenges.map((challenge) => {
 ---
 
 <DirectoryIndexShell
-  description={copy.challengeIndex.copy}
-  englishHref={getChallengeIndexHref('en')}
+  description={description}
   icon={PuzzleIcon}
-  iconLabel={copy.challengeIndex.title}
-  portugueseHref={getChallengeIndexHref('pt-br')}
-  title={copy.challengeIndex.title}
+  iconLabel={title}
+  localeHrefs={localeHrefs}
+  title={title}
 >
   {items.length > 0 ? (
     <FilterableDirectory
@@ -74,7 +78,7 @@ const items = sortedChallenges.map((challenge) => {
       fewerFiltersLabel={copy.challengeIndex.showLess}
       items={items}
       client:load
-      kind="guide-rows"
+      layout="rows"
       moreFiltersLabel={copy.challengeIndex.more}
     />
   ) : (

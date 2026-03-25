@@ -1,0 +1,223 @@
+---
+import StaticArticlePage from '@/components/ui/StaticArticlePage.astro'
+import { getLegalContactLinks } from '@/lib/legal-contact'
+import {
+  getLegalGoverningLaw,
+  getLegalOperatorLocation,
+  getLegalOperatorName,
+  getLegalTemplateNotice,
+  getLegalVenue,
+  siteConfig,
+} from '@/lib/site-config'
+import { resolveLocaleHrefMap } from '@/lib/locale-config'
+import { getTermsHref } from '@/lib/terms-links'
+import { getSiteLocale, type SiteLocale } from '@/lib/site-copy'
+
+type Props = {
+  locale?: SiteLocale
+}
+
+const { locale: requestedLocale = 'en' } = Astro.props
+const locale = getSiteLocale(requestedLocale)
+const isPortuguese = locale === 'pt-br'
+const { legalEmail, supportEmail } = getLegalContactLinks()
+const contactEmails = [legalEmail, supportEmail].filter((email) => email !== null)
+const operatorName = getLegalOperatorName(locale)
+const operatorLocation = getLegalOperatorLocation(locale)
+const governingLaw = getLegalGoverningLaw(locale)
+const venue = getLegalVenue(locale)
+const templateNotice = getLegalTemplateNotice(locale)
+const localeHrefs = resolveLocaleHrefMap((supportedLocale) => getTermsHref(supportedLocale))
+---
+
+<StaticArticlePage
+  description={
+    isPortuguese
+      ? `Termos-base para uso de ${siteConfig.site.name} e dos recursos relacionados.`
+      : `Starter terms for using ${siteConfig.site.name} and related features.`
+  }
+  kicker="Legal"
+  localeHrefs={localeHrefs}
+  title={isPortuguese ? 'Termos de Uso' : 'Terms of Service'}
+>
+  <blockquote>
+    <p>
+      <strong>{isPortuguese ? 'Aviso de template.' : 'Template note.'}</strong> {templateNotice}
+    </p>
+  </blockquote>
+
+  {isPortuguese ? (
+    <>
+      <p>
+        Estes Termos de Uso sao um ponto de partida reutilizavel para projetos feitos com este
+        template. Eles regem o acesso a {siteConfig.site.name} e a qualquer conteudo, conta, download,
+        newsletter ou recurso de produto que o operador resolver habilitar.
+      </p>
+
+      <h2>Quem opera o site</h2>
+      <p>
+        {operatorName} opera {siteConfig.site.name} a partir de {operatorLocation}. Nestes termos, "nos"
+        se refere a esse operador e ao projeto construido sobre este template.
+      </p>
+
+      <h2>Uso aceitavel</h2>
+      <p>Voce so pode usar o site para fins licitos e sem prejudicar a plataforma ou outras pessoas.</p>
+      <ul>
+        <li>Nao interfira no site, na infraestrutura ou nos controles de seguranca</li>
+        <li>Nao faca scraping nem reutilize o conteudo de forma abusiva ou sem autorizacao</li>
+        <li>Nao envie spam, malware, material ilegal ou conteudo enganoso</li>
+        <li>Nao deturpe sua identidade nem sua relacao com empresa, marca ou organizacao</li>
+      </ul>
+
+      <h2>Contas e recursos opcionais</h2>
+      <p>
+        Algumas implementacoes podem adicionar contas, comentarios, assinaturas, pagamentos, downloads
+        ou outros recursos restritos. Quando esses recursos existirem, usuarios devem fornecer dados
+        corretos e manter suas credenciais seguras.
+      </p>
+
+      <h2>Conteudo e propriedade intelectual</h2>
+      <p>
+        Salvo indicacao em contrario, estrutura do site, design e conteudo original pertencem ao
+        operador ou aos seus licenciadores. Usuarios podem compartilhar links e citar trechos curtos
+        com atribuicao, mas reutilizacao maior depende da licenca ou das permissoes publicadas naquela
+        instalacao.
+      </p>
+
+      <h2>Sem aconselhamento profissional</h2>
+      <p>
+        Este template costuma ser usado em projetos editoriais ou educacionais. O conteudo publicado em
+        cima dele deve ser tratado como informacao geral, salvo quando o operador declarar algo mais
+        especifico.
+      </p>
+
+      <h2>Servicos de terceiros</h2>
+      <p>
+        Projetos criados a partir deste template podem depender de hospedagem, analytics, auth,
+        comentarios, email ou pagamentos. Esses provedores operam sob seus proprios termos e politicas.
+      </p>
+
+      <h2>Disponibilidade e mudancas</h2>
+      <p>
+        O operador pode atualizar, pausar, renomear, limitar ou encerrar partes do site a qualquer
+        momento. Estes termos tambem podem mudar conforme o produto ou as exigencias legais mudarem.
+      </p>
+
+      <h2>Isencao e limitacao de responsabilidade</h2>
+      <p>
+        O site pode ser fornecido "como esta" e "conforme disponivel" na maior extensao permitida por
+        lei. Revise e adapte esta clausula para a jurisdicao, o modelo de negocio e o risco real do
+        projeto antes do lancamento.
+      </p>
+
+      <h2>Lei aplicavel e foro</h2>
+      <p>
+        Este documento-base assume que disputas sao regidas por {governingLaw} e tratadas em {venue}.
+        Troque esta secao pela lei, pelo foro e pelas regras obrigatorias de consumo que realmente se
+        aplicam a sua operacao.
+      </p>
+
+      {contactEmails.length > 0 ? (
+        <>
+          <h2>Contato</h2>
+          <p>
+            Para notificacoes juridicas ou duvidas de suporte relacionadas a estes termos, entre em
+            contato por{' '}
+            {contactEmails.map((email, index) => (
+              <>
+                {index > 0 ? (index === contactEmails.length - 1 ? ' ou ' : ', ') : null}
+                <a href={email.href}>{email.value}</a>
+              </>
+            ))}
+            .
+          </p>
+        </>
+      ) : null}
+    </>
+  ) : (
+    <>
+      <p>
+        These Terms of Service are a reusable starting point for projects built on this template. They
+        govern access to {siteConfig.site.name} and to any content, accounts, downloads, newsletters, or
+        product features the operator decides to enable.
+      </p>
+
+      <h2>Who operates the site</h2>
+      <p>
+        {operatorName} operates {siteConfig.site.name} from {operatorLocation}. In these terms, "we" refers
+        to that operator and the project built on this template.
+      </p>
+
+      <h2>Acceptable use</h2>
+      <p>You may use the site only for lawful purposes and in a way that does not harm the platform or other users.</p>
+      <ul>
+        <li>Do not interfere with the site, its infrastructure, or its security controls</li>
+        <li>Do not scrape or reuse the content in abusive or unauthorized ways</li>
+        <li>Do not upload spam, malware, unlawful material, or deceptive content</li>
+        <li>Do not misrepresent your identity or your relationship with a company or brand</li>
+      </ul>
+
+      <h2>Accounts and optional features</h2>
+      <p>
+        Some deployments may add accounts, comments, subscriptions, payments, downloads, or other
+        gated features. When those features exist, users must provide accurate information and keep
+        their credentials secure.
+      </p>
+
+      <h2>Content and intellectual property</h2>
+      <p>
+        Unless stated otherwise, the site structure, design, and original content belong to the
+        operator or its licensors. Users may share links and quote limited excerpts with attribution,
+        but broader reuse depends on the license or permissions published for that deployment.
+      </p>
+
+      <h2>No professional advice</h2>
+      <p>
+        This template is commonly used for editorial or educational projects. Content published on top
+        of it should be treated as general information unless the operator clearly states otherwise.
+      </p>
+
+      <h2>Third-party services</h2>
+      <p>
+        Projects built from this template may rely on providers such as hosting, analytics, auth,
+        comments, email, or payments. Those providers operate under their own terms and policies.
+      </p>
+
+      <h2>Availability and changes</h2>
+      <p>
+        The operator may update, pause, rename, limit, or discontinue parts of the site at any time.
+        These terms may also change as the product or legal requirements change.
+      </p>
+
+      <h2>Disclaimer and limitation of liability</h2>
+      <p>
+        The site may be provided on an "as is" and "as available" basis to the maximum extent allowed
+        by law. Review and adapt this clause to match the jurisdiction, business model, and actual risk
+        profile of the project before launch.
+      </p>
+
+      <h2>Governing law and venue</h2>
+      <p>
+        This starter document assumes that disputes are governed by {governingLaw} and handled in {venue}.
+        Replace this section with the real law, forum, and mandatory consumer rules that apply to your
+        operation.
+      </p>
+
+      {contactEmails.length > 0 ? (
+        <>
+          <h2>Contact</h2>
+          <p>
+            For legal notices or support questions related to these terms, contact{' '}
+            {contactEmails.map((email, index) => (
+              <>
+                {index > 0 ? (index === contactEmails.length - 1 ? ' or ' : ', ') : null}
+                <a href={email.href}>{email.value}</a>
+              </>
+            ))}
+            .
+          </p>
+        </>
+      ) : null}
+    </>
+  )}
+</StaticArticlePage>

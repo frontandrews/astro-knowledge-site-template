@@ -1,0 +1,117 @@
+{
+  "sections": [
+    {
+      "id": "articles",
+      "pageType": "articles",
+      "enabled": true,
+      "order": 10,
+      "sourceDir": "collections/articles",
+      "routes": {
+        "en": "articles",
+        "pt-br": "artigos"
+      },
+      "labels": {
+        "en": "Articles",
+        "pt-br": "Artigos"
+      },
+      "descriptions": {
+        "en": "Starter articles that show how to adapt the shell after the first clone.",
+        "pt-br": "Artigos iniciais que mostram como adaptar a shell depois do primeiro clone."
+      }
+    },
+    {
+      "id": "tracks",
+      "pageType": "tracks",
+      "enabled": true,
+      "order": 20,
+      "sourceDir": "collections/roadmaps",
+      "routes": {
+        "en": "tracks",
+        "pt-br": "trilhas"
+      },
+      "labels": {
+        "en": "Tracks",
+        "pt-br": "Trilhas"
+      },
+      "descriptions": {
+        "en": "A minimal guided route powered by the bundled starter article.",
+        "pt-br": "Uma trilha minima guiada pelo artigo inicial incluido no template."
+      }
+    },
+    {
+      "id": "topics",
+      "pageType": "topics",
+      "enabled": true,
+      "order": 30,
+      "routes": {
+        "en": "topics",
+        "pt-br": "topicos"
+      },
+      "labels": {
+        "en": "Topics",
+        "pt-br": "Topicos"
+      },
+      "descriptions": {
+        "en": "Topic pages derived from the starter article taxonomy.",
+        "pt-br": "Paginas de topicos derivadas da taxonomia do artigo inicial."
+      }
+    },
+    {
+      "id": "concepts",
+      "pageType": "concepts",
+      "enabled": true,
+      "order": 40,
+      "sourceDir": "collections/concepts",
+      "routes": {
+        "en": "concepts",
+        "pt-br": "conceitos"
+      },
+      "labels": {
+        "en": "Concepts",
+        "pt-br": "Conceitos"
+      },
+      "descriptions": {
+        "en": "Reference entries that explain the content contract used by the shell.",
+        "pt-br": "Entradas de referencia que explicam o contrato de conteudo usado pela shell."
+      }
+    },
+    {
+      "id": "glossary",
+      "pageType": "glossary",
+      "enabled": true,
+      "order": 50,
+      "sourceDir": "collections/glossary",
+      "routes": {
+        "en": "glossary",
+        "pt-br": "glossario"
+      },
+      "labels": {
+        "en": "Glossary",
+        "pt-br": "Glossario"
+      },
+      "descriptions": {
+        "en": "Short starter definitions for the bundled setup.",
+        "pt-br": "Definicoes curtas para o setup inicial incluido no template."
+      }
+    },
+    {
+      "id": "challenges",
+      "pageType": "challenges",
+      "enabled": true,
+      "order": 60,
+      "sourceDir": "collections/challenges",
+      "routes": {
+        "en": "challenges",
+        "pt-br": "desafios"
+      },
+      "labels": {
+        "en": "Challenges",
+        "pt-br": "Desafios"
+      },
+      "descriptions": {
+        "en": "A tiny practice problem to validate the interactive playground.",
+        "pt-br": "Um desafio pequeno para validar o playground interativo."
+      }
+    }
+  ]
+}

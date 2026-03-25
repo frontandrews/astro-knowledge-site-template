@@ -35,25 +35,25 @@ export const filterChipVariants = cva(
 
 export const directoryListVariants = cva('', {
   variants: {
-    kind: {
-      'guide-rows': ui.linearList,
-      'title-cards': ui.titleCardList,
+    layout: {
+      rows: ui.linearList,
+      cards: ui.titleCardList,
     },
   },
   defaultVariants: {
-    kind: 'title-cards',
+    layout: 'cards',
   },
 })
 
 export const directoryLinkVariants = cva('', {
   variants: {
-    kind: {
-      'guide-rows': ui.linearCardInteractive,
-      'title-cards': ui.titleCardLink,
+    layout: {
+      rows: ui.linearCardInteractive,
+      cards: ui.titleCardLink,
     },
   },
   defaultVariants: {
-    kind: 'title-cards',
+    layout: 'cards',
   },
 })
 
@@ -135,36 +135,5 @@ export const eyebrowVariants = cva('', {
   },
   defaultVariants: {
     tone: 'caps',
-  },
-})
-
-export const guideTreeItemVariants = cva('grid', {
-  variants: {
-    depth: {
-      0: '',
-      1: 'pl-4',
-      2: 'pl-5',
-    },
-  },
-  defaultVariants: {
-    depth: 0,
-  },
-})
-
-export const guideTreeLabelVariants = cva('m-0', {
-  variants: {
-    depth: {
-      0: 'font-head text-[1.2rem] font-black tracking-[-0.02em] text-site-ink lg:text-[1.35rem]',
-      1: 'text-base font-bold tracking-[0.01em] text-site-ink lg:text-[1.08rem]',
-      2: 'text-[0.82rem] font-bold uppercase tracking-[0.18em] text-site-line-strong lg:text-[0.9rem]',
-    },
-    interactive: {
-      false: '',
-      true: 'transition-colors duration-150 hover:text-site-link-hover',
-    },
-  },
-  defaultVariants: {
-    depth: 0,
-    interactive: false,
   },
 })

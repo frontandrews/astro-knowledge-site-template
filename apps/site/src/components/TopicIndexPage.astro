@@ -4,56 +4,60 @@ import TagsIcon from '@lucide/astro/icons/tags'
 
 import FilterableDirectory from '@/components/FilterableDirectory.svelte'
 import DirectoryIndexShell from '@/components/ui/DirectoryIndexShell.astro'
+import { getArticleHrefFromEntry } from '@/lib/article-links'
+import { sortArticlesByRecency } from '@/lib/article-tree'
 import { formatEditorialDate } from '@/lib/format-date'
-import { getGuideHrefFromEntry } from '@/lib/guide-links'
-import { sortGuidesByRecency } from '@/lib/guide-tree'
+import { resolveLocaleHrefMap } from '@/lib/locale-config'
+import { getPageTypeDescription, getPageTypeLabel } from '@/lib/section-manifest'
 import { getSiteCopy, type SiteLocale } from '@/lib/site-copy'
 import { siteStorageKeys } from '@/lib/storage-keys'
 import { getTopicIndexHref } from '@/lib/topic-links'
-import { getLocalizedGuideTopics, getOrderedAvailableTopicFilters } from '@/lib/topic-taxonomy'
+import { getLocalizedArticleTopics, getOrderedAvailableTopicFilters } from '@/lib/topic-taxonomy'
 
 type Props = {
   locale: SiteLocale
-  posts: CollectionEntry<'guides'>[]
+  posts: CollectionEntry<'articles'>[]
 }
 
 const { locale, posts } = Astro.props
 const copy = getSiteCopy(locale)
+const title = getPageTypeLabel('topics', locale)
+const description = getPageTypeDescription('topics', locale)
+const localeHrefs = resolveLocaleHrefMap((supportedLocale) => getTopicIndexHref(supportedLocale))
 const dateLocale = locale === 'pt-br' ? 'pt-BR' : 'en-US'
-const sortedPosts = sortGuidesByRecency(posts)
+const sortedPosts = sortArticlesByRecency(posts)
 const availableFilters = getOrderedAvailableTopicFilters(sortedPosts, locale)
 const items = sortedPosts.map((post) => ({
-  badgeLabel: post.data.kind === 'article' ? copy.directory.noteBadge : undefined,
+  badgeLabel: post.data.kind === 'note' ? copy.directory.noteBadge : undefined,
   completedCtaLabel: copy.directory.readAgain,
-  completionId: post.data.guideId,
+  completionId: post.data.articleId,
   contentKind: post.data.kind,
   ctaLabel: copy.directory.readMore,
   description: post.data.description,
   eyebrow: formatEditorialDate(post.data.pubDate, dateLocale),
-  href: getGuideHrefFromEntry(post),
-  tags: getLocalizedGuideTopics(post).map(({ id, label }) => ({ id, label })),
+  href: getArticleHrefFromEntry(post),
+  tags: getLocalizedArticleTopics(post).map(({ id, label }) => ({ id, label })),
   title: post.data.title,
 }))
 ---
 
 <DirectoryIndexShell
-  description={copy.topicIndex.copy}
-  englishHref={getTopicIndexHref('en')}
+  description={description}
   icon={TagsIcon}
-  iconLabel={copy.topicIndex.title}
-  portugueseHref={getTopicIndexHref('pt-br')}
-  title={copy.topicIndex.title}
+  iconLabel={title}
+  localeHrefs={localeHrefs}
+  title={title}
 >
   <FilterableDirectory
     allItemsLabel={copy.directory.allItems}
     articleItemsLabel={copy.directory.articleItems}
     availableFilters={availableFilters}
-    completionStorageKey={siteStorageKeys.completedGuides}
+    completionStorageKey={siteStorageKeys.completedArticles}
     filterLabel={copy.directory.filterByTopic}
     filterQueryKey="topic"
-    guideItemsLabel={copy.directory.guideItems}
     items={items}
     client:load
-    kind="guide-rows"
+    layout="rows"
+    noteItemsLabel={copy.directory.noteItems}
   />
 </DirectoryIndexShell>

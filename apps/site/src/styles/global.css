@@ -1,4 +1,3 @@
-@import "@seniorpath/theme/retroui.css";
 @import "tailwindcss";
 
 :root {
@@ -93,6 +92,10 @@
   --article-body-color: rgba(224, 224, 255, 0.82);
   --article-rule: rgba(124, 124, 255, 0.16);
   --article-surface: color-mix(in srgb, rgba(15, 52, 96, 0.1) 96%, #f3f5f8);
+  --article-inline-code-bg: color-mix(in srgb, var(--site-surface-strong) 54%, rgba(11, 17, 32, 0.82));
+  --article-inline-code-border: color-mix(in srgb, var(--site-link-hover) 24%, rgba(245, 247, 255, 0.14));
+  --article-inline-code-ink: color-mix(in srgb, var(--site-base-ink-bright) 72%, var(--site-link-hover) 28%);
+  --article-inline-code-shadow: inset 0 1px 0 rgba(245, 247, 255, 0.08);
   --article-link: color-mix(in srgb, var(--site-link-hover) 76%, var(--site-surface-strong));
   --article-link-hover: var(--site-base-ink-bright);
   --radius-xs: 8px;
@@ -284,6 +287,29 @@ pre {
     color: inherit;
   }
 
+  .article-prose :not(pre) > code {
+    background: var(--article-inline-code-bg);
+    border: 1px solid var(--article-inline-code-border);
+    border-radius: 0.45rem;
+    box-shadow: var(--article-inline-code-shadow);
+    color: var(--article-inline-code-ink);
+    font-size: 0.92em;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+    padding: 0.08rem 0.42rem 0.14rem;
+  }
+
+  .article-prose pre code {
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    color: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    padding: 0;
+  }
+
   .article-prose a {
     @apply text-article-link underline decoration-site-line-strong underline-offset-2 transition-colors duration-150;
   }
@@ -358,42 +384,42 @@ pre {
     background: var(--site-progress-fill);
   }
 
-  [data-guide-post].is-complete {
+  [data-article-post].is-complete {
     border-color: color-mix(in srgb, var(--site-line) 88%, rgba(255, 255, 255, 0.12));
     background: color-mix(in srgb, var(--site-surface) 18%, transparent);
     opacity: 0.7;
   }
 
-  [data-guide-post]:not(.is-complete) [data-card-title] {
+  [data-article-post]:not(.is-complete) [data-card-title] {
     color: var(--site-link-hover);
   }
 
-  [data-guide-post].is-complete [data-card-title] {
+  [data-article-post].is-complete [data-card-title] {
     color: var(--site-ink-soft);
   }
 
-  [data-guide-post] [data-guide-post-complete-badge] {
+  [data-article-post] [data-article-post-complete-badge] {
     opacity: 0;
   }
 
-  [data-guide-post].is-complete [data-guide-post-complete-badge] {
+  [data-article-post].is-complete [data-article-post-complete-badge] {
     opacity: 1;
   }
 
   @media (min-width: 48rem) {
-    [data-guide-post].is-complete [data-guide-post-default-cta] {
+    [data-article-post].is-complete [data-article-post-default-cta] {
       opacity: 0;
       transform: translateX(0.25rem);
     }
 
-    [data-guide-post].is-complete:hover [data-guide-post-complete-badge],
-    [data-guide-post].is-complete:focus-within [data-guide-post-complete-badge] {
+    [data-article-post].is-complete:hover [data-article-post-complete-badge],
+    [data-article-post].is-complete:focus-within [data-article-post-complete-badge] {
       opacity: 0;
       transform: scale(0.9);
     }
 
-    [data-guide-post].is-complete:hover [data-guide-post-complete-text],
-    [data-guide-post].is-complete:focus-within [data-guide-post-complete-text] {
+    [data-article-post].is-complete:hover [data-article-post-complete-text],
+    [data-article-post].is-complete:focus-within [data-article-post-complete-text] {
       opacity: 1;
       transform: translateX(0);
       color: var(--site-link-hover);
