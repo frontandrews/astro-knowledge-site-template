@@ -128,6 +128,10 @@ export function getSyncedContentRoot() {
   return syncedContentRoot
 }
 
+export function getStarterContentRoot() {
+  return starterContentRoot
+}
+
 export function getSyncedCollectionDir(collection) {
   return path.join(syncedContentRoot, collection)
 }
@@ -136,19 +140,23 @@ export function getSyncedSectionManifestPath() {
   return path.join(syncedContentRoot, 'sections.manifest.mjs')
 }
 
-export async function resolveContentRoot({ requireConfigured = false } = {}) {
+export async function resolveContentRoot({ requireConfigured = false, requireExternal = false } = {}) {
   const config = await readContentSourceConfig()
   const configuredContentRoot = normalizePath(process.env.SITE_CONTENT_DIR ?? config.contentRoot)
 
   if (configuredContentRoot) {
+    if (requireExternal && path.resolve(configuredContentRoot) === path.resolve(starterContentRoot)) {
+      return null
+    }
+
     return configuredContentRoot
   }
 
-  if (await pathExists(starterContentRoot)) {
+  if (!requireExternal && (await pathExists(starterContentRoot))) {
     return starterContentRoot
   }
 
-  if (!requireConfigured && (await pathExists(legacyLocalFallbackContentRoot))) {
+  if (!requireConfigured && !requireExternal && (await pathExists(legacyLocalFallbackContentRoot))) {
     return legacyLocalFallbackContentRoot
   }
 

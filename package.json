@@ -1,7 +1,7 @@
 {
   "name": "astro-knowledge-site-template",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.3.0",
   "packageManager": "pnpm@10.32.0",
   "scripts": {
     "build": "pnpm build:site",
@@ -9,14 +9,21 @@
     "content:sync": "pnpm --filter @template/site content:sync",
     "dev": "pnpm dev:site",
     "dev:site": "pnpm --filter @template/site dev",
+    "docs:smoke": "node ./scripts/docs-smoke.mjs",
+    "init:content-repo": "node ./scripts/init-content-repo.mjs",
     "init:template": "node ./scripts/init-template.mjs",
     "preview": "pnpm preview:site",
     "preview:site": "pnpm --filter @template/site preview",
+    "smoke:external": "node ./scripts/smoke-external.mjs",
+    "smoke:starter": "pnpm init:template && pnpm verify:starter",
     "style:guard": "pnpm --filter @template/site style:guard",
     "tailwind:canonical": "pnpm --filter @template/site tailwind:canonical",
     "tailwind:canonical:fix": "pnpm --filter @template/site tailwind:canonical:fix",
     "typecheck:site": "pnpm --filter @template/site check",
     "typecheck": "pnpm typecheck:site",
-    "verify": "pnpm style:guard && pnpm tailwind:canonical && pnpm typecheck:site && pnpm build:site"
+    "verify": "pnpm verify:starter",
+    "verify:core": "pnpm style:guard && pnpm tailwind:canonical && pnpm typecheck:site && pnpm build:site",
+    "verify:external": "node ./scripts/verify-external.mjs && pnpm verify:core",
+    "verify:starter": "node ./scripts/run-with-content-root.mjs ./examples/starter-content pnpm verify:core"
   }
 }
