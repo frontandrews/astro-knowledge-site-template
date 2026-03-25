@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Public roadmap
+    url: https://github.com/frontandrews/astro-knowledge-site-template/issues/1
+    about: See what is already planned before opening a broad product request.
+  - name: Showcase / built with this template
+    url: https://github.com/frontandrews/astro-knowledge-site-template/issues/2
+    about: Share sites, forks, and experiments built from this template.

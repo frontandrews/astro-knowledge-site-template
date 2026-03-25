@@ -1,0 +1,40 @@
+name: Feature request
+description: Suggest an improvement for adoption, DX, or shell capabilities.
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      placeholder: What is missing or painful today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      placeholder: What would you like the template to do?
+    validations:
+      required: true
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use case
+      placeholder: Who benefits and how would they use it?
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Onboarding
+        - Content contract
+        - Branding
+        - Deployment
+        - Search
+        - Practice / challenges
+        - Docs
+        - Other
