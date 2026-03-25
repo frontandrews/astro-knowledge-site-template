@@ -6,12 +6,9 @@ coverage/
 .env
 .env.local
 .DS_Store
-/.local/
-/agents/
+/.local/*
+!/.local/content-source.example.json
 /data/
-/docs/career-playbook/
-/docs/design-system-interview/
-/docs/objetivos/
-/docs/cv-feedback.md
-/docs/cv-rewrite-v1.md
-/docs/product-plan.md
+/apps/site/.content/
+apps/site/.env
+apps/site/.env.local
