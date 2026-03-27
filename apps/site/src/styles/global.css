@@ -19,6 +19,7 @@
   --site-base-highlight-bg: #000;
   --site-base-highlight-ink: #fde047;
   --site-shadow-dropdown: 0 18px 60px rgba(5, 10, 20, 0.2);
+  --site-shadow-header: 0 18px 56px rgba(4, 6, 16, 0.24);
   --site-shadow-overlay: 0 24px 80px rgba(0, 0, 0, 0.28);
   --site-overlay-backdrop: color-mix(in srgb, var(--site-base-bg) 58%, transparent);
 
@@ -98,6 +99,8 @@
   --article-heading-color: var(--site-base-ink-bright);
   --article-copy-color: var(--site-base-ink);
   --article-body-color: rgb(192, 202, 245);
+  --article-excerpt-color: #a9b1d6;
+  --article-tag-tone-color: #565f89;
   --article-rule: rgba(124, 124, 255, 0.16);
   --article-surface: color-mix(in srgb, rgba(15, 52, 96, 0.1) 96%, #f3f5f8);
   --article-inline-code-bg: color-mix(in srgb, var(--site-surface-strong) 54%, rgba(11, 17, 32, 0.82));
@@ -122,11 +125,13 @@
 
   --color-article-body: var(--article-body-color);
   --color-article-copy: var(--article-copy-color);
+  --color-article-excerpt: var(--article-excerpt-color);
   --color-article-heading: var(--article-heading-color);
   --color-article-link: var(--article-link);
   --color-article-link-hover: var(--article-link-hover);
   --color-article-rule: var(--article-rule);
   --color-article-surface: var(--article-surface);
+  --color-article-tag-tone: var(--article-tag-tone-color);
   --color-site-accent: var(--site-accent);
   --color-site-accent-soft: var(--site-accent-soft);
   --color-site-bg: var(--site-bg);

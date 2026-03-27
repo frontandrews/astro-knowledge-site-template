@@ -7,8 +7,8 @@ const shareLabel = 'm-0 text-[0.8rem] font-medium uppercase tracking-[0.22em] te
 
 export const uiTypography = {
   articleBylineName: 'm-0 font-sans font-bold text-article-heading',
-  articleExcerpt: 'm-0 mt-3 max-w-[60ch] text-[1.02rem] leading-[1.7] text-[#a9b1d6] lg:text-[1.15rem]',
-  articleHeaderTagTone: 'text-[0.75rem] leading-6 tracking-[0.04em] text-[#565f89]',
+  articleExcerpt: 'm-0 mt-3 max-w-[60ch] text-[1.02rem] leading-[1.7] text-article-excerpt lg:text-[1.15rem]',
+  articleHeaderTagTone: 'text-[0.75rem] leading-6 tracking-[0.04em] text-article-tag-tone',
   articleKicker: metaQuiet,
   articleMeta: 'm-0 text-sm leading-6 text-article-body lg:text-[0.96rem]',
   articleMetaSubtle: metaQuiet,

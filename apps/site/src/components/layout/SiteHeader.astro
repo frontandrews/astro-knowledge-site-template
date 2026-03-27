@@ -97,7 +97,7 @@ const headerBackdropClass =
 <header class="sticky top-0 z-30 mb-5 bg-transparent">
   <div class={cn(ui.frame, 'relative pb-1.5 pt-3 nav:pb-2.5 nav:pt-3')}>
     <div class={headerBackdropClass}></div>
-    <div class="relative z-10 flex items-center justify-between gap-3 rounded-[1.4rem] border border-site-line/80 bg-[color-mix(in_srgb,var(--site-panel)_84%,transparent)] px-4 py-2.5 shadow-[0_18px_56px_rgba(4,6,16,0.24)] backdrop-blur-xl nav:gap-4 nav:px-5 nav:py-3 lg:px-6 lg:py-3.5">
+    <div class="relative z-10 flex items-center justify-between gap-3 rounded-[1.4rem] border border-site-line/80 bg-[color-mix(in_srgb,var(--site-panel)_84%,transparent)] px-4 py-2.5 shadow-(--site-shadow-header) backdrop-blur-xl nav:gap-4 nav:px-5 nav:py-3 lg:px-6 lg:py-3.5">
       <a class={brandLinkClass} href={homeHref}>
         <span class={brandIconWrapClass}>
           <BrandIcon className={brandIconClass} />
