@@ -10,10 +10,12 @@ const articleFixtureCount = 25
 
 function buildArticleFixture({
   articleId,
+  branchId = 'first-clone',
   date,
   description,
   fileSlug,
   locale,
+  order = 100,
   pathLabels,
   summary,
   title,
@@ -27,7 +29,7 @@ category: Template
 kind: article
 level: beginner
 locale: ${locale}
-order: 100
+order: ${order}
 path:
   - ${pathLabels[0]}
   - ${pathLabels[1]}
@@ -56,12 +58,78 @@ topicIds:
   - delivery
 trackEligible: false
 pillarId: foundations
-branchId: first-clone
+branchId: ${branchId}
 pubDate: ${date}
 ---
 ## ${title}
 
 This article is generated only for local e2e pagination coverage.
+`
+}
+
+function buildRecommendationFixture({
+  articleId,
+  description,
+  fileSlug,
+  order,
+  relationships,
+  summary,
+  title,
+  topicIds,
+}) {
+  const relationshipLines = relationships.length > 0
+    ? relationships.map((relationship) => `  - ${relationship}`).join('\n')
+    : '  []'
+  const topicLines = topicIds.length > 0
+    ? topicIds.map((topicId) => `  - ${topicId}`).join('\n')
+    : '  - delivery'
+
+  return `---
+articleId: ${articleId}
+title: ${title}
+description: ${description}
+summary: ${summary}
+category: Template
+kind: article
+level: beginner
+locale: en
+order: ${order}
+path:
+  - Starter
+  - Next steps
+practiceChecklist:
+  - Validate next-step recommendation ordering in e2e.
+relationships:
+${relationshipLines}
+relatedDeckIds: []
+readiness:
+  draft_complete: true
+  examples_added: true
+  interview_angle: false
+  language_simple: true
+  practice_items_filled: true
+  reasoning_complete: true
+  relationships_set: true
+  senior_layer: true
+  takeaways_filled: true
+  voice_human: true
+status: active
+takeaways:
+  - Generated next-step recommendation fixture ${fileSlug}.
+tags:
+  - test
+  - next-step
+topicIds:
+${topicLines}
+trackEligible: false
+pillarId: foundations
+branchId: ${fileSlug}
+pubDate: 2026-03-01
+updatedDate: 2026-03-02
+---
+## ${title}
+
+This article is generated only for local e2e recommendation coverage.
 `
 }
 
@@ -109,6 +177,53 @@ async function populatePaginationFixtures(contentRoot) {
   }
 }
 
+async function populateRecommendationFixtures(contentRoot) {
+  const enDir = path.join(contentRoot, 'collections', 'articles', 'en', 'foundations')
+
+  await mkdir(enDir, { recursive: true })
+
+  const fixtures = [
+    {
+      articleId: 'next-step-root',
+      description: 'Starter e2e fixture that should promote the next unread related article.',
+      fileSlug: 'next-step-root',
+      order: 70,
+      relationships: ['next-step-estimation', 'next-step-communication'],
+      summary: 'A root article for testing progress-aware next-step recommendations.',
+      title: 'Next Step Root',
+      topicIds: ['delivery'],
+    },
+    {
+      articleId: 'next-step-estimation',
+      description: 'Starter e2e fixture that should be skipped once it is already completed.',
+      fileSlug: 'next-step-estimation',
+      order: 71,
+      relationships: ['next-step-communication'],
+      summary: 'The first related article for next-step recommendation coverage.',
+      title: 'Next Step Estimation',
+      topicIds: ['delivery'],
+    },
+    {
+      articleId: 'next-step-communication',
+      description: 'Starter e2e fixture that becomes the next step after estimation is done.',
+      fileSlug: 'next-step-communication',
+      order: 72,
+      relationships: [],
+      summary: 'The fallback related article for next-step recommendation coverage.',
+      title: 'Next Step Communication',
+      topicIds: ['leadership'],
+    },
+  ]
+
+  for (const fixture of fixtures) {
+    await writeFile(
+      path.join(enDir, `${fixture.fileSlug}.md`),
+      buildRecommendationFixture(fixture),
+      'utf8',
+    )
+  }
+}
+
 const tempRoot = await mkdtemp(path.join(os.tmpdir(), 'seniorpath-e2e-content-'))
 const contentRoot = path.join(tempRoot, 'content')
 let cleanedUp = false
@@ -143,6 +258,7 @@ process.on('SIGTERM', () => {
 try {
   await cp(starterContentRoot, contentRoot, { recursive: true })
   await populatePaginationFixtures(contentRoot)
+  await populateRecommendationFixtures(contentRoot)
 
   child = spawn('pnpm', ['--filter', '@template/site', 'dev', '--host', '127.0.0.1', '--port', '4173'], {
     cwd: repoRoot,

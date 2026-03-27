@@ -32,6 +32,17 @@ describe('article progress helpers', () => {
     expect(readCompletedArticles()).toEqual([])
   })
 
+  it('degrades safely when browser storage is blocked', () => {
+    const localStorageSpy = vi.spyOn(window, 'localStorage', 'get').mockImplementation(() => {
+      throw new Error('storage blocked')
+    })
+
+    expect(writeCompletedArticles(['article-4'])).toBe(false)
+    expect(readCompletedArticles()).toEqual([])
+
+    localStorageSpy.mockRestore()
+  })
+
   it('subscribes to progress changes and storage sync', () => {
     const listener = vi.fn()
     const unsubscribe = subscribeToCompletedArticles(listener)

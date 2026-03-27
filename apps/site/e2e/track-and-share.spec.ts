@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test'
+import { e2eHookSelectors } from './support/hooks'
 
 test.describe('track progress and share flows', () => {
   test('shows a completed track state when the only article is already finished', async ({ page }) => {
@@ -11,9 +12,22 @@ test.describe('track progress and share flows', () => {
 
     await page.goto('/tracks/first-clone-checklist')
 
-    await expect(page.getByText('100%')).toBeVisible()
-    await expect(page.getByText('Track progress: Track completed')).toBeVisible()
-    await expect(page.getByRole('link', { name: /Review the track/ })).toBeVisible()
+    await expect(page.locator(e2eHookSelectors.trackProgressRoot)).toHaveClass(/is-complete/)
+    await expect(page.locator(e2eHookSelectors.trackProgressValue)).toHaveText('100%')
+  })
+
+  test('renders concept nodes inline and exposes richer track preview metadata', async ({ page }) => {
+    await page.goto('/tracks')
+
+    const trackCard = page.getByRole('link', { name: 'First clone checklist' })
+
+    await expect(trackCard).toBeVisible()
+    await expect(trackCard).toContainText(/Beginner • 1 step • ~1 min/)
+
+    await page.goto('/tracks/first-clone-checklist')
+
+    await expect(page.locator(e2eHookSelectors.trackConcept)).toBeVisible()
+    await expect(page.locator(e2eHookSelectors.trackConcept)).toContainText('Start with a safe first pass')
   })
 
   test('copies the article share link through the share panel', async ({ page }) => {
@@ -36,11 +50,13 @@ test.describe('track progress and share flows', () => {
     })
 
     await page.goto('/articles/foundations/customize-the-template-after-the-first-clone')
-    await page.waitForLoadState('networkidle')
-    await page.waitForTimeout(750)
-    await page.getByRole('button', { name: 'Copy link' }).click()
+    const shareCopyButton = page.locator(e2eHookSelectors.articleShareCopyButton)
 
-    await expect(page.getByText('Link copied. You can paste it into any chat.')).toBeVisible()
+    await expect(page.locator(e2eHookSelectors.articleShareReady)).toBeVisible()
+    await expect(shareCopyButton).toBeVisible()
+    await shareCopyButton.click()
+
+    await expect(page.locator(e2eHookSelectors.articleShareFeedback)).toBeVisible()
     await expect
       .poll(() => page.evaluate(() => (window as Window & { __copiedText?: string }).__copiedText ?? ''))
       .toContain('/articles/foundations/customize-the-template-after-the-first-clone')

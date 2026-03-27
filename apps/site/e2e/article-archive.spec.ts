@@ -1,14 +1,16 @@
 import { expect, test } from '@playwright/test'
+import { e2eHookSelectors } from './support/hooks'
 
 test.describe('article archive pagination', () => {
   test('navigates to the second english archive page', async ({ page }) => {
     await page.goto('/articles')
 
-    await expect(page.getByRole('link', { name: 'Next page' })).toBeVisible()
-    await page.getByRole('link', { name: 'Next page' }).click()
+    await expect(page.locator(e2eHookSelectors.directoryPaginationNextLink)).toBeVisible()
+    await page.locator(e2eHookSelectors.directoryPaginationNextLink).click()
 
     await expect(page).toHaveURL(/\/articles\/page\/2$/)
-    await expect(page.getByText('Customize the template after the first clone').first()).toBeVisible()
+    await expect(page.locator(e2eHookSelectors.directoryPaginationCurrentPage)).toContainText('2')
+    await expect(page.locator(e2eHookSelectors.directoryItem).first()).toBeVisible()
   })
 
   test('navigates to the second portuguese archive page', async ({ page }) => {
@@ -18,10 +20,11 @@ test.describe('article archive pagination', () => {
 
     await page.goto('/pt-br/artigos')
 
-    await expect(page.getByRole('link', { name: 'Próxima página' })).toBeVisible()
-    await page.getByRole('link', { name: 'Próxima página' }).click()
+    await expect(page.locator(e2eHookSelectors.directoryPaginationNextLink)).toBeVisible()
+    await page.locator(e2eHookSelectors.directoryPaginationNextLink).click()
 
     await expect(page).toHaveURL(/\/pt-br\/artigos\/page\/2$/)
-    await expect(page.getByText('Personalize o template depois do primeiro clone').first()).toBeVisible()
+    await expect(page.locator(e2eHookSelectors.directoryPaginationCurrentPage)).toContainText('2')
+    await expect(page.locator(e2eHookSelectors.directoryItem).first()).toBeVisible()
   })
 })

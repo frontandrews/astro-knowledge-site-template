@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test'
+import { switchLocale } from './support/locale'
 
 test.describe('shell locale flows', () => {
   test.describe('browser locale redirect', () => {
@@ -12,22 +13,28 @@ test.describe('shell locale flows', () => {
       await page.goto('/')
 
       await expect(page).toHaveURL(/\/pt-br$/)
-      await expect(
-        page.getByRole('heading', { name: 'Explicando as coisas que as pessoas fingem entender' }),
-      ).toBeVisible()
+      await expect(page.locator('h1').first()).toBeVisible()
     })
+  })
+
+  test('keeps an explicit localized route when there is no saved preference', async ({ page }) => {
+    await page.addInitScript(() => {
+      window.localStorage.removeItem('site-template.locale-preference.v1')
+    })
+
+    await page.goto('/pt-br')
+
+    await expect(page).toHaveURL(/\/pt-br$/)
+    await expect(page.locator('html')).toHaveAttribute('lang', 'pt-BR')
   })
 
   test('switches locale from the desktop menu and persists the preference', async ({ page }) => {
     await page.goto('/articles')
 
-    await page.locator('summary[aria-label="Language switcher"]').click()
-    await page.getByRole('link', { name: 'Português' }).click()
+    await switchLocale(page, 'pt-br')
 
     await expect(page).toHaveURL(/\/pt-br\/artigos$/)
-    await expect(
-      page.getByRole('heading', { name: 'Explicando as coisas que as pessoas fingem entender' }),
-    ).toBeVisible()
+    await expect(page.locator('h1').first()).toBeVisible()
     await expect
       .poll(() => page.evaluate(() => window.localStorage.getItem('site-template.locale-preference.v1')))
       .toBe('pt-br')

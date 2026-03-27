@@ -3,6 +3,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  getPagefindModulePath,
   getSearchResultGroupLabel,
   shouldCloseSearchWithShortcut,
   shouldOpenSearchWithShortcut,
@@ -18,6 +19,12 @@ describe('site search helpers', () => {
     expect(getSearchResultGroupLabel('/articles/example', sections, 'Pages')).toBe('Articles')
     expect(getSearchResultGroupLabel('/topics?page=2', sections, 'Pages')).toBe('Topics')
     expect(getSearchResultGroupLabel('/privacy', sections, 'Pages')).toBe('Pages')
+  })
+
+  it('builds the pagefind module path relative to the deploy base url', () => {
+    expect(getPagefindModulePath('/')).toBe('/pagefind/pagefind.js')
+    expect(getPagefindModulePath('/docs')).toBe('/docs/pagefind/pagefind.js')
+    expect(getPagefindModulePath('/docs/')).toBe('/docs/pagefind/pagefind.js')
   })
 
   it('opens with slash only outside editable targets', () => {
