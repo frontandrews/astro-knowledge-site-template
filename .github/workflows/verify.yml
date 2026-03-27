@@ -7,6 +7,43 @@ on:
   pull_request:
 
 jobs:
+  e2e-smoke:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.32.0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browser
+        run: pnpm --filter @template/site exec playwright install --with-deps chromium
+
+      - name: E2E and visual smoke
+        run: pnpm test:e2e:site
+
+      - name: Upload Playwright artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-artifacts
+          path: |
+            apps/site/playwright-report
+            apps/site/test-results
+          retention-days: 7
+
   starter-smoke:
     runs-on: ubuntu-latest
 
@@ -34,6 +71,9 @@ jobs:
       - name: Starter smoke
         run: pnpm verify:starter
 
+      - name: Performance smoke
+        run: pnpm perf:smoke
+
   external-smoke:
     runs-on: ubuntu-latest
 
@@ -57,6 +97,9 @@ jobs:
 
       - name: External smoke
         run: pnpm smoke:external
+
+      - name: Performance smoke
+        run: pnpm perf:smoke
 
   docs-smoke:
     runs-on: ubuntu-latest

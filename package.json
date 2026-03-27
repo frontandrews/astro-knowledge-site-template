@@ -6,14 +6,17 @@
   "scripts": {
     "build": "pnpm build:site",
     "build:site": "pnpm --filter @template/site build",
+    "content:drift": "node ./scripts/check-content-drift.mjs",
     "content:sync": "pnpm --filter @template/site content:sync",
     "dev": "pnpm dev:site",
     "dev:site": "pnpm --filter @template/site dev",
     "docs:smoke": "node ./scripts/docs-smoke.mjs",
     "init:content-repo": "node ./scripts/init-content-repo.mjs",
     "init:template": "node ./scripts/init-template.mjs",
+    "perf:smoke": "node ./scripts/performance-smoke.mjs && node ./scripts/html-critical-smoke.mjs",
     "preview": "pnpm preview:site",
     "preview:site": "pnpm --filter @template/site preview",
+    "scale:smoke": "node ./scripts/editorial-scale-smoke.mjs",
     "smoke:external": "node ./scripts/smoke-external.mjs",
     "smoke:starter": "pnpm init:template && pnpm verify:starter",
     "style:guard": "pnpm --filter @template/site style:guard",
@@ -24,7 +27,7 @@
     "typecheck:site": "pnpm --filter @template/site check",
     "typecheck": "pnpm typecheck:site",
     "verify": "pnpm verify:starter",
-    "verify:core": "pnpm style:guard && pnpm tailwind:canonical && pnpm typecheck:site && pnpm build:site",
+    "verify:core": "pnpm content:drift && pnpm style:guard && pnpm tailwind:canonical && pnpm typecheck:site && pnpm build:site",
     "verify:external": "node ./scripts/verify-external.mjs && pnpm verify:core",
     "verify:starter": "node ./scripts/run-with-content-root.mjs ./examples/starter-content pnpm verify:core"
   }

@@ -36,7 +36,7 @@ function getLocalizedText(value) {
 
 function assertSectionManifest(manifest) {
   if (!manifest || typeof manifest !== 'object' || !Array.isArray(manifest.sections)) {
-    throw new Error('Manifesto de secoes invalido: `sections` precisa ser um array.')
+    throw new Error('Invalid section manifest: `sections` must be an array.')
   }
 
   const seenPageTypes = new Set()
@@ -48,46 +48,46 @@ function assertSectionManifest(manifest) {
 
   for (const section of manifest.sections) {
     if (!section?.id || typeof section.id !== 'string') {
-      throw new Error('Manifesto de secoes invalido: cada secao precisa de `id`.')
+      throw new Error('Invalid section manifest: each section must define `id`.')
     }
 
     if (seenSectionIds.has(section.id)) {
-      throw new Error(`Manifesto de secoes invalido: id de secao duplicado (${section.id}).`)
+      throw new Error(`Invalid section manifest: duplicate section id (${section.id}).`)
     }
 
     seenSectionIds.add(section.id)
 
     if (!section?.pageType || typeof section.pageType !== 'string') {
-      throw new Error(`Manifesto de secoes invalido: secao ${section.id} precisa de \`pageType\`.`)
+      throw new Error(`Invalid section manifest: section ${section.id} must define \`pageType\`.`)
     }
 
     if (!SUPPORTED_PAGE_TYPES.includes(section.pageType)) {
       throw new Error(
-        `Manifesto de secoes invalido: secao ${section.id} usa pageType nao suportado (${section.pageType}).`,
+        `Invalid section manifest: section ${section.id} uses unsupported pageType (${section.pageType}).`,
       )
     }
 
     if (seenPageTypes.has(section.pageType)) {
       throw new Error(
-        `Manifesto de secoes invalido: pageType duplicado (${section.pageType}). O shell suporta uma secao por pageType.`,
+        `Invalid section manifest: duplicate pageType (${section.pageType}). The shell supports a single section per pageType.`,
       )
     }
 
     seenPageTypes.add(section.pageType)
 
     if (!getLocalizedText(section.routes)?.en || !getLocalizedText(section.routes)?.['pt-br']) {
-      throw new Error(`Manifesto de secoes invalido: secao ${section.id} precisa de rotas EN e PT-BR.`)
+      throw new Error(`Invalid section manifest: section ${section.id} must define EN and PT-BR routes.`)
     }
 
     if (!getLocalizedText(section.labels)?.en || !getLocalizedText(section.labels)?.['pt-br']) {
-      throw new Error(`Manifesto de secoes invalido: secao ${section.id} precisa de labels EN e PT-BR.`)
+      throw new Error(`Invalid section manifest: section ${section.id} must define EN and PT-BR labels.`)
     }
 
     for (const locale of ['en', 'pt-br']) {
       const route = section.routes[locale]
 
       if (seenRoutes[locale].has(route)) {
-        throw new Error(`Manifesto de secoes invalido: rota duplicada em ${locale} (${route}).`)
+        throw new Error(`Invalid section manifest: duplicate route in ${locale} (${route}).`)
       }
 
       seenRoutes[locale].add(route)

@@ -11,7 +11,7 @@ Use this when you want the bundled starter content only.
 Build command:
 
 ```bash
-pnpm verify:starter
+SITE_BUILD_TARGET=production pnpm verify:starter
 ```
 
 Build output directory:
@@ -19,6 +19,8 @@ Build output directory:
 ```text
 apps/site/dist
 ```
+
+`apps/site/dist/_headers` is generated automatically during build, so Cloudflare Pages can apply the baseline CSP, security headers, and cache policy directly from the published artifact.
 
 ## External content repo deployment
 
@@ -34,7 +36,7 @@ If your Pages project was created with Git integration first, disable automatic 
 Example shell-side build command:
 
 ```bash
-SITE_CONTENT_DIR=../your-content-repo pnpm verify:external
+SITE_BUILD_TARGET=production SITE_CONTENT_DIR=../your-content-repo pnpm verify:external
 ```
 
 Example workspace:
@@ -46,3 +48,5 @@ workspace/
 ```
 
 This keeps the template provider-neutral while still giving Cloudflare users a concrete path.
+
+If you add third-party origins such as analytics or custom APIs, extend the generated CSP with the `PUBLIC_CSP_*` env vars documented in [Deploy the template](./deploy.md).

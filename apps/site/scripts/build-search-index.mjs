@@ -1,11 +1,10 @@
 import { createIndex, close } from 'pagefind'
 import { readFile, readdir, rm } from 'node:fs/promises'
 import path from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 
 const siteRoot = fileURLToPath(new URL('..', import.meta.url))
-const distRoot = path.join(siteRoot, 'dist')
-const outputPath = path.join(distRoot, 'pagefind')
+const defaultDistRoot = path.join(siteRoot, 'dist')
 
 async function* walkHtmlFiles(directory) {
   let entries
@@ -34,7 +33,7 @@ async function* walkHtmlFiles(directory) {
   }
 }
 
-function getPageUrl(filePath) {
+function getPageUrl(filePath, distRoot) {
   const relativePath = path.relative(distRoot, filePath).replace(/\\/g, '/')
 
   if (relativePath === 'index.html') {
@@ -44,53 +43,68 @@ function getPageUrl(filePath) {
   return `/${relativePath.replace(/index\.html$/, '')}`
 }
 
-await rm(outputPath, { force: true, recursive: true })
+export async function buildSearchIndex({
+  distRoot = defaultDistRoot,
+  outputPath = path.join(distRoot, 'pagefind'),
+} = {}) {
+  await rm(outputPath, { force: true, recursive: true })
 
-const { index, errors } = await createIndex({
-  rootSelector: '[data-pagefind-body]',
-})
-
-if (!index) {
-  throw new Error(errors.join('\n') || 'Failed to create Pagefind index.')
-}
-
-let indexedPages = 0
-
-for await (const filePath of walkHtmlFiles(distRoot)) {
-  let content
-
-  try {
-    content = await readFile(filePath, 'utf8')
-  } catch (error) {
-    if (error?.code === 'ENOENT') {
-      continue
-    }
-
-    throw error
-  }
-
-  if (!content.includes('data-pagefind-body')) {
-    continue
-  }
-
-  const response = await index.addHTMLFile({
-    content,
-    url: getPageUrl(filePath),
+  const { index, errors } = await createIndex({
+    rootSelector: '[data-pagefind-body]',
   })
 
-  if (response.errors.length > 0) {
-    throw new Error(response.errors.join('\n'))
+  if (!index) {
+    throw new Error(errors.join('\n') || 'Failed to create Pagefind index.')
   }
 
-  indexedPages += 1
+  let indexedPages = 0
+
+  try {
+    for await (const filePath of walkHtmlFiles(distRoot)) {
+      let content
+
+      try {
+        content = await readFile(filePath, 'utf8')
+      } catch (error) {
+        if (error?.code === 'ENOENT') {
+          continue
+        }
+
+        throw error
+      }
+
+      if (!content.includes('data-pagefind-body')) {
+        continue
+      }
+
+      const response = await index.addHTMLFile({
+        content,
+        url: getPageUrl(filePath, distRoot),
+      })
+
+      if (response.errors.length > 0) {
+        throw new Error(response.errors.join('\n'))
+      }
+
+      indexedPages += 1
+    }
+
+    const writeResponse = await index.writeFiles({ outputPath })
+
+    if (writeResponse.errors.length > 0) {
+      throw new Error(writeResponse.errors.join('\n'))
+    }
+  } finally {
+    await close()
+  }
+
+  return {
+    indexedPages,
+    outputPath,
+  }
 }
 
-const writeResponse = await index.writeFiles({ outputPath })
-
-if (writeResponse.errors.length > 0) {
-  throw new Error(writeResponse.errors.join('\n'))
+if (process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url) {
+  const { indexedPages } = await buildSearchIndex()
+  console.log(`[pagefind] Indexed ${indexedPages} pages from data-pagefind-body roots.`)
 }
-
-await close()
-
-console.log(`[pagefind] Indexed ${indexedPages} pages from data-pagefind-body roots.`)

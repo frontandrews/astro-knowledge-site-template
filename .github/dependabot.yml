@@ -1,0 +1,62 @@
+version: 2
+
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "08:00"
+      timezone: America/Sao_Paulo
+    commit-message:
+      prefix: ci
+    labels:
+      - dependencies
+      - github-actions
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "08:00"
+      timezone: America/Sao_Paulo
+    commit-message:
+      prefix: deps
+    labels:
+      - dependencies
+      - javascript
+    open-pull-requests-limit: 10
+    versioning-strategy: increase-if-necessary
+    groups:
+      astro-stack:
+        patterns:
+          - astro
+          - "@astrojs/*"
+          - svelte
+          - "@tailwindcss/*"
+          - tailwindcss
+      codemirror-stack:
+        patterns:
+          - "@codemirror/*"
+      test-stack:
+        patterns:
+          - "@playwright/test"
+          - jsdom
+          - vitest
+      ui-and-runtime:
+        patterns:
+          - "@github/hotkey"
+          - "@lucide/astro"
+          - bits-ui
+          - class-variance-authority
+          - clsx
+          - focus-trap
+          - marked
+          - pagefind
+          - sucrase
+          - tailwind-merge
