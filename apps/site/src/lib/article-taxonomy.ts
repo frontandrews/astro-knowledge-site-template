@@ -9,6 +9,7 @@ import {
   type LearningPathPillar,
 } from '@/lib/learning-paths'
 import { getDefaultLocale } from '@/lib/locale-config'
+import { getEntryLeafRouteSegment, getNormalizedRouteSegments } from '@/lib/route-segments'
 import { getSiteCopy, getSiteLocale, type SiteLocale } from '@/lib/site-copy'
 import { translateSiteLabel } from '@/lib/site-labels'
 
@@ -31,7 +32,7 @@ export type ArticleTaxonomy = {
 }
 
 export function getArticleSlugFromEntryId(entryId: string) {
-  return entryId.replace(/^\/+|\/+$/g, '').split('/').filter(Boolean).at(-1) ?? entryId
+  return getEntryLeafRouteSegment(entryId)
 }
 
 export function getArticleCanonicalParams(post: ArticleEntry): ArticleCanonicalParams | null {
@@ -42,7 +43,7 @@ export function getArticleCanonicalParams(post: ArticleEntry): ArticleCanonicalP
     return null
   }
 
-  const parts = routePath.replace(/^\/+|\/+$/g, '').split('/').filter(Boolean)
+  const parts = getNormalizedRouteSegments(routePath)
   const segments = post.data.locale === getDefaultLocale() ? parts.slice(1) : parts.slice(2)
 
   if (segments.length !== 2) {

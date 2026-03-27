@@ -53,7 +53,10 @@ const controllerId = randomUUID()
       <p class={ui.progressMeta}>
         {metaLine}
       </p>
-      <div class="grid gap-2">
+      <p class={cn(ui.metaQuiet, 'text-sm leading-6')} data-no-js-only="true" {...getDataHookAttributes(trackProgressDomHooks.noJsNote)}>
+        {copy.trackProgress.noJsDescription}
+      </p>
+      <div class="grid gap-2" data-js-only="true">
         <div class="flex items-center justify-between gap-4">
           <p class="track-progress-status m-0 text-[0.9rem] font-medium text-site-ink lg:text-[0.98rem]" {...getDataHookAttributes(trackProgressDomHooks.progressStatus)}>
             {copy.startHere.progressLabel}: {copy.startHere.stepLabel} 1 {ofLabel} {items.length}

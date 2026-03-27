@@ -6,10 +6,12 @@ import ArticleCard from '@/components/ArticleCard.astro'
 import ArticleSharePanel from '@/components/ArticleSharePanel.astro'
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import TrackProgressPanel from '@/components/TrackProgressPanel.astro'
-import { getArticleReadingTimeMinutes } from '@/lib/article-meta'
+import TrackConceptPanel from '@/components/TrackConceptPanel.astro'
 import { formatEditorialDate } from '@/lib/format-date'
-import { resolveLocaleHrefMap, resolveLocaleMap } from '@/lib/locale-config'
-import { getSiteCopy, getSiteDateLocale, type SiteLocale } from '@/lib/site-copy'
+import { getLocalePath, resolveLocaleHrefMap, resolveLocaleMap } from '@/lib/locale-config'
+import { resolveEntityOgImageUrl } from '@/lib/og-image'
+import { createBreadcrumbSchema, createTrackSchema } from '@/lib/seo'
+import { getSiteCopy, getSiteDateLocale, getSiteLowerCaseLocale, type SiteLocale } from '@/lib/site-copy'
 import { getTracksHref } from '@/lib/tracks-links'
 import CompactSection from '@/components/ui/CompactSection.astro'
 import PageHeader from '@/components/ui/PageHeader.astro'
@@ -23,7 +25,12 @@ type Props = {
 const { locale, roadmap } = Astro.props
 const copy = getSiteCopy(locale)
 const roadmapSlugs = roadmap.slugs as Record<string, string | undefined>
+const roadmapAvailableLocales = new Set<string>(roadmap.availableLocales)
 const alternateLocaleHrefs = resolveLocaleMap((supportedLocale) => {
+  if (!roadmapAvailableLocales.has(supportedLocale)) {
+    return null
+  }
+
   const localizedSlug = roadmapSlugs[supportedLocale]
   return localizedSlug ? getTracksHref(supportedLocale, localizedSlug) : null
 })
@@ -33,43 +40,117 @@ const localeHrefs = resolveLocaleHrefMap((supportedLocale) =>
 )
 const tracksHref = getTracksHref(locale) ?? '/'
 const dateLocale = getSiteDateLocale(locale)
+const lowerCaseLocale = getSiteLowerCaseLocale(locale)
 const shareUrl = Astro.url.href
+const socialImage = resolveEntityOgImageUrl(
+  Astro.site ?? Astro.url,
+  'tracks',
+  locale,
+  roadmap.id,
+)
 const trackItems = roadmap.articleNodes.map((node, index) => ({
   articleId: node.articleId,
   href: node.href,
   stepLabel: String(index + 1),
   title: node.post.data.title,
 }))
-const totalReadingMinutes = roadmap.articleNodes.reduce((sum, node) => sum + getArticleReadingTimeMinutes(node.post), 0)
+const stepLabel = (roadmap.stepCount === 1 ? copy.startHere.stepLabel : copy.startHere.stepsLabel)
+  .toLocaleLowerCase(lowerCaseLocale)
+const trackMetaItems = [
+  copy.articleMeta.levelLabels[roadmap.level],
+  `${roadmap.stepCount} ${stepLabel}`,
+  `~${roadmap.estimatedReadingMinutes} min`,
+]
+const trackStructuredData = [
+  createTrackSchema({
+    description: roadmap.summary,
+    items: roadmap.articleNodes.map((node) => ({
+      description: node.post.data.description,
+      title: node.post.data.title,
+      url: new URL(node.href, Astro.site ?? Astro.url).toString(),
+    })),
+    level: roadmap.level,
+    locale,
+    title: roadmap.title,
+    totalReadingMinutes: roadmap.estimatedReadingMinutes,
+    totalSteps: roadmap.stepCount,
+    url: shareUrl,
+  }),
+  createBreadcrumbSchema({
+    items: [
+      {
+        name: copy.layout.home,
+        url: new URL(getLocalePath(locale), Astro.site ?? Astro.url).toString(),
+      },
+      {
+        name: copy.layout.tracks,
+        url: new URL(tracksHref, Astro.site ?? Astro.url).toString(),
+      },
+      {
+        name: roadmap.title,
+        url: shareUrl,
+      },
+    ],
+  }),
+]
+
+const renderedNodes = roadmap.nodes.map((node, index) => {
+  const stepIndex =
+    node.kind === 'article'
+      ? roadmap.articleNodes.findIndex((articleNode) => articleNode.id === node.id) + 1
+      : null
+
+  return {
+    isFirst: index === 0,
+    node,
+    stepIndex,
+  }
+})
 ---
 
 <BaseLayout
   alternateLocaleHrefs={alternateLocaleHrefs}
   description={roadmap.summary}
   localeHrefs={localeHrefs}
+  socialImage={socialImage}
+  structuredData={trackStructuredData}
   title={roadmap.title}
 >
-  <PageHeader description={roadmap.summary} icon={RouteIcon} iconLabel={copy.layout.tracks} title={roadmap.title} />
+  <PageHeader description={roadmap.summary} icon={RouteIcon} iconLabel={copy.layout.tracks} title={roadmap.title}>
+    <div class={ui.metaList}>
+      {trackMetaItems.map((item) => (
+        <span class={ui.badge}>{item}</span>
+      ))}
+    </div>
+  </PageHeader>
 
   <TrackProgressPanel
     items={trackItems}
     locale={locale}
     tracksHref={tracksHref}
-    totalReadingMinutes={totalReadingMinutes}
+    totalReadingMinutes={roadmap.estimatedReadingMinutes}
   />
 
   <CompactSection className="xl:mt-0">
     <div class={ui.linearList}>
-      {roadmap.articleNodes.map((node, index) => (
-        <ArticleCard
-          className={index === 0 ? 'border-t-0' : ''}
-          eyebrow={`${formatEditorialDate(node.post.data.pubDate, dateLocale)} - ${copy.startHere.stepLabel} ${index + 1}`}
-          eyebrowVariant="sentence"
-          post={node.post}
-          subtitle={node.post.data.description}
-          variant="linear"
-        />
-      ))}
+      {renderedNodes.map(({ isFirst, node, stepIndex }) =>
+        node.kind === 'article' ? (
+          <ArticleCard
+            className={isFirst ? 'border-t-0' : ''}
+            eyebrow={`${formatEditorialDate(node.post.data.pubDate, dateLocale)} - ${copy.startHere.stepLabel} ${stepIndex}`}
+            eyebrowVariant="sentence"
+            post={node.post}
+            subtitle={node.post.data.description}
+            variant="linear"
+          />
+        ) : (
+          <TrackConceptPanel
+            className={isFirst ? 'border-t-0' : ''}
+            locale={locale}
+            node={node}
+          />
+        ),
+      )}
     </div>
   </CompactSection>
 

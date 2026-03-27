@@ -1,0 +1,59 @@
+---
+import LinkCard from '@/components/ui/LinkCard.astro'
+import { getArticleHrefFromEntry } from '@/lib/article-links'
+import { cn } from '@/lib/cn'
+import { getDataHookAttributes, trackPageDomHooks } from '@/lib/dom-hooks'
+import type { ResolvedRoadmapConceptNode } from '@/lib/roadmaps'
+import { getSiteCopy, type SiteLocale } from '@/lib/site-copy'
+import { ui } from '@/lib/ui'
+
+type Props = {
+  className?: string
+  locale: SiteLocale
+  node: ResolvedRoadmapConceptNode
+}
+
+const { className = '', locale, node } = Astro.props
+const copy = getSiteCopy(locale)
+const relatedArticles = node.relatedArticles.map((article) => ({
+  description: article.data.description,
+  href: getArticleHrefFromEntry(article),
+  title: article.data.title,
+}))
+---
+
+<section
+  class={cn('border-t border-site-line px-[0.45rem] py-[0.8rem] first:border-t-0 lg:px-[0.55rem] lg:py-[0.95rem]', className)}
+  {...getDataHookAttributes(trackPageDomHooks.concept, node.id)}
+>
+  <div class={cn(ui.panel, ui.spotlightPanel)}>
+    <div class="grid gap-2">
+      <p class={ui.eyebrow}>{copy.startHere.conceptLabel}</p>
+      <h2
+        class={ui.headingCompact}
+        {...getDataHookAttributes(trackPageDomHooks.conceptTitle, node.title)}
+      >
+        {node.title}
+      </h2>
+      <p class={ui.cardDescription}>{node.summary}</p>
+      <p class={ui.bodyCopy}>{node.panelBody}</p>
+    </div>
+
+    {relatedArticles.length > 0 ? (
+      <div class="grid gap-3 border-t border-site-line pt-4">
+        <p class={ui.eyebrow}>{copy.directory.relatedArticles}</p>
+        <div class="grid gap-2 md:grid-cols-2">
+          {relatedArticles.map((article) => (
+            <LinkCard
+              description={article.description}
+              href={article.href}
+              title={article.title}
+              titleTag="h3"
+              variant="ghost"
+            />
+          ))}
+        </div>
+      </div>
+    ) : null}
+  </div>
+</section>
