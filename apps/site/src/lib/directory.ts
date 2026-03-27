@@ -1,20 +1,25 @@
 import type { CollectionEntry } from 'astro:content'
+import { getTopicRootGroupId } from '@template/content'
 
 import { getArticleHrefFromEntry } from '@/lib/article-links'
 import { sortArticlesByRecency } from '@/lib/article-tree'
 import { formatEditorialDate } from '@/lib/format-date'
 import { getSiteCopy, getSiteDateLocale, type SiteLocale } from '@/lib/site-copy'
-import { getTopicGroupHref } from '@/lib/topic-links'
+import { getTopicGroupHref, getTopicHref } from '@/lib/topic-links'
 import {
   getAvailableTopicGroups,
+  getAvailableTopicsInGroup,
   getLocalizedArticleTopics,
   getLocalizedArticleTopicsInGroup,
   getLocalizedTopicGroupLabel,
+  getLocalizedTopicLabel,
+  getLocalizedTopicSummary,
   getLocalizedTopicGroupSummary,
   getTopicGroupArticles,
 } from '@/lib/topic-taxonomy'
 
 export const ARTICLE_DIRECTORY_PAGE_SIZE = 24
+export const CARD_DIRECTORY_PAGE_SIZE = 12
 export const HOME_DIRECTORY_PREVIEW_SIZE = 12
 export const TOPIC_GROUP_DIRECTORY_PAGE_SIZE = 24
 export const TOPIC_INDEX_PAGE_SIZE = 12
@@ -88,11 +93,9 @@ export function getPaginatedPathNumbers(totalItems: number, pageSize: number) {
 }
 
 function formatArticleCountLabel(count: number, locale: SiteLocale) {
-  if (locale === 'pt-br') {
-    return `${count} ${count === 1 ? 'artigo' : 'artigos'}`
-  }
-
-  return `${count} ${count === 1 ? 'article' : 'articles'}`
+  const copy = getSiteCopy(locale)
+  const label = count === 1 ? copy.directory.articleCountSingular : copy.directory.articleCountPlural
+  return `${count} ${label}`
 }
 
 export function buildArticleDirectoryItems(
@@ -131,4 +134,16 @@ export function buildTopicGroupDirectoryItems(posts: ArticleEntry[], locale: Sit
     tags: [],
     title: getLocalizedTopicGroupLabel(group.id, locale),
   }))
+}
+
+export function buildTopicDirectoryItems(posts: ArticleEntry[], locale: SiteLocale) {
+  return getAvailableTopicGroups(posts, locale).flatMap<DirectoryItem>((group) =>
+    getAvailableTopicsInGroup(posts, group.id, locale).map((topic) => ({
+      description: getLocalizedTopicSummary(topic.id, locale),
+      href: getTopicHref(topic.id, locale),
+      meta: getLocalizedTopicGroupLabel(getTopicRootGroupId(topic.id) ?? group.id, locale),
+      tags: [],
+      title: getLocalizedTopicLabel(topic.id, locale),
+    })),
+  )
 }

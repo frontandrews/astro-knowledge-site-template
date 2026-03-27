@@ -1,4 +1,5 @@
 import { brandConfig, type BrandLocaleDefinition } from '@/brand/brand.config'
+import { encodeRoutePath } from '@/lib/route-segments'
 
 export type SiteLocale = string
 export type SiteLocaleDefinition = BrandLocaleDefinition
@@ -62,7 +63,7 @@ export function getLocalePrefix(locale?: string | null) {
 
 export function getLocalePath(locale?: string | null, pathname = '') {
   const prefix = getLocalePrefix(locale)
-  const normalizedPath = pathname.replace(/^\/+|\/+$/g, '')
+  const normalizedPath = encodeRoutePath(pathname)
 
   if (!normalizedPath) {
     return prefix || '/'

@@ -5,6 +5,7 @@ import DirectoryList from '@/components/ui/DirectoryList.astro'
 import DirectoryPagination from '@/components/ui/DirectoryPagination.astro'
 import CompactSection from '@/components/ui/CompactSection.astro'
 import PageHeader from '@/components/ui/PageHeader.astro'
+import RecentlyUpdatedSection from '@/components/RecentlyUpdatedSection.astro'
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import { getArticlesIndexHref, getArticlesPageHref } from '@/lib/article-links'
 import {
@@ -13,9 +14,9 @@ import {
   paginateItems,
 } from '@/lib/directory'
 import { getLocalePath, resolveLocaleHrefMap } from '@/lib/locale-config'
+import type { RecentUpdateItem } from '@/lib/recent-updates'
 import { getSiteCopy, type SiteLocale } from '@/lib/site-copy'
 import { getActiveArticlesByLocale } from '@/lib/site-content'
-import { getTopicIndexHref } from '@/lib/topic-links'
 import { ui } from '@/lib/ui'
 
 type Props = {
@@ -23,9 +24,10 @@ type Props = {
   locale: SiteLocale
   page?: number
   previewCount?: number
+  recentUpdates?: RecentUpdateItem[]
 }
 
-const { isHome = false, locale, page = 1, previewCount } = Astro.props
+const { isHome = false, locale, page = 1, previewCount, recentUpdates = [] } = Astro.props
 const copy = getSiteCopy(locale)
 const localeHrefs = resolveLocaleHrefMap((supportedLocale) =>
   isHome ? getLocalePath(supportedLocale) : getArticlesIndexHref(supportedLocale),
@@ -70,9 +72,6 @@ const isPaginatedArchivePage = !isPreview && paginatedItems.currentPage > 1
             {copy.articlesIndex.viewAllLabel}
           </a>
         ) : null}
-        <a class={ui.controlButton + ' min-h-11 px-4 text-sm font-semibold'} href={getTopicIndexHref(locale)}>
-          {copy.articlesIndex.browseTopicsLabel}
-        </a>
       </div>
     ) : null}
 
@@ -87,4 +86,6 @@ const isPaginatedArchivePage = !isPreview && paginatedItems.currentPage > 1
       />
     ) : null}
   </CompactSection>
+
+  {isHome ? <RecentlyUpdatedSection items={recentUpdates} locale={locale} /> : null}
 </BaseLayout>

@@ -7,11 +7,12 @@ import DirectoryPagination from '@/components/ui/DirectoryPagination.astro'
 import DirectoryIndexShell from '@/components/ui/DirectoryIndexShell.astro'
 import {
   TOPIC_INDEX_PAGE_SIZE,
-  buildTopicGroupDirectoryItems,
+  buildTopicDirectoryItems,
   paginateItems,
 } from '@/lib/directory'
 import { getLocalePath, resolveLocaleHrefMap } from '@/lib/locale-config'
 import { getPageTypeDescription, getPageTypeLabel } from '@/lib/section-manifest'
+import type { RecentUpdateItem } from '@/lib/recent-updates'
 import { getSiteCopy, type SiteLocale } from '@/lib/site-copy'
 import { getActiveArticlesByLocale } from '@/lib/site-content'
 import { getTopicIndexHref, getTopicIndexPageHref } from '@/lib/topic-links'
@@ -23,9 +24,10 @@ type Props = {
   page?: number
   posts?: CollectionEntry<'articles'>[]
   previewCount?: number
+  recentUpdates?: RecentUpdateItem[]
 }
 
-const { isHome = false, locale, page = 1, posts = [], previewCount } = Astro.props
+const { isHome = false, locale, page = 1, posts = [], previewCount, recentUpdates = [] } = Astro.props
 const copy = getSiteCopy(locale)
 const title = getPageTypeLabel('topics', locale)
 const description = getPageTypeDescription('topics', locale)
@@ -33,7 +35,7 @@ const localeHrefs = resolveLocaleHrefMap((supportedLocale) =>
   isHome ? getLocalePath(supportedLocale) : getTopicIndexHref(supportedLocale),
 )
 const sourcePosts = posts.length > 0 ? posts : await getActiveArticlesByLocale(locale)
-const items = buildTopicGroupDirectoryItems(sourcePosts, locale)
+const items = buildTopicDirectoryItems(sourcePosts, locale)
 const isPreview = typeof previewCount === 'number'
 const paginatedItems = paginateItems(items, page, TOPIC_INDEX_PAGE_SIZE)
 const visibleItems = isPreview ? items.slice(0, previewCount) : paginatedItems.items
@@ -50,6 +52,8 @@ const isPaginatedArchivePage = !isPreview && paginatedItems.currentPage > 1
   localeHrefs={localeHrefs}
   noindex={isPaginatedArchivePage}
   pagefind={!isPaginatedArchivePage && !isPreview}
+  recentUpdates={isHome ? recentUpdates : []}
+  recentUpdatesLocale={isHome ? locale : undefined}
   title={pageTitle}
 >
   {visibleItems.length > 0 ? (

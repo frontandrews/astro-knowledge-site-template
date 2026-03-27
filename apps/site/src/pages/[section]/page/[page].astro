@@ -1,5 +1,9 @@
 ---
 import ArticlesIndexPage from '@/components/ArticlesIndexPage.astro'
+import ChallengeIndexPage from '@/components/ChallengeIndexPage.astro'
+import ConceptsIndexPage from '@/components/ConceptsIndexPage.astro'
+import GlossaryIndexPage from '@/components/GlossaryIndexPage.astro'
+import TracksPage from '@/components/TracksPage.astro'
 import TopicIndexPage from '@/components/TopicIndexPage.astro'
 import { getDefaultLocale } from '@/lib/locale-config'
 import { getDefaultPaginatedIndexPaths } from '@/lib/paginated-section-pages'
@@ -9,7 +13,7 @@ export async function getStaticPaths() {
 }
 
 const defaultLocale = getDefaultLocale()
-const { page, pageType } = Astro.props
+const { challenges = [], concepts = [], page, pageType, roadmaps = [], terms = [] } = Astro.props
 
 if (!pageType) {
   return new Response(null, {
@@ -20,4 +24,8 @@ if (!pageType) {
 ---
 
 {pageType === 'articles' ? <ArticlesIndexPage locale={defaultLocale} page={page} /> : null}
+{pageType === 'tracks' ? <TracksPage locale={defaultLocale} page={page} roadmaps={roadmaps} /> : null}
 {pageType === 'topics' ? <TopicIndexPage locale={defaultLocale} page={page} /> : null}
+{pageType === 'concepts' ? <ConceptsIndexPage concepts={concepts} locale={defaultLocale} page={page} /> : null}
+{pageType === 'glossary' ? <GlossaryIndexPage locale={defaultLocale} page={page} terms={terms} /> : null}
+{pageType === 'challenges' ? <ChallengeIndexPage challenges={challenges} locale={defaultLocale} page={page} /> : null}

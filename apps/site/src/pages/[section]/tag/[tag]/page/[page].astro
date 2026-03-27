@@ -1,0 +1,36 @@
+---
+import ChallengeIndexPage from '@/components/ChallengeIndexPage.astro'
+import ConceptsIndexPage from '@/components/ConceptsIndexPage.astro'
+import GlossaryIndexPage from '@/components/GlossaryIndexPage.astro'
+import TracksPage from '@/components/TracksPage.astro'
+import { getDefaultPaginatedFilterableSectionPaths } from '@/lib/filterable-section-pages'
+import { getDefaultLocale } from '@/lib/locale-config'
+
+export async function getStaticPaths() {
+  return getDefaultPaginatedFilterableSectionPaths()
+}
+
+const defaultLocale = getDefaultLocale()
+const {
+  challenges = [],
+  concepts = [],
+  locale = defaultLocale,
+  page,
+  pageType,
+  roadmaps = [],
+  selectedFilterId,
+  terms = [],
+} = Astro.props
+
+if (!pageType) {
+  return new Response(null, {
+    status: 404,
+    statusText: 'Not Found',
+  })
+}
+---
+
+{pageType === 'tracks' ? <TracksPage locale={locale} page={page} roadmaps={roadmaps} selectedFilterId={selectedFilterId} /> : null}
+{pageType === 'concepts' ? <ConceptsIndexPage concepts={concepts} locale={locale} page={page} selectedFilterId={selectedFilterId} /> : null}
+{pageType === 'glossary' ? <GlossaryIndexPage locale={locale} page={page} selectedTagId={selectedFilterId} terms={terms} /> : null}
+{pageType === 'challenges' ? <ChallengeIndexPage challenges={challenges} locale={locale} page={page} selectedFilterId={selectedFilterId} /> : null}

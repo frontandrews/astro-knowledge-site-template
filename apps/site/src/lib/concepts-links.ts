@@ -1,5 +1,6 @@
 import { getConceptDomainRouteSegment, getConceptGroupRouteSegment } from '@/lib/concept-taxonomy'
 import { getLocalePath, normalizeSiteLocale } from '@/lib/locale-config'
+import { getEntryLeafRouteSegment } from '@/lib/route-segments'
 import { getPageTypeHref } from '@/lib/section-manifest'
 
 type ConceptEntryLike = {
@@ -31,11 +32,29 @@ export function getConceptsHref(
     return `${baseHref}?${params.toString()}`
   }
 
-  return `${baseHref}/${slug}`
+  return getPageTypeHref('concepts', locale, slug) ?? baseHref
+}
+
+export function getConceptsPageHref(locale = 'en', page = 1) {
+  const indexHref = getConceptsHref(locale)
+  const normalizedPage = Number.isFinite(page) ? Math.max(1, Math.floor(page)) : 1
+
+  return normalizedPage <= 1 ? indexHref : `${indexHref}/page/${normalizedPage}`
+}
+
+export function getConceptsTagHref(locale = 'en', tagSlug: string) {
+  return `${getConceptsHref(locale)}/tag/${encodeURIComponent(tagSlug)}`
+}
+
+export function getConceptsTagPageHref(locale = 'en', tagSlug: string, page = 1) {
+  const indexHref = getConceptsTagHref(locale, tagSlug)
+  const normalizedPage = Number.isFinite(page) ? Math.max(1, Math.floor(page)) : 1
+
+  return normalizedPage <= 1 ? indexHref : `${indexHref}/page/${normalizedPage}`
 }
 
 export function getConceptSlugFromEntry(entry: ConceptEntryLike) {
-  return entry.id.replace(/^\/+|\/+$/g, '').split('/').filter(Boolean).at(-1) ?? ''
+  return getEntryLeafRouteSegment(entry.id)
 }
 
 export function getConceptHrefFromEntry(entry: ConceptEntryLike) {

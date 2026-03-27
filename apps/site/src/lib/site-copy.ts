@@ -24,6 +24,7 @@ type SiteCopy = {
     confirmTitle: string
     copyLink: string
     copyLinkError: string
+    copyLinkManual: string
     copyLinkSuccess: string
     levelLabel: string
     markCompleted: string
@@ -117,12 +118,54 @@ type SiteCopy = {
   challengeMeta: {
     levelLabels: Record<ChallengeLevel, string>
   }
+  challengePlayground: {
+    allHintsRevealed: string
+    attemptsPlural: string
+    attemptsSingular: string
+    createExecutionEnvironmentError: string
+    editorErrorPrefix: string
+    editorUnavailable: string
+    errorLabel: string
+    executionError: string
+    executionErrorTitle: string
+    executionTimeout: string
+    expectedLabel: string
+    hintAvailable: string
+    hintsRevealedPlural: string
+    hintsRevealedSingular: string
+    interactiveExecutionOnly: string
+    lineMessage: string
+    linkCopied: string
+    nextHint: string
+    processTypeScriptError: string
+    receivedLabel: string
+    reset: string
+    resetTitle: string
+    resultsPassing: string
+    run: string
+    runTitle: string
+    runUnavailable: string
+    running: string
+    share: string
+    shareManualCopy: string
+    shareTitle: string
+    showHint: string
+    solvedFirstAttempt: string
+    solvedNthAttempt: string
+    noJsCodeLabel: string
+    noJsDescription: string
+    storageUnavailable: string
+    successfulButMoreEfficient: string
+    testsAllPassing: string
+  }
   conceptsIndex: {
     copy: string
     title: string
   }
   directory: {
     allItems: string
+    articleCountPlural: string
+    articleCountSingular: string
     filterByConcept: string
     filterBySubtopic: string
     filterByTag: string
@@ -132,6 +175,7 @@ type SiteCopy = {
     nextPage: string
     noteItems: string
     noteBadge: string
+    filtersRequireJavaScript: string
     page: string
     previousPage: string
     readAgain: string
@@ -150,6 +194,7 @@ type SiteCopy = {
     menu: string
     primaryNav: string
     languageSwitcher: string
+    skipToContent: string
   }
   startHere: {
     articleLabel: string
@@ -191,6 +236,19 @@ type SiteCopy = {
     tracks: string
     topics: string
   }
+  recentUpdates: {
+    description: string
+    publishedLabel: string
+    title: string
+    updatedLabel: string
+  }
+  notFound: {
+    eyebrow: string
+    homeLabel: string
+    sectionHeading: string
+    title: string
+    description: string
+  }
   search: {
     copy: string
     devNotice: string
@@ -204,6 +262,7 @@ type SiteCopy = {
     hint: string
     loading: string
     noResults: string
+    noJsFallback: string
     placeholder: string
     shortcut: string
     title: string
@@ -215,6 +274,8 @@ type SiteCopy = {
     cancel: string
     confirmSolved: string
     confirmUnsolved: string
+    noJsDetailsLabel: string
+    noJsMessage: string
     solutionLabel: string
     solvedMessage: string
     solvedTitle: string
@@ -224,6 +285,7 @@ type SiteCopy = {
   trackProgress: {
     continueTrack: string
     nextLabel: string
+    noJsDescription: string
     ofLabel: string
   }
   topicIndex: {
@@ -259,6 +321,7 @@ const siteCopy: Record<string, SiteCopy> = {
       confirmTitle: 'Mark this article as completed?',
       copyLink: 'Copy link',
       copyLinkError: 'This browser could not copy the link.',
+      copyLinkManual: 'Copy the link manually from the field below.',
       copyLinkSuccess: 'Link copied. You can paste it into any chat.',
       levelLabel: 'Level',
       markCompleted: 'Mark as completed',
@@ -284,7 +347,7 @@ const siteCopy: Record<string, SiteCopy> = {
       tableOfContents: 'On this page',
       nextStep: 'Next step',
       openComments: 'View comments',
-      updatedPrefix: 'Updated on',
+      updatedPrefix: 'Updated on ',
     },
     articleMeta: {
       categoryLabels: {
@@ -328,6 +391,7 @@ const siteCopy: Record<string, SiteCopy> = {
       menu: 'Menu',
       primaryNav: 'Primary navigation',
       languageSwitcher: 'Language switcher',
+      skipToContent: 'Skip to main content',
     },
     startHere: {
       articleLabel: 'Article',
@@ -400,12 +464,57 @@ const siteCopy: Record<string, SiteCopy> = {
         intermediate: 'Intermediate',
       },
     },
+    challengePlayground: {
+      allHintsRevealed: 'All hints revealed',
+      attemptsPlural: '{count} attempts',
+      attemptsSingular: '{count} attempt',
+      createExecutionEnvironmentError: 'Could not create execution environment',
+      editorErrorPrefix: 'Editor error',
+      editorUnavailable: 'Editor unavailable',
+      errorLabel: 'Error',
+      executionError: 'Execution error',
+      executionErrorTitle: 'Execution error',
+      executionTimeout: 'Time limit exceeded. Check for infinite loops.',
+      expectedLabel: 'expected',
+      hintAvailable: 'Stuck? Hints available.',
+      hintsRevealedPlural: '{count}/{total} hints revealed',
+      hintsRevealedSingular: '{count}/{total} hint revealed',
+      interactiveExecutionOnly: 'Interactive execution is available only for JavaScript and TypeScript.',
+      lineMessage: 'Line {line}: {message}',
+      linkCopied: 'Link copied!',
+      nextHint: 'Next hint',
+      processTypeScriptError: 'Could not process TypeScript types',
+      receivedLabel: 'received',
+      reset: 'Reset',
+      resetTitle: 'Reset to the starter code',
+      resultsPassing: '{passCount}/{totalCount} tests passing',
+      run: 'Run',
+      runTitle: 'Run (Ctrl+Enter)',
+      runUnavailable: 'Execution unavailable',
+      running: 'Running...',
+      share: 'Share',
+      shareManualCopy: 'Copy the link manually from the field below.',
+      shareTitle: 'Copy a link with your solution',
+      showHint: 'Show hint',
+      solvedFirstAttempt: 'Solved on the first attempt!',
+      solvedNthAttempt: 'Solved on attempt {attempt}',
+      noJsCodeLabel: 'Starter code',
+      noJsDescription:
+        'The interactive editor needs JavaScript. You can still read the prompt and copy the starter code below.',
+      storageUnavailable:
+        'This browser is blocking local storage. Your code and solved state will not persist after reload.',
+      successfulButMoreEfficient:
+        'Your solution passes. A more efficient version exists: optimal time {time} and space {space}. See "{solutionLabel}".',
+      testsAllPassing: 'All passing',
+    },
     conceptsIndex: {
       copy: 'Master the most important concepts to grow your understanding.',
       title: 'Concepts',
     },
     directory: {
       allItems: 'All',
+      articleCountPlural: 'articles',
+      articleCountSingular: 'article',
       filterByConcept: 'Filter by concept',
       filterBySubtopic: 'Filter by subtopic',
       filterByTag: 'Filter by tag',
@@ -415,6 +524,7 @@ const siteCopy: Record<string, SiteCopy> = {
       nextPage: 'Next page',
       noteItems: 'Notes',
       noteBadge: 'Note',
+      filtersRequireJavaScript: 'Filters need JavaScript. You can still browse the full list below.',
       page: 'Page',
       previousPage: 'Previous page',
       readAgain: 'Read again',
@@ -439,6 +549,20 @@ const siteCopy: Record<string, SiteCopy> = {
       tracks: 'Tracks',
       topics: 'Topics',
     },
+    recentUpdates: {
+      description: 'Fresh edits and recent additions worth revisiting from across the site.',
+      publishedLabel: 'New',
+      title: 'Recently updated',
+      updatedLabel: 'Updated',
+    },
+    notFound: {
+      eyebrow: '404',
+      homeLabel: 'Go to homepage',
+      sectionHeading: 'Start again from one of the main sections',
+      title: 'Page not found',
+      description:
+        'This page may have moved, been removed, or never existed in this locale. Start again from the homepage or jump into one of the main sections.',
+    },
     search: {
       copy: 'Search across articles, topics, and glossary entries from one place.',
       devNotice: 'Search index is generated during build. Use preview/build to test Pagefind locally.',
@@ -452,6 +576,7 @@ const siteCopy: Record<string, SiteCopy> = {
       hint: 'Site search',
       loading: 'Searching...',
       noResults: 'No results found.',
+      noJsFallback: 'Browse content',
       placeholder: 'Search',
       shortcut: 'Ctrl K',
       title: 'Search',
@@ -486,6 +611,8 @@ const siteCopy: Record<string, SiteCopy> = {
       cancel: "I'll keep trying",
       confirmSolved: 'View anyway',
       confirmUnsolved: 'View anyway',
+      noJsDetailsLabel: 'Open the reference solution',
+      noJsMessage: 'Without JavaScript, the reference solution is shown inline instead of in a dialog.',
       solutionLabel: 'Solution',
       solvedMessage: 'You already solved this challenge. Want to see the reference solution?',
       solvedTitle: 'Challenge solved!',
@@ -495,6 +622,7 @@ const siteCopy: Record<string, SiteCopy> = {
     trackProgress: {
       continueTrack: 'Continue on this track',
       nextLabel: 'Next',
+      noJsDescription: 'Progress tracking needs JavaScript. You can still follow the track from the first step.',
       ofLabel: 'of',
     },
     topicIndex: {
@@ -528,6 +656,7 @@ const siteCopy: Record<string, SiteCopy> = {
       confirmTitle: 'Marcar este artigo como concluído?',
       copyLink: 'Copiar link',
       copyLinkError: 'Este navegador não conseguiu copiar o link.',
+      copyLinkManual: 'Copie o link manualmente no campo abaixo.',
       copyLinkSuccess: 'Link copiado. Agora você pode colar em qualquer chat.',
       levelLabel: 'Nível',
       markCompleted: 'Marcar como concluído',
@@ -553,7 +682,7 @@ const siteCopy: Record<string, SiteCopy> = {
       tableOfContents: 'Nesta página',
       nextStep: 'Próximo passo',
       openComments: 'Ver comentarios',
-      updatedPrefix: 'Atualizado em',
+      updatedPrefix: 'Atualizado em ',
     },
     articleMeta: {
       categoryLabels: {
@@ -597,6 +726,7 @@ const siteCopy: Record<string, SiteCopy> = {
       menu: 'Menu',
       primaryNav: 'Principal',
       languageSwitcher: 'Alternar idioma',
+      skipToContent: 'Pular para o conteudo principal',
     },
     startHere: {
       articleLabel: 'Artigo',
@@ -669,12 +799,57 @@ const siteCopy: Record<string, SiteCopy> = {
         intermediate: 'Intermediario',
       },
     },
+    challengePlayground: {
+      allHintsRevealed: 'Todas as dicas reveladas',
+      attemptsPlural: '{count} tentativas',
+      attemptsSingular: '{count} tentativa',
+      createExecutionEnvironmentError: 'Erro ao criar ambiente de execução',
+      editorErrorPrefix: 'Erro do editor',
+      editorUnavailable: 'Editor indisponivel',
+      errorLabel: 'Erro',
+      executionError: 'Erro de execução',
+      executionErrorTitle: 'Erro de execução',
+      executionTimeout: 'Tempo limite excedido. Verifique se ha loops infinitos.',
+      expectedLabel: 'esperado',
+      hintAvailable: 'Travado? Dicas disponiveis.',
+      hintsRevealedPlural: '{count}/{total} dicas reveladas',
+      hintsRevealedSingular: '{count}/{total} dica revelada',
+      interactiveExecutionOnly: 'Execução interativa disponível apenas para JavaScript e TypeScript.',
+      lineMessage: 'Linha {line}: {message}',
+      linkCopied: 'Link copiado!',
+      nextHint: 'Proxima dica',
+      processTypeScriptError: 'Erro ao processar tipos TypeScript',
+      receivedLabel: 'recebido',
+      reset: 'Reiniciar',
+      resetTitle: 'Voltar ao codigo inicial',
+      resultsPassing: '{passCount}/{totalCount} testes passando',
+      run: 'Executar',
+      runTitle: 'Executar (Ctrl+Enter)',
+      runUnavailable: 'Execução indisponível',
+      running: 'Executando...',
+      share: 'Compartilhar',
+      shareManualCopy: 'Copie o link manualmente no campo abaixo.',
+      shareTitle: 'Copiar link com sua solucao',
+      showHint: 'Ver dica',
+      solvedFirstAttempt: 'Resolvido na primeira tentativa!',
+      solvedNthAttempt: 'Resolvido na {attempt}ª tentativa',
+      noJsCodeLabel: 'Codigo inicial',
+      noJsDescription:
+        'O editor interativo precisa de JavaScript. Voce ainda pode ler o desafio e copiar o codigo inicial abaixo.',
+      storageUnavailable:
+        'Este navegador esta bloqueando o local storage. Seu codigo e seu progresso nao vao persistir apos recarregar.',
+      successfulButMoreEfficient:
+        'Sua solucao passa. Existe uma versao mais eficiente: solucao otima em tempo {time} e espaco {space}. Veja em "{solutionLabel}".',
+      testsAllPassing: 'Todos passando',
+    },
     conceptsIndex: {
       copy: 'Domine os conceitos mais importantes para evoluir seu conhecimento.',
       title: 'Conceitos',
     },
     directory: {
       allItems: 'Tudo',
+      articleCountPlural: 'artigos',
+      articleCountSingular: 'artigo',
       filterByConcept: 'Filtrar por conceito',
       filterBySubtopic: 'Filtrar por subtema',
       filterByTag: 'Filtrar por tag',
@@ -684,6 +859,7 @@ const siteCopy: Record<string, SiteCopy> = {
       nextPage: 'Próxima página',
       noteItems: 'Notas',
       noteBadge: 'Nota',
+      filtersRequireJavaScript: 'Os filtros precisam de JavaScript. Ainda assim, a lista completa continua navegavel abaixo.',
       page: 'Página',
       previousPage: 'Página anterior',
       readAgain: 'Ler novamente',
@@ -708,6 +884,20 @@ const siteCopy: Record<string, SiteCopy> = {
       tracks: 'Trilhas',
       topics: 'Tópicos',
     },
+    recentUpdates: {
+      description: 'Edicoes recentes e entradas novas que valem uma revisita em secoes diferentes do site.',
+      publishedLabel: 'Novo',
+      title: 'Recentemente atualizado',
+      updatedLabel: 'Atualizado',
+    },
+    notFound: {
+      eyebrow: '404',
+      homeLabel: 'Ir para a home',
+      sectionHeading: 'Recomece por uma das principais secoes',
+      title: 'Pagina nao encontrada',
+      description:
+        'Esta pagina pode ter mudado de endereco, sido removida ou nunca ter existido neste locale. Recomece pela home ou entre por uma das principais secoes.',
+    },
     search: {
       copy: 'Busque em artigos, tópicos e termos do glossário em um único lugar.',
       devNotice: 'O índice de busca é gerado no build. Use preview/build para testar o Pagefind localmente.',
@@ -721,6 +911,7 @@ const siteCopy: Record<string, SiteCopy> = {
       hint: 'Busca no site',
       loading: 'Buscando...',
       noResults: 'Nenhum resultado encontrado.',
+      noJsFallback: 'Explorar conteudo',
       placeholder: 'Buscar',
       shortcut: 'Ctrl K',
       title: 'Buscar',
@@ -813,6 +1004,8 @@ const siteCopy: Record<string, SiteCopy> = {
       cancel: 'Vou tentar mais',
       confirmSolved: 'Ver mesmo assim',
       confirmUnsolved: 'Ver mesmo assim',
+      noJsDetailsLabel: 'Abrir a solucao de referencia',
+      noJsMessage: 'Sem JavaScript, a solucao de referencia aparece inline em vez de um dialogo.',
       solutionLabel: 'Solução',
       solvedMessage: 'Você já resolveu este desafio. Quer ver a solução de referência?',
       solvedTitle: 'Desafio resolvido!',
@@ -822,6 +1015,7 @@ const siteCopy: Record<string, SiteCopy> = {
     trackProgress: {
       continueTrack: 'Continue nesta trilha',
       nextLabel: 'Próximo',
+      noJsDescription: 'O acompanhamento de progresso precisa de JavaScript. Mesmo assim, voce pode seguir a trilha desde o primeiro passo.',
       ofLabel: 'de',
     },
     topicIndex: {

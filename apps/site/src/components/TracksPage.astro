@@ -1,39 +1,80 @@
 ---
 import RouteIcon from '@lucide/astro/icons/route'
 
+import DirectoryList from '@/components/ui/DirectoryList.astro'
+import DirectoryPagination from '@/components/ui/DirectoryPagination.astro'
+import RouteFilterNav from '@/components/ui/RouteFilterNav.astro'
 import BaseLayout from '@/layouts/BaseLayout.astro'
+import { CARD_DIRECTORY_PAGE_SIZE, paginateItems } from '@/lib/directory'
 import { getLocalePath, resolveLocaleHrefMap } from '@/lib/locale-config'
+import type { RecentUpdateItem } from '@/lib/recent-updates'
 import type { ResolvedEditorialRoadmap } from '@/lib/roadmaps'
+import { getRouteFilterEntries, getRouteFilterEntryById } from '@/lib/route-filters'
 import { getPageTypeDescription, getPageTypeLabel } from '@/lib/section-manifest'
-import { getSiteCopy, type SiteLocale } from '@/lib/site-copy'
-import { getTracksHref } from '@/lib/tracks-links'
-import FilterableDirectory from '@/components/FilterableDirectory.svelte'
+import { getSiteCopy, getSiteLowerCaseLocale, type SiteLocale } from '@/lib/site-copy'
+import { getTracksHref, getTracksPageHref, getTracksTagHref, getTracksTagPageHref } from '@/lib/tracks-links'
 import CompactSection from '@/components/ui/CompactSection.astro'
 import PageHeader from '@/components/ui/PageHeader.astro'
+import RecentlyUpdatedSection from '@/components/RecentlyUpdatedSection.astro'
 
 type Props = {
   isHome?: boolean
   locale: SiteLocale
+  page?: number
+  recentUpdates?: RecentUpdateItem[]
   roadmaps: ResolvedEditorialRoadmap[]
+  selectedFilterId?: string | null
 }
 
-const { isHome = false, locale, roadmaps } = Astro.props
+const {
+  isHome = false,
+  locale,
+  page = 1,
+  recentUpdates = [],
+  roadmaps,
+  selectedFilterId = null,
+} = Astro.props
 const copy = getSiteCopy(locale)
 const localeHrefs = resolveLocaleHrefMap((supportedLocale) =>
   isHome ? getLocalePath(supportedLocale) : getTracksHref(supportedLocale),
 )
-const title = getPageTypeLabel('tracks', locale)
 const description = getPageTypeDescription('tracks', locale)
+const lowerCaseLocale = getSiteLowerCaseLocale(locale)
 const items = roadmaps.map((roadmap) => ({
+  description: roadmap.summary,
   href: roadmap.href,
+  meta: [
+    copy.articleMeta.levelLabels[roadmap.level],
+    `${roadmap.stepCount} ${(roadmap.stepCount === 1 ? copy.startHere.stepLabel : copy.startHere.stepsLabel).toLocaleLowerCase(lowerCaseLocale)}`,
+    `~${roadmap.estimatedReadingMinutes} min`,
+  ].join(' • '),
   tags: roadmap.tags,
   title: roadmap.title,
 }))
+const availableFilters = Array.from(
+  new Map(
+    items.flatMap((item) => item.tags.map((tag) => [tag.id, tag.label] as const)),
+  ).entries(),
+).map(([id, label]) => ({ id, label }))
+const filterEntries = getRouteFilterEntries(availableFilters, locale)
+const selectedFilter = selectedFilterId
+  ? getRouteFilterEntryById(availableFilters, locale, selectedFilterId)
+  : null
+const filteredItems = selectedFilter
+  ? items.filter((item) => item.tags.some((tag) => tag.id === selectedFilter.id))
+  : items
+const paginatedItems = paginateItems(filteredItems, page, CARD_DIRECTORY_PAGE_SIZE)
+const title = page > 1
+  ? `${selectedFilter ? `${getPageTypeLabel('tracks', locale)} · ${selectedFilter.label}` : getPageTypeLabel('tracks', locale)} · ${copy.directory.page} ${paginatedItems.currentPage}`
+  : selectedFilter ? `${getPageTypeLabel('tracks', locale)} · ${selectedFilter.label}` : getPageTypeLabel('tracks', locale)
+const isPaginatedArchivePage = paginatedItems.currentPage > 1
 ---
 
 <BaseLayout
   description={description}
   localeHrefs={localeHrefs}
+  noindex={isPaginatedArchivePage}
+  pagefind={!isPaginatedArchivePage}
   title={title}
 >
   <PageHeader
@@ -44,13 +85,29 @@ const items = roadmaps.map((roadmap) => ({
   />
 
   <CompactSection>
-    <FilterableDirectory
-      filterLabel={copy.tracksIndex.filterLabel}
-      fewerFiltersLabel={copy.directory.showLess}
-      items={items}
-      client:idle
-      layout="cards"
-      moreFiltersLabel={copy.directory.more}
+    <RouteFilterNav
+      activeFilterId={selectedFilter?.id}
+      allHref={getTracksHref(locale) ?? getLocalePath(locale)}
+      allLabel={copy.directory.allItems}
+      entries={filterEntries}
+      filterLabel={copy.directory.filterByTag}
+      getHref={(tagSlug) => getTracksTagHref(locale, tagSlug)}
+    />
+
+    <DirectoryList items={paginatedItems.items} layout="cards" />
+
+    <DirectoryPagination
+      currentPage={paginatedItems.currentPage}
+      getHref={(targetPage) =>
+        selectedFilter
+          ? getTracksTagPageHref(locale, selectedFilter.slug, targetPage)
+          : (getTracksPageHref(locale, targetPage) ?? getLocalePath(locale))}
+      nextLabel={copy.directory.nextPage}
+      pageCount={paginatedItems.pageCount}
+      pageLabel={copy.directory.page}
+      previousLabel={copy.directory.previousPage}
     />
   </CompactSection>
+
+  {isHome ? <RecentlyUpdatedSection items={recentUpdates} locale={locale} /> : null}
 </BaseLayout>

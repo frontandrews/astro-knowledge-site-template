@@ -1,0 +1,63 @@
+---
+import { ui } from '@/lib/ui'
+import type { RouteFilterEntry } from '@/lib/route-filters'
+import { filterChipVariants } from '@/lib/ui-variants'
+
+type Props = {
+  activeFilterId?: string | null
+  allHref: string
+  allLabel: string
+  entries: RouteFilterEntry[]
+  filterLabel: string
+  getHref: (slug: string) => string
+}
+
+const {
+  activeFilterId = null,
+  allHref,
+  allLabel,
+  entries,
+  filterLabel,
+  getHref,
+} = Astro.props
+
+const filterTones = [
+  { dark: 'var(--site-filter-tone-1-dark)', light: 'var(--site-filter-tone-1-light)' },
+  { dark: 'var(--site-filter-tone-2-dark)', light: 'var(--site-filter-tone-2-light)' },
+  { dark: 'var(--site-filter-tone-3-dark)', light: 'var(--site-filter-tone-3-light)' },
+  { dark: 'var(--site-filter-tone-4-dark)', light: 'var(--site-filter-tone-4-light)' },
+  { dark: 'var(--site-filter-tone-5-dark)', light: 'var(--site-filter-tone-5-light)' },
+  { dark: 'var(--site-filter-tone-6-dark)', light: 'var(--site-filter-tone-6-light)' },
+]
+---
+
+{entries.length > 0 ? (
+  <div class="mb-3 mt-4 grid justify-items-start gap-4">
+    <div class="relative grid justify-items-start gap-2">
+      <p class={ui.filterLabel}>{filterLabel}</p>
+      <div class="flex flex-wrap justify-start gap-2.5">
+        <a
+          aria-current={activeFilterId ? undefined : 'page'}
+          class={filterChipVariants({ active: !activeFilterId })}
+          href={allHref}
+        >
+          <span>{allLabel}</span>
+        </a>
+        {entries.map((entry, index) => {
+          const tone = filterTones[index % filterTones.length]
+
+          return (
+            <a
+              aria-current={activeFilterId === entry.id ? 'page' : undefined}
+              class={filterChipVariants({ active: activeFilterId === entry.id })}
+              href={getHref(entry.slug)}
+              style={`--chip-accent: ${tone.light}; --chip-accent-dark: ${tone.dark};`}
+            >
+              <span>{entry.label}</span>
+            </a>
+          )
+        })}
+      </div>
+    </div>
+  </div>
+) : null}

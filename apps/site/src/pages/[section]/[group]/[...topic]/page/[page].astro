@@ -1,0 +1,21 @@
+---
+import TopicGroupPage from '@/components/TopicGroupPage.astro'
+import { getDefaultLocale } from '@/lib/locale-config'
+import { getDefaultPaginatedTopicDetailPaths } from '@/lib/paginated-section-pages'
+
+export async function getStaticPaths() {
+  return getDefaultPaginatedTopicDetailPaths()
+}
+
+const defaultLocale = getDefaultLocale()
+const { groupId, page, pageType, topicId } = Astro.props
+
+if (pageType !== 'topics' || !groupId || !topicId) {
+  return new Response(null, {
+    status: 404,
+    statusText: 'Not Found',
+  })
+}
+---
+
+<TopicGroupPage groupId={groupId} locale={defaultLocale} page={page} topicId={topicId} />

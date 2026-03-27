@@ -122,13 +122,14 @@ export function getSectionIndexHref(sectionId: string, locale?: string) {
 }
 
 export function getSectionHref(sectionId: string, locale?: string, slug?: string | null) {
-  const indexHref = getSectionIndexHref(sectionId, locale)
+  const normalizedLocale = normalizeLocale(locale)
+  const routeSegment = getSectionRouteSegment(sectionId, normalizedLocale)
 
-  if (!indexHref) {
+  if (!routeSegment) {
     return null
   }
 
-  return slug ? `${indexHref}/${slug}` : indexHref
+  return getLocalePath(normalizedLocale, slug ? `${routeSegment}/${slug}` : routeSegment)
 }
 
 export function getPageTypeLabel(pageType: SectionPageType, locale?: string) {

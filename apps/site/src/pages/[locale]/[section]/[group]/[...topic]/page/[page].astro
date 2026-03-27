@@ -1,0 +1,19 @@
+---
+import TopicGroupPage from '@/components/TopicGroupPage.astro'
+import { getLocalizedPaginatedTopicDetailPaths } from '@/lib/paginated-section-pages'
+
+export async function getStaticPaths() {
+  return getLocalizedPaginatedTopicDetailPaths()
+}
+
+const { groupId, locale, page, pageType, topicId } = Astro.props
+
+if (pageType !== 'topics' || !groupId || !topicId) {
+  return new Response(null, {
+    status: 404,
+    statusText: 'Not Found',
+  })
+}
+---
+
+<TopicGroupPage groupId={groupId} locale={locale} page={page} topicId={topicId} />

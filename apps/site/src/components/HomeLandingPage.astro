@@ -2,6 +2,7 @@
 import CompactSection from '@/components/ui/CompactSection.astro'
 import LinkCard from '@/components/ui/LinkCard.astro'
 import PageHeader from '@/components/ui/PageHeader.astro'
+import RecentlyUpdatedSection from '@/components/RecentlyUpdatedSection.astro'
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import {
   getHomeLandingCopy,
@@ -16,13 +17,16 @@ import {
   getSectionHref,
   getSectionLabel,
 } from '@/lib/section-manifest'
+import type { RecentUpdateItem } from '@/lib/recent-updates'
 import type { SiteLocale } from '@/lib/site-copy'
+import { ui } from '@/lib/ui'
 
 type Props = {
   locale: SiteLocale
+  recentUpdates?: RecentUpdateItem[]
 }
 
-const { locale } = Astro.props
+const { locale, recentUpdates = [] } = Astro.props
 const landing = getHomeLandingCopy(locale)
 const localeHrefs = resolveLocaleHrefMap((supportedLocale) => getLocalePath(supportedLocale))
 const sectionCards = getEnabledSections()
@@ -49,9 +53,11 @@ const sectionCards = getEnabledSections()
     </p>
   </PageHeader>
 
-  <CompactSection className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+  <CompactSection className={ui.cardsGrid}>
     {sectionCards.map((card) => (
       <LinkCard description={card.description} href={card.href} title={card.title} />
     ))}
   </CompactSection>
+
+  <RecentlyUpdatedSection items={recentUpdates} locale={locale} />
 </BaseLayout>

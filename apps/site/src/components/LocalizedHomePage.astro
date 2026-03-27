@@ -9,6 +9,10 @@ import TopicIndexPage from '@/components/TopicIndexPage.astro'
 import TracksPage from '@/components/TracksPage.astro'
 import { HOME_DIRECTORY_PREVIEW_SIZE } from '@/lib/directory'
 import {
+  RECENT_UPDATES_PREVIEW_SIZE,
+  resolveRecentUpdateItems,
+} from '@/lib/recent-updates'
+import {
   resolveEditorialRoadmaps,
   type EditorialLocale,
   type ResolvedEditorialRoadmap,
@@ -33,6 +37,7 @@ type Props = {
 const { locale } = Astro.props
 const homeSectionId = getHomeDefaultSection()
 const homeSection = homeSectionId === 'landing' ? null : getSection(homeSectionId)
+const recentUpdates = await resolveRecentUpdateItems(locale, RECENT_UPDATES_PREVIEW_SIZE)
 
 let roadmaps: ResolvedEditorialRoadmap[] = []
 let activeConcepts: CollectionEntry<'concepts'>[] = []
@@ -52,17 +57,22 @@ if (homeSection?.pageType === 'tracks') {
 ---
 
 {homeSection?.pageType === 'tracks' ? (
-  <TracksPage isHome locale={locale} roadmaps={roadmaps} />
+  <TracksPage isHome locale={locale} recentUpdates={recentUpdates} roadmaps={roadmaps} />
 ) : homeSection?.pageType === 'topics' ? (
-  <TopicIndexPage isHome locale={locale} previewCount={HOME_DIRECTORY_PREVIEW_SIZE} />
+  <TopicIndexPage
+    isHome
+    locale={locale}
+    previewCount={HOME_DIRECTORY_PREVIEW_SIZE}
+    recentUpdates={recentUpdates}
+  />
 ) : homeSection?.pageType === 'concepts' ? (
-  <ConceptsIndexPage concepts={activeConcepts} isHome locale={locale} />
+  <ConceptsIndexPage concepts={activeConcepts} isHome locale={locale} recentUpdates={recentUpdates} />
 ) : homeSection?.pageType === 'glossary' ? (
-  <GlossaryIndexPage isHome locale={locale} terms={activeGlossary} />
+  <GlossaryIndexPage isHome locale={locale} recentUpdates={recentUpdates} terms={activeGlossary} />
 ) : homeSection?.pageType === 'challenges' ? (
-  <ChallengeIndexPage challenges={activeChallenges} isHome locale={locale} />
+  <ChallengeIndexPage challenges={activeChallenges} isHome locale={locale} recentUpdates={recentUpdates} />
 ) : homeSectionId === 'landing' ? (
-  <HomeLandingPage locale={locale} />
+  <HomeLandingPage locale={locale} recentUpdates={recentUpdates} />
 ) : (
-  <ArticlesIndexPage isHome locale={locale} />
+  <ArticlesIndexPage isHome locale={locale} recentUpdates={recentUpdates} />
 )}

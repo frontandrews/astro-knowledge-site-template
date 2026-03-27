@@ -2,6 +2,9 @@
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import CompactSection from '@/components/ui/CompactSection.astro'
 import PageHeader from '@/components/ui/PageHeader.astro'
+import RecentlyUpdatedSection from '@/components/RecentlyUpdatedSection.astro'
+import type { RecentUpdateItem } from '@/lib/recent-updates'
+import type { SiteLocale } from '@/lib/site-copy'
 
 type BreadcrumbItem = {
   href: string | null
@@ -18,6 +21,8 @@ type Props = {
   noindex?: boolean
   pagefind?: boolean
   pageHeaderClassName?: string
+  recentUpdates?: RecentUpdateItem[]
+  recentUpdatesLocale?: SiteLocale
   title: string
 }
 
@@ -31,6 +36,8 @@ const {
   noindex = false,
   pagefind = true,
   pageHeaderClassName = '',
+  recentUpdates = [],
+  recentUpdatesLocale,
   title,
 } = Astro.props
 ---
@@ -55,4 +62,6 @@ const {
   <CompactSection>
     <slot />
   </CompactSection>
+
+  {recentUpdatesLocale ? <RecentlyUpdatedSection items={recentUpdates} locale={recentUpdatesLocale} /> : null}
 </BaseLayout>

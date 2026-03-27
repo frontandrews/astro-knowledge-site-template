@@ -2,12 +2,23 @@
 import type { CollectionEntry } from 'astro:content'
 import PuzzleIcon from '@lucide/astro/icons/puzzle'
 
-import FilterableDirectory from '@/components/FilterableDirectory.svelte'
+import DirectoryList from '@/components/ui/DirectoryList.astro'
+import DirectoryPagination from '@/components/ui/DirectoryPagination.astro'
 import DirectoryIndexShell from '@/components/ui/DirectoryIndexShell.astro'
 import InfoPanel from '@/components/ui/InfoPanel.astro'
+import RouteFilterNav from '@/components/ui/RouteFilterNav.astro'
+import { ARTICLE_DIRECTORY_PAGE_SIZE, paginateItems } from '@/lib/directory'
 import { getChallengeLevelLabel, sortChallenges } from '@/lib/challenge-meta'
-import { getChallengeHrefFromEntry, getChallengeIndexHref } from '@/lib/challenge-links'
+import {
+  getChallengeHrefFromEntry,
+  getChallengeIndexHref,
+  getChallengeIndexPageHref,
+  getChallengeTagHref,
+  getChallengeTagPageHref,
+} from '@/lib/challenge-links'
 import { getLocalePath, resolveLocaleHrefMap } from '@/lib/locale-config'
+import type { RecentUpdateItem } from '@/lib/recent-updates'
+import { getRouteFilterEntries, getRouteFilterEntryById } from '@/lib/route-filters'
 import { getPageTypeDescription, getPageTypeLabel } from '@/lib/section-manifest'
 import { getSiteCopy, type SiteLocale } from '@/lib/site-copy'
 
@@ -15,11 +26,20 @@ type Props = {
   challenges: CollectionEntry<'challenges'>[]
   isHome?: boolean
   locale: SiteLocale
+  page?: number
+  recentUpdates?: RecentUpdateItem[]
+  selectedFilterId?: string | null
 }
 
-const { challenges, isHome = false, locale } = Astro.props
+const {
+  challenges,
+  isHome = false,
+  locale,
+  page = 1,
+  recentUpdates = [],
+  selectedFilterId = null,
+} = Astro.props
 const copy = getSiteCopy(locale)
-const title = getPageTypeLabel('challenges', locale)
 const description = getPageTypeDescription('challenges', locale)
 const localeHrefs = resolveLocaleHrefMap((supportedLocale) =>
   isHome ? getLocalePath(supportedLocale) : getChallengeIndexHref(supportedLocale),
@@ -64,6 +84,18 @@ const items = sortedChallenges.map((challenge) => {
     title: challenge.data.title,
   }
 })
+const filterEntries = getRouteFilterEntries(availableFilters, locale)
+const selectedFilter = selectedFilterId
+  ? getRouteFilterEntryById(availableFilters, locale, selectedFilterId)
+  : null
+const filteredItems = selectedFilter
+  ? items.filter((item) => item.tags.some((tag) => tag.id === selectedFilter.id))
+  : items
+const paginatedItems = paginateItems(filteredItems, page, ARTICLE_DIRECTORY_PAGE_SIZE)
+const title = page > 1
+  ? `${selectedFilter ? `${getPageTypeLabel('challenges', locale)} · ${selectedFilter.label}` : getPageTypeLabel('challenges', locale)} · ${copy.directory.page} ${paginatedItems.currentPage}`
+  : selectedFilter ? `${getPageTypeLabel('challenges', locale)} · ${selectedFilter.label}` : getPageTypeLabel('challenges', locale)
+const isPaginatedArchivePage = paginatedItems.currentPage > 1
 ---
 
 <DirectoryIndexShell
@@ -71,20 +103,37 @@ const items = sortedChallenges.map((challenge) => {
   icon={PuzzleIcon}
   iconLabel={title}
   localeHrefs={localeHrefs}
+  noindex={isPaginatedArchivePage}
+  pagefind={!isPaginatedArchivePage}
+  recentUpdates={isHome ? recentUpdates : []}
+  recentUpdatesLocale={isHome ? locale : undefined}
   title={title}
 >
-  {items.length > 0 ? (
-    <FilterableDirectory
-      allItemsLabel={copy.challengeIndex.allItems}
-      availableFilters={availableFilters}
-      filterLabel={copy.challengeIndex.filterLabel}
-      fewerFiltersLabel={copy.challengeIndex.showLess}
-      items={items}
-      client:idle
-      layout="rows"
-      moreFiltersLabel={copy.challengeIndex.more}
-    />
+  {paginatedItems.items.length > 0 ? (
+    <>
+      <RouteFilterNav
+        activeFilterId={selectedFilter?.id}
+        allHref={getChallengeIndexHref(locale)}
+        allLabel={copy.challengeIndex.allItems}
+        entries={filterEntries}
+        filterLabel={copy.challengeIndex.filterLabel}
+        getHref={(tagSlug) => getChallengeTagHref(locale, tagSlug)}
+      />
+      <DirectoryList items={paginatedItems.items} layout="rows" />
+    </>
   ) : (
     <InfoPanel body={copy.challengeIndex.emptyState} />
   )}
+
+  <DirectoryPagination
+    currentPage={paginatedItems.currentPage}
+    getHref={(targetPage) =>
+      selectedFilter
+        ? getChallengeTagPageHref(locale, selectedFilter.slug, targetPage)
+        : getChallengeIndexPageHref(locale, targetPage)}
+    nextLabel={copy.directory.nextPage}
+    pageCount={paginatedItems.pageCount}
+    pageLabel={copy.directory.page}
+    previousLabel={copy.directory.previousPage}
+  />
 </DirectoryIndexShell>

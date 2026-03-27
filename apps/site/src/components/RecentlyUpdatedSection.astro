@@ -1,0 +1,40 @@
+---
+import CompactSection from '@/components/ui/CompactSection.astro'
+import FilterableDirectory from '@/components/FilterableDirectory.svelte'
+import {
+  getDataHookAttributes,
+  recentUpdatesDomHooks,
+} from '@/lib/dom-hooks'
+import { getSiteCopy, type SiteLocale } from '@/lib/site-copy'
+import type { RecentUpdateItem } from '@/lib/recent-updates'
+import { ui } from '@/lib/ui'
+
+type Props = {
+  items: RecentUpdateItem[]
+  locale: SiteLocale
+}
+
+const { items, locale } = Astro.props
+const copy = getSiteCopy(locale)
+const recentUpdateItems = items.map((item) => ({
+  href: item.href,
+  meta: item.meta,
+  tags: [],
+  title: item.title,
+}))
+---
+
+{items.length > 0 ? (
+  <CompactSection className="grid gap-5">
+    <div class="grid gap-5" {...getDataHookAttributes(recentUpdatesDomHooks.root)}>
+      <div class="grid gap-2 md:max-w-2xl">
+        <h2 class={ui.headingCompact}>{copy.recentUpdates.title}</h2>
+        <p class={ui.bodyCopy}>{copy.recentUpdates.description}</p>
+      </div>
+
+      <div {...getDataHookAttributes(recentUpdatesDomHooks.item)}>
+        <FilterableDirectory items={recentUpdateItems} layout="cards" />
+      </div>
+    </div>
+  </CompactSection>
+) : null}

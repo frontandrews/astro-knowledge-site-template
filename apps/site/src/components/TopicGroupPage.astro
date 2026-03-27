@@ -10,12 +10,16 @@ import {
 import { resolveLocaleHrefMap } from '@/lib/locale-config'
 import { getActiveArticlesByLocale } from '@/lib/site-content'
 import { getSiteCopy, type SiteLocale } from '@/lib/site-copy'
-import { getTopicGroupHref, getTopicGroupPageHref } from '@/lib/topic-links'
+import { getTopicGroupHref, getTopicGroupPageHref, getTopicHref, getTopicPageHref } from '@/lib/topic-links'
 import {
+  getLocalizedTopicLabel,
+  getLocalizedTopicSummary,
+  getTopicBreadcrumb,
   getLocalizedTopicGroupLabel,
   getLocalizedTopicGroupSummary,
   getTopicGroupArticles,
   getTopicGroupBreadcrumb,
+  getTopicTreeArticles,
 } from '@/lib/topic-taxonomy'
 import type { CollectionEntry } from 'astro:content'
 
@@ -24,14 +28,18 @@ type Props = {
   locale: SiteLocale
   page?: number
   posts?: CollectionEntry<'articles'>[]
+  topicId?: string | null
 }
 
-const { groupId, locale, page = 1, posts = [] } = Astro.props
+const { groupId, locale, page = 1, posts = [], topicId = null } = Astro.props
 const copy = getSiteCopy(locale)
-const title = getLocalizedTopicGroupLabel(groupId, locale)
-const description = getLocalizedTopicGroupSummary(groupId, locale)
-const localeHrefs = resolveLocaleHrefMap((supportedLocale) => getTopicGroupHref(groupId, supportedLocale))
-const sourcePosts = posts.length > 0 ? posts : getTopicGroupArticles(await getActiveArticlesByLocale(locale), groupId, locale)
+const title = topicId ? getLocalizedTopicLabel(topicId, locale) : getLocalizedTopicGroupLabel(groupId, locale)
+const description = topicId ? getLocalizedTopicSummary(topicId, locale) : getLocalizedTopicGroupSummary(groupId, locale)
+const localeHrefs = resolveLocaleHrefMap((supportedLocale) =>
+  topicId ? getTopicHref(topicId, supportedLocale) : getTopicGroupHref(groupId, supportedLocale),
+)
+const allPosts = posts.length > 0 ? posts : await getActiveArticlesByLocale(locale)
+const sourcePosts = topicId ? getTopicTreeArticles(allPosts, topicId, locale) : getTopicGroupArticles(allPosts, groupId, locale)
 const items = buildArticleDirectoryItems(sourcePosts, locale, { groupId })
 const paginatedItems = paginateItems(items, page, TOPIC_GROUP_DIRECTORY_PAGE_SIZE)
 const pageTitle = page > 1 ? `${title} · ${copy.directory.page} ${paginatedItems.currentPage}` : title
@@ -39,7 +47,7 @@ const isPaginatedArchivePage = paginatedItems.currentPage > 1
 ---
 
 <DirectoryIndexShell
-  breadcrumbs={getTopicGroupBreadcrumb(groupId, locale)}
+  breadcrumbs={topicId ? getTopicBreadcrumb(topicId, locale) : getTopicGroupBreadcrumb(groupId, locale)}
   description={description}
   localeHrefs={localeHrefs}
   noindex={isPaginatedArchivePage}
@@ -54,7 +62,7 @@ const isPaginatedArchivePage = paginatedItems.currentPage > 1
 
   <DirectoryPagination
     currentPage={paginatedItems.currentPage}
-    getHref={(targetPage) => getTopicGroupPageHref(groupId, locale, targetPage)}
+    getHref={(targetPage) => (topicId ? getTopicPageHref(topicId, locale, targetPage) : getTopicGroupPageHref(groupId, locale, targetPage))}
     nextLabel={copy.directory.nextPage}
     pageCount={paginatedItems.pageCount}
     pageLabel={copy.directory.page}

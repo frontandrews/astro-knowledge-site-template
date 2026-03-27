@@ -2,11 +2,22 @@
 import type { CollectionEntry } from 'astro:content'
 import BrainIcon from '@lucide/astro/icons/brain'
 
-import FilterableDirectory from '@/components/FilterableDirectory.svelte'
+import DirectoryList from '@/components/ui/DirectoryList.astro'
+import DirectoryPagination from '@/components/ui/DirectoryPagination.astro'
 import DirectoryIndexShell from '@/components/ui/DirectoryIndexShell.astro'
-import { getConceptHrefFromEntry, getConceptsHref } from '@/lib/concepts-links'
+import RouteFilterNav from '@/components/ui/RouteFilterNav.astro'
+import {
+  getConceptHrefFromEntry,
+  getConceptsHref,
+  getConceptsPageHref,
+  getConceptsTagHref,
+  getConceptsTagPageHref,
+} from '@/lib/concepts-links'
+import { CARD_DIRECTORY_PAGE_SIZE, paginateItems } from '@/lib/directory'
 import { getLocalePath, resolveLocaleHrefMap } from '@/lib/locale-config'
+import { getRouteFilterEntries, getRouteFilterEntryById } from '@/lib/route-filters'
 import { getPageTypeDescription, getPageTypeLabel } from '@/lib/section-manifest'
+import type { RecentUpdateItem } from '@/lib/recent-updates'
 import {
   CONCEPT_DOMAINS,
   getAvailableConceptGroups,
@@ -21,14 +32,23 @@ type Props = {
   concepts: CollectionEntry<'concepts'>[]
   isHome?: boolean
   locale: SiteLocale
+  page?: number
+  recentUpdates?: RecentUpdateItem[]
+  selectedFilterId?: string | null
 }
 
-const { concepts, isHome = false, locale } = Astro.props
+const {
+  concepts,
+  isHome = false,
+  locale,
+  page = 1,
+  recentUpdates = [],
+  selectedFilterId = null,
+} = Astro.props
 const copy = getSiteCopy(locale)
 const localeHrefs = resolveLocaleHrefMap((supportedLocale) =>
   isHome ? getLocalePath(supportedLocale) : getConceptsHref(supportedLocale),
 )
-const title = getPageTypeLabel('concepts', locale)
 const description = getPageTypeDescription('concepts', locale)
 const availableDomains = CONCEPT_DOMAINS.filter((domain) =>
   concepts.some((concept) => concept.data.domainId === domain.id),
@@ -67,6 +87,18 @@ const items = concepts.map((concept) => {
     title: concept.data.title,
   }
 })
+const filterEntries = getRouteFilterEntries(availableFilters, locale)
+const selectedFilter = selectedFilterId
+  ? getRouteFilterEntryById(availableFilters, locale, selectedFilterId)
+  : null
+const filteredItems = selectedFilter
+  ? items.filter((item) => item.tags.some((tag) => tag.id === selectedFilter.id))
+  : items
+const paginatedItems = paginateItems(filteredItems, page, CARD_DIRECTORY_PAGE_SIZE)
+const title = page > 1
+  ? `${selectedFilter ? `${getPageTypeLabel('concepts', locale)} · ${selectedFilter.label}` : getPageTypeLabel('concepts', locale)} · ${copy.directory.page} ${paginatedItems.currentPage}`
+  : selectedFilter ? `${getPageTypeLabel('concepts', locale)} · ${selectedFilter.label}` : getPageTypeLabel('concepts', locale)
+const isPaginatedArchivePage = paginatedItems.currentPage > 1
 ---
 
 <DirectoryIndexShell
@@ -74,17 +106,32 @@ const items = concepts.map((concept) => {
   icon={BrainIcon}
   iconLabel={title}
   localeHrefs={localeHrefs}
+  noindex={isPaginatedArchivePage}
+  pagefind={!isPaginatedArchivePage}
+  recentUpdates={isHome ? recentUpdates : []}
+  recentUpdatesLocale={isHome ? locale : undefined}
   title={title}
 >
-  <FilterableDirectory
-    allItemsLabel={copy.directory.allItems}
-    availableFilters={availableFilters}
-    articleItemsLabel={copy.directory.articleItems}
+  <RouteFilterNav
+    activeFilterId={selectedFilter?.id}
+    allHref={getConceptsHref(locale)}
+    allLabel={copy.directory.allItems}
+    entries={filterEntries}
     filterLabel={copy.directory.filterByConcept}
-    filterQueryKey="scope"
-    items={items}
-    client:idle
-    layout="cards"
-    noteItemsLabel={copy.directory.noteItems}
+    getHref={(tagSlug) => getConceptsTagHref(locale, tagSlug)}
+  />
+
+  <DirectoryList items={paginatedItems.items} layout="cards" />
+
+  <DirectoryPagination
+    currentPage={paginatedItems.currentPage}
+    getHref={(targetPage) =>
+      selectedFilter
+        ? getConceptsTagPageHref(locale, selectedFilter.slug, targetPage)
+        : getConceptsPageHref(locale, targetPage)}
+    nextLabel={copy.directory.nextPage}
+    pageCount={paginatedItems.pageCount}
+    pageLabel={copy.directory.page}
+    previousLabel={copy.directory.previousPage}
   />
 </DirectoryIndexShell>

@@ -149,6 +149,19 @@ export function getTopicArticles(posts: ArticleEntry[], topicId: string, locale:
   )
 }
 
+export function getTopicTreeArticles(posts: ArticleEntry[], topicId: string, locale: SiteLocale) {
+  const topicIds = new Set([topicId, ...getTopicTreeIds(topicId)])
+
+  return sortArticles(
+    posts.filter(
+      (post) =>
+        post.data.locale === locale &&
+        post.data.status !== 'archived' &&
+        getArticleTopicIds(post).some((articleTopicId) => topicIds.has(articleTopicId)),
+    ),
+  )
+}
+
 export function getTopicGroupArticles(posts: ArticleEntry[], groupId: string, locale: SiteLocale) {
   const topicIds = new Set(getTopicTreeIds(groupId))
 

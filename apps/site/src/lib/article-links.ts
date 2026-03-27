@@ -7,6 +7,7 @@ import {
   SUPPORTED_ARTICLE_LOCALES,
 } from '@/lib/article-registry'
 import { getDefaultLocale, getLocalePath, isSupportedLocale } from '@/lib/locale-config'
+import { getRouteHref } from '@/lib/route-segments'
 
 const SUPPORTED_ARTICLE_LOCALE_SET = new Set<string>(SUPPORTED_ARTICLE_LOCALES)
 
@@ -33,11 +34,13 @@ function getFlatArticleRoutePathFromEntryId(entryId: string) {
 
   const section = getArticleSectionSegment(normalizedLocale)
 
-  return getLocalePath(normalizedLocale, `${section}/${slug}`).replace(/^\/+/, '')
+  return normalizedLocale === getDefaultLocale()
+    ? `${section}/${slug}`
+    : `${normalizedLocale}/${section}/${slug}`
 }
 
 export function getArticleHrefFromEntryId(entryId: string) {
-  return `/${getFlatArticleRoutePathFromEntryId(entryId) ?? getArticleRoutePathFromEntryId(entryId)}`
+  return getRouteHref(getFlatArticleRoutePathFromEntryId(entryId) ?? getArticleRoutePathFromEntryId(entryId))
 }
 
 type ArticleEntryLike = {
@@ -51,7 +54,7 @@ type ArticleEntryLike = {
 export function getArticleHref(articleId: string, locale = 'en') {
   const routePath = getArticleRoutePath(articleId, locale)
 
-  return routePath ? `/${routePath}` : null
+  return routePath ? getRouteHref(routePath) : null
 }
 
 export function getArticleHrefFromEntry(entry: ArticleEntryLike) {
@@ -61,13 +64,13 @@ export function getArticleHrefFromEntry(entry: ArticleEntryLike) {
 export function getArticlePillarHref(pillarId: string, locale = 'en') {
   const routePath = getArticlePillarRoutePath(pillarId, locale)
 
-  return routePath ? `/${routePath}` : null
+  return routePath ? getRouteHref(routePath) : null
 }
 
 export function getArticleBranchHref(pillarId: string, branchId: string, locale = 'en') {
   const routePath = getArticleBranchRoutePath(pillarId, branchId, locale)
 
-  return routePath ? `/${routePath}` : null
+  return routePath ? getRouteHref(routePath) : null
 }
 
 export function getArticlesIndexHref(locale = 'en') {

@@ -2,68 +2,148 @@
 import type { CollectionEntry } from 'astro:content'
 import BookTextIcon from '@lucide/astro/icons/book-text'
 
-import FilterableDirectory from '@/components/FilterableDirectory.svelte'
+import DirectoryList from '@/components/ui/DirectoryList.astro'
+import DirectoryPagination from '@/components/ui/DirectoryPagination.astro'
 import DirectoryIndexShell from '@/components/ui/DirectoryIndexShell.astro'
-import { getGlossaryHrefFromEntry, getGlossaryIndexHref } from '@/lib/glossary-links'
-import { getLocalePath, resolveLocaleHrefMap } from '@/lib/locale-config'
+import RouteFilterNav from '@/components/ui/RouteFilterNav.astro'
+import { CARD_DIRECTORY_PAGE_SIZE, paginateItems } from '@/lib/directory'
+import {
+  getGlossaryHrefFromEntry,
+  getGlossaryIndexHref,
+  getGlossaryIndexPageHref,
+  getGlossaryTagHref,
+  getGlossaryTagPageHref,
+} from '@/lib/glossary-links'
+import {
+  getGlossaryTagEntries,
+  getGlossaryTagEntryById,
+} from '@/lib/glossary-tags'
+import {
+  getLocalePath,
+  getSupportedLocales,
+} from '@/lib/locale-config'
+import type { RecentUpdateItem } from '@/lib/recent-updates'
 import { getPageTypeDescription, getPageTypeLabel } from '@/lib/section-manifest'
-import { translateSiteLabels } from '@/lib/site-labels'
+import { getActiveGlossaryByLocale } from '@/lib/site-content'
 import { getSiteCopy, getSiteDateLocale, type SiteLocale } from '@/lib/site-copy'
+import { ui } from '@/lib/ui'
 
 type Props = {
   isHome?: boolean
   locale: SiteLocale
+  page?: number
+  recentUpdates?: RecentUpdateItem[]
+  selectedTagId?: string | null
   terms: CollectionEntry<'glossary'>[]
 }
 
-const { isHome = false, locale, terms } = Astro.props
+const {
+  isHome = false,
+  locale,
+  page = 1,
+  recentUpdates = [],
+  selectedTagId = null,
+  terms,
+} = Astro.props
 const copy = getSiteCopy(locale)
 const sortLocale = getSiteDateLocale(locale)
-const title = getPageTypeLabel('glossary', locale)
-const description = getPageTypeDescription('glossary', locale)
-const localeHrefs = resolveLocaleHrefMap((supportedLocale) =>
-  isHome ? getLocalePath(supportedLocale) : getGlossaryIndexHref(supportedLocale),
-)
+const baseTitle = getPageTypeLabel('glossary', locale)
+const baseDescription = getPageTypeDescription('glossary', locale)
 const sortedTerms = [...terms].sort((left, right) =>
   left.data.title.localeCompare(right.data.title, sortLocale, {
     sensitivity: 'base',
   }),
 )
-const tagEntries = Array.from(
-  new Map(
-    sortedTerms
-      .flatMap((term) =>
-        translateSiteLabels(term.data.tags, locale).map((label, index) => [term.data.tags[index], label] as const),
-      )
-      .sort((left, right) => left[1].localeCompare(right[1], sortLocale, { sensitivity: 'base' })),
-  ).entries(),
-).map(([id, label]) => ({ id, label }))
-const items = sortedTerms.map((term) => ({
+const tagEntries = getGlossaryTagEntries(sortedTerms, locale)
+const selectedTag = selectedTagId
+  ? getGlossaryTagEntryById(sortedTerms, locale, selectedTagId)
+  : null
+const filteredTerms = selectedTag
+  ? sortedTerms.filter((term) => term.data.tags.includes(selectedTag.id))
+  : sortedTerms
+const items = filteredTerms.map((term) => ({
   href: getGlossaryHrefFromEntry(term),
-  tags: translateSiteLabels(term.data.tags, locale).map((label, index) => ({
-    id: term.data.tags[index],
-    label,
-  })),
+  tags: [],
   title: term.data.title,
 }))
+const paginatedItems = paginateItems(items, page, CARD_DIRECTORY_PAGE_SIZE)
+const titleRoot = selectedTag ? `${baseTitle} · ${selectedTag.label}` : baseTitle
+const title = paginatedItems.currentPage > 1
+  ? `${titleRoot} · ${copy.directory.page} ${paginatedItems.currentPage}`
+  : titleRoot
+const isPaginatedArchivePage = paginatedItems.currentPage > 1
+const localeHrefs = selectedTag && !isHome
+  ? Object.fromEntries(
+      await Promise.all(
+        getSupportedLocales().map(async (supportedLocale) => {
+          const localeTerms = await getActiveGlossaryByLocale(supportedLocale)
+          const localizedTag = getGlossaryTagEntryById(localeTerms, supportedLocale, selectedTag.id)
+
+          return [
+            supportedLocale,
+            localizedTag
+              ? getGlossaryTagHref(supportedLocale, localizedTag.slug)
+              : getGlossaryIndexHref(supportedLocale),
+          ] as const
+        }),
+      ),
+    )
+  : Object.fromEntries(
+      getSupportedLocales().map((supportedLocale) => [
+        supportedLocale,
+        isHome ? getLocalePath(supportedLocale) : getGlossaryIndexHref(supportedLocale),
+      ]),
+    )
+const breadcrumbs = selectedTag
+  ? [
+      {
+        href: getGlossaryIndexHref(locale),
+        label: baseTitle,
+      },
+      {
+        href: null,
+        label: selectedTag.label,
+      },
+    ]
+  : []
 ---
 
 <DirectoryIndexShell
-  description={description}
+  breadcrumbs={breadcrumbs}
+  description={baseDescription}
   icon={BookTextIcon}
-  iconLabel={title}
+  iconLabel={baseTitle}
   localeHrefs={localeHrefs}
+  noindex={isPaginatedArchivePage}
+  pagefind={!isPaginatedArchivePage}
+  recentUpdates={isHome ? recentUpdates : []}
+  recentUpdatesLocale={isHome ? locale : undefined}
   title={title}
 >
-  <FilterableDirectory
-    allItemsLabel={copy.directory.allItems}
-    availableFilters={tagEntries}
-    articleItemsLabel={copy.directory.articleItems}
-    filterLabel={copy.directory.filterByTopic}
-    filterQueryKey="tag"
-    items={items}
-    client:idle
-    layout="cards"
-    noteItemsLabel={copy.directory.noteItems}
+  <RouteFilterNav
+    activeFilterId={selectedTag?.id}
+    allHref={getGlossaryIndexHref(locale)}
+    allLabel={copy.directory.allItems}
+    entries={tagEntries}
+    filterLabel={copy.directory.filterByTag}
+    getHref={(tagSlug) => getGlossaryTagHref(locale, tagSlug)}
+  />
+
+  {paginatedItems.items.length > 0 ? (
+    <DirectoryList items={paginatedItems.items} layout="cards" />
+  ) : (
+    <p class={ui.bodyCopy}>{copy.articlesIndex.comingSoon}</p>
+  )}
+
+  <DirectoryPagination
+    currentPage={paginatedItems.currentPage}
+    getHref={(targetPage) =>
+      selectedTag
+        ? getGlossaryTagPageHref(locale, selectedTag.slug, targetPage)
+        : getGlossaryIndexPageHref(locale, targetPage)}
+    nextLabel={copy.directory.nextPage}
+    pageCount={paginatedItems.pageCount}
+    pageLabel={copy.directory.page}
+    previousLabel={copy.directory.previousPage}
   />
 </DirectoryIndexShell>

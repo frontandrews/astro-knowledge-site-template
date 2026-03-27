@@ -7,6 +7,7 @@ import {
   LEARNING_PATH_PILLARS,
 } from '@/lib/learning-paths'
 import { getDefaultLocale, getNonDefaultLocales } from '@/lib/locale-config'
+import { getEntryLeafRouteSegment } from '@/lib/route-segments'
 import { getActiveArticlesByLocale } from '@/lib/site-content'
 
 function getArticleLocales(includeDefault = false) {
@@ -65,7 +66,7 @@ export async function getLocalizedArticleNotePaths() {
         params: {
           locale,
           section: getArticleSectionSegment(locale),
-          slug: post.id.replace(/^\/+|\/+$/g, '').split('/').filter(Boolean).at(-1) ?? post.id,
+          slug: getEntryLeafRouteSegment(post.id),
         },
         props: {
           locale,
@@ -90,7 +91,7 @@ export async function getDefaultArticleNotePaths() {
     .map((post) => ({
       params: {
         section: getArticleSectionSegment(locale),
-        slug: post.id.replace(/^\/+|\/+$/g, '').split('/').filter(Boolean).at(-1) ?? post.id,
+        slug: getEntryLeafRouteSegment(post.id),
       },
       props: {
         locale,

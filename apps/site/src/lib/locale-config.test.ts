@@ -21,6 +21,7 @@ describe('locale config helpers', () => {
     expect(getLocalePath('en')).toBe('/')
     expect(getLocalePath('en', 'articles')).toBe('/articles')
     expect(getLocalePath('pt-br', 'artigos')).toBe('/pt-br/artigos')
+    expect(getLocalePath('pt-br', 'conceitos/cafe\u0301?guia')).toBe('/pt-br/conceitos/caf%C3%A9%3Fguia')
   })
 
   it('detects the locale from the pathname', () => {

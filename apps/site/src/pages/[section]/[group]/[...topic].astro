@@ -1,0 +1,23 @@
+---
+import TopicGroupPage from '@/components/TopicGroupPage.astro'
+import { getDynamicTopicDetailPaths } from '@/lib/dynamic-section-pages'
+import { getDefaultLocale } from '@/lib/locale-config'
+
+export async function getStaticPaths() {
+  const defaultLocale = getDefaultLocale()
+
+  return getDynamicTopicDetailPaths(defaultLocale)
+}
+
+const defaultLocale = getDefaultLocale()
+const { groupId, pageType, topicId } = Astro.props
+
+if (pageType !== 'topics' || !groupId || !topicId) {
+  return new Response(null, {
+    status: 404,
+    statusText: 'Not Found',
+  })
+}
+---
+
+<TopicGroupPage groupId={groupId} locale={defaultLocale} topicId={topicId} />

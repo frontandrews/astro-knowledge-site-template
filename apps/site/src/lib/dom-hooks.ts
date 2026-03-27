@@ -45,8 +45,39 @@ export const layoutDomHooks = {
   newsletterMirror: createDataHook('data-newsletter-email-mirror'),
 } as const
 
+export const desktopLocaleMenuDomHooks = {
+  link: createDataHook('data-desktop-locale-link'),
+  trigger: createDataHook('data-desktop-locale-trigger'),
+} as const
+
+export const mobileNavMenuDomHooks = {
+  panel: createDataHook('data-mobile-nav-panel'),
+  root: createDataHook('data-mobile-nav-root'),
+  trigger: createDataHook('data-mobile-nav-trigger'),
+} as const
+
+export const directoryPaginationDomHooks = {
+  nextLink: createDataHook('data-directory-pagination-next'),
+  pageLink: createDataHook('data-directory-pagination-page'),
+  previousLink: createDataHook('data-directory-pagination-previous'),
+  root: createDataHook('data-directory-pagination'),
+} as const
+
+export const directoryFilterDomHooks = {
+  noJsNote: createDataHook('data-directory-filter-no-js'),
+} as const
+
 export const articleCompletionSummaryDomHooks = {
+  nextStepLink: createDataHook('data-completion-next-step-link'),
+  nextStepSection: createDataHook('data-completion-next-step-section'),
+  nextStepTitle: createDataHook('data-completion-next-step-title'),
   markUnread: createDataHook('data-completion-mark-unread'),
+  recommendationCandidates: createDataHook('data-completion-recommendation-candidates'),
+  relatedItem: createDataHook('data-completion-related-item'),
+  relatedItemClass: createDataHook('data-completion-related-item-class'),
+  relatedList: createDataHook('data-completion-related-list'),
+  relatedSection: createDataHook('data-completion-related-section'),
+  root: createDataHook('data-article-completion-summary'),
 } as const
 
 export const articleCompletionPanelDomHooks = {
@@ -54,14 +85,27 @@ export const articleCompletionPanelDomHooks = {
   root: createDataHook('data-article-completion-panel'),
 } as const
 
+export const challengePlaygroundDomHooks = {
+  allPassingBadge: createDataHook('data-challenge-all-passing'),
+  noJsFallback: createDataHook('data-challenge-playground-no-js'),
+  shareUrl: createDataHook('data-challenge-share-url'),
+  root: createDataHook('data-challenge-playground'),
+  runButton: createDataHook('data-challenge-run'),
+  storageWarning: createDataHook('data-challenge-storage-warning'),
+} as const
+
 export const articleShareDomHooks = {
   copyButton: createDataHook('data-share-copy'),
   copyLinkError: createDataHook('data-copy-link-error'),
+  copyLinkManual: createDataHook('data-copy-link-manual'),
   copyLinkSuccess: createDataHook('data-copy-link-success'),
   description: createDataHook('data-share-description'),
   fallback: createDataHook('data-share-fallback'),
   feedback: createDataHook('data-share-feedback'),
+  manualInput: createDataHook('data-share-manual-input'),
+  manualSection: createDataHook('data-share-manual-section'),
   nativeButton: createDataHook('data-share-native'),
+  ready: createDataHook('data-share-ready'),
   root: createDataHook('data-article-share'),
   title: createDataHook('data-share-title'),
   url: createDataHook('data-share-url'),
@@ -96,6 +140,7 @@ export const trackProgressDomHooks = {
   nextLink: createDataHook('data-track-next-link'),
   nextTrackLabel: createDataHook('data-track-next-track-label'),
   nextText: createDataHook('data-track-next-text'),
+  noJsNote: createDataHook('data-track-progress-no-js'),
   ofLabel: createDataHook('data-of-label'),
   overallIcon: createDataHook('data-track-overall-icon'),
   overallText: createDataHook('data-track-overall-text'),
@@ -106,6 +151,37 @@ export const trackProgressDomHooks = {
   reviewLabel: createDataHook('data-review-label'),
   root: createDataHook('data-track-progress-root'),
   stepLabel: createDataHook('data-step-label'),
+} as const
+
+export const trackPageDomHooks = {
+  concept: createDataHook('data-track-concept'),
+  conceptTitle: createDataHook('data-track-concept-title'),
+} as const
+
+export const solutionRevealDomHooks = {
+  confirmButton: createDataHook('data-solution-reveal-confirm'),
+  content: createDataHook('data-solution-reveal-content'),
+  noJsDetails: createDataHook('data-solution-reveal-no-js'),
+  triggerButton: createDataHook('data-solution-reveal-trigger'),
+} as const
+
+export const searchLauncherDomHooks = {
+  desktopTrigger: createDataHook('data-search-launcher-desktop-trigger'),
+  dialog: createDataHook('data-search-launcher-dialog'),
+  input: createDataHook('data-search-launcher-input'),
+  mobileTrigger: createDataHook('data-search-launcher-mobile-trigger'),
+  noJsFallback: createDataHook('data-search-launcher-no-js-fallback'),
+  resultLink: createDataHook('data-search-launcher-result-link'),
+} as const
+
+export const recentUpdatesDomHooks = {
+  item: createDataHook('data-recent-updates-item'),
+  root: createDataHook('data-recent-updates-root'),
+} as const
+
+export const legalPageDomHooks = {
+  operationalReview: createDataHook('data-legal-operational-review'),
+  publicationChecklist: createDataHook('data-legal-publication-checklist'),
 } as const
 
 export function getDataHookAttributes<Name extends string>(

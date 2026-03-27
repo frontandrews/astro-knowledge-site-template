@@ -1,9 +1,11 @@
 import type { CollectionEntry } from 'astro:content'
-import { TOPIC_GROUP_DEFINITIONS, getTopicGroupRouteSegment } from '@template/content'
+import { TOPIC_GROUP_DEFINITIONS, getTopicGroupRouteSegment, getTopicPathSegments } from '@template/content'
 
 import { getChallengeSlugFromEntry } from '@/lib/challenge-links'
 import { getConceptSlugFromEntry } from '@/lib/concepts-links'
+import { assertUniqueStaticPaths } from '@/lib/content-integrity'
 import { getDefaultLocale } from '@/lib/locale-config'
+import { getEntryLeafRouteSegment, getNormalizedRouteSegment } from '@/lib/route-segments'
 import {
   resolveEditorialRoadmaps,
   type EditorialLocale,
@@ -56,6 +58,14 @@ type DynamicSectionDetailProps = {
   topics?: ReturnType<typeof getAvailableTopicsInGroup>
 }
 
+type DynamicTopicDetailProps = {
+  groupId: string
+  locale: SectionLocale
+  pageType: 'topics'
+  sectionId: string
+  topicId: string
+}
+
 type StaticPath<Props> = {
   params: Record<string, string>
   props: Props
@@ -90,7 +100,7 @@ export async function getDynamicSectionIndexPaths(locale: SectionLocale) {
   const activeGlossary = await getActiveGlossaryByLocale(locale)
   const activeChallenges = await getActiveChallengesByLocale(locale)
 
-  return sections.map<StaticPath<DynamicSectionIndexProps>>((section) => {
+  return assertUniqueStaticPaths(sections.map<StaticPath<DynamicSectionIndexProps>>((section) => {
     const props: DynamicSectionIndexProps = {
       locale,
       pageType: section.pageType,
@@ -114,7 +124,7 @@ export async function getDynamicSectionIndexPaths(locale: SectionLocale) {
       },
       props,
     }
-  })
+  }), 'dynamic section index')
 }
 
 export async function getDynamicSectionDetailPaths(locale: SectionLocale) {
@@ -126,22 +136,26 @@ export async function getDynamicSectionDetailPaths(locale: SectionLocale) {
   const activeGlossary = await getActiveGlossaryByLocale(locale)
   const activeChallenges = await getActiveChallengesByLocale(locale)
 
-  return sections.flatMap<StaticPath<DynamicSectionDetailProps>>((section) => {
+  return assertUniqueStaticPaths(sections.flatMap<StaticPath<DynamicSectionDetailProps>>((section) => {
     if (section.pageType === 'tracks') {
-      return resolveEditorialRoadmaps(locale as EditorialLocale, articles).map((roadmap) => ({
-        params: {
-          ...(isDefaultLocale ? {} : { locale }),
-          section: section.routes[locale],
-          slug: roadmap.slug,
-        },
-        props: {
-          locale,
-          pageType: section.pageType,
-          roadmap,
-          sectionId: section.id,
-          slug: roadmap.slug,
-        },
-      }))
+      return resolveEditorialRoadmaps(locale as EditorialLocale, articles).map((roadmap) => {
+        const slug = getNormalizedRouteSegment(roadmap.slug)
+
+        return {
+          params: {
+            ...(isDefaultLocale ? {} : { locale }),
+            section: section.routes[locale],
+            slug,
+          },
+          props: {
+            locale,
+            pageType: section.pageType,
+            roadmap,
+            sectionId: section.id,
+            slug,
+          },
+        }
+      })
     }
 
     if (section.pageType === 'topics') {
@@ -153,7 +167,7 @@ export async function getDynamicSectionDetailPaths(locale: SectionLocale) {
           return []
         }
 
-        const slug = getTopicGroupRouteSegment(group.id, locale)
+        const slug = getNormalizedRouteSegment(getTopicGroupRouteSegment(group.id, locale))
 
         return [
           {
@@ -197,7 +211,7 @@ export async function getDynamicSectionDetailPaths(locale: SectionLocale) {
 
     if (section.pageType === 'glossary') {
       return activeGlossary.map((term) => {
-        const slug = term.id.split('/').slice(1).join('/')
+        const slug = getEntryLeafRouteSegment(term.id)
 
         return {
           params: {
@@ -238,5 +252,41 @@ export async function getDynamicSectionDetailPaths(locale: SectionLocale) {
     }
 
     return []
-  })
+  }), 'dynamic section detail')
+}
+
+export async function getDynamicTopicDetailPaths(locale: SectionLocale) {
+  const isDefaultLocale = locale === getDefaultLocale()
+  const topicsSection = getRoutableSections(locale).find((section) => section.pageType === 'topics')
+
+  if (!topicsSection) {
+    return []
+  }
+
+  const activeArticles = await getActiveArticlesByLocale(locale)
+
+  return assertUniqueStaticPaths(
+    TOPIC_GROUP_DEFINITIONS.flatMap<StaticPath<DynamicTopicDetailProps>>((group) =>
+      getAvailableTopicsInGroup(activeArticles, group.id, locale).map((topic) => {
+        const [, ...topicSegments] = getTopicPathSegments(topic.id, locale)
+
+        return {
+          params: {
+            ...(isDefaultLocale ? {} : { locale }),
+            group: getTopicGroupRouteSegment(group.id, locale),
+            section: topicsSection.routes[locale],
+            topic: topicSegments.join('/'),
+          },
+          props: {
+            groupId: group.id,
+            locale,
+            pageType: 'topics',
+            sectionId: topicsSection.id,
+            topicId: topic.id,
+          },
+        }
+      }),
+    ),
+    'dynamic topic detail',
+  )
 }

@@ -1,4 +1,4 @@
-import { getTopicGroupRouteSegment, getTopicRouteSegment } from '@template/content'
+import { getTopicGroupRouteSegment, getTopicPathSegments } from '@template/content'
 import { getLocalePath } from '@/lib/locale-config'
 import { getPageTypeHref } from '@/lib/section-manifest'
 
@@ -14,9 +14,7 @@ export function getTopicIndexPageHref(locale = 'en', page = 1) {
 }
 
 export function getTopicGroupHref(groupId: string, locale = 'en') {
-  const baseHref = getTopicIndexHref(locale)
-
-  return `${baseHref}/${getTopicGroupRouteSegment(groupId, locale)}`
+  return getPageTypeHref('topics', locale, getTopicGroupRouteSegment(groupId, locale)) ?? getTopicIndexHref(locale)
 }
 
 export function getTopicGroupPageHref(groupId: string, locale = 'en', page = 1) {
@@ -27,9 +25,19 @@ export function getTopicGroupPageHref(groupId: string, locale = 'en', page = 1) 
 }
 
 export function getTopicHref(topicId: string, locale = 'en') {
-  const params = new URLSearchParams({
-    topic: getTopicRouteSegment(topicId, locale),
-  })
+  const topicPath = getTopicPathSegments(topicId, locale)
+  const [groupSegment, ...topicSegments] = topicPath
 
-  return `${getTopicIndexHref(locale)}?${params.toString()}`
+  if (!groupSegment || topicSegments.length === 0) {
+    return getTopicIndexHref(locale)
+  }
+
+  return `${getTopicIndexHref(locale)}/${groupSegment}/${topicSegments.join('/')}`
+}
+
+export function getTopicPageHref(topicId: string, locale = 'en', page = 1) {
+  const baseHref = getTopicHref(topicId, locale)
+  const normalizedPage = Number.isFinite(page) ? Math.max(1, Math.floor(page)) : 1
+
+  return normalizedPage <= 1 ? baseHref : `${baseHref}/page/${normalizedPage}`
 }
