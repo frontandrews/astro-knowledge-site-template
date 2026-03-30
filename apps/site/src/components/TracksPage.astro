@@ -84,7 +84,7 @@ const isPaginatedArchivePage = paginatedItems.currentPage > 1
     title={title}
   />
 
-  <CompactSection>
+  <CompactSection data-pagefind-ignore>
     <RouteFilterNav
       activeFilterId={selectedFilter?.id}
       allHref={getTracksHref(locale) ?? getLocalePath(locale)}
@@ -109,5 +109,9 @@ const isPaginatedArchivePage = paginatedItems.currentPage > 1
     />
   </CompactSection>
 
-  {isHome ? <RecentlyUpdatedSection items={recentUpdates} locale={locale} /> : null}
+  {isHome ? (
+    <div data-pagefind-ignore>
+      <RecentlyUpdatedSection items={recentUpdates} locale={locale} />
+    </div>
+  ) : null}
 </BaseLayout>

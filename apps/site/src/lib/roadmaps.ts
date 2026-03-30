@@ -40,13 +40,13 @@ export {
 }
 
 function isRenderableRoadmapArticleNode(node: ResolvedRoadmapArticleNode) {
-  return node.post.data.status === 'active' && node.post.data.trackEligible
+  return node.isAvailableInLocale && node.post.data.status === 'active' && node.post.data.trackEligible
 }
 
 function sanitizeRoadmapNodes(nodes: ResolvedRoadmapNode[]) {
   return nodes.flatMap<ResolvedRoadmapNode>((node) => {
     if (node.kind === 'article') {
-      return isRenderableRoadmapArticleNode(node) ? [node] : []
+      return isRenderableRoadmapArticleNode(node) || !node.isAvailableInLocale ? [node] : []
     }
 
     return [

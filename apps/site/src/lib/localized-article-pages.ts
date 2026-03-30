@@ -1,3 +1,5 @@
+import type { CollectionEntry } from 'astro:content'
+
 import { getArticleCanonicalParams } from '@/lib/article-taxonomy'
 import { getArticleSectionSegment, SUPPORTED_ARTICLE_LOCALES } from '@/lib/article-registry'
 import { sortArticles } from '@/lib/article-tree'
@@ -8,7 +10,9 @@ import {
 } from '@/lib/learning-paths'
 import { getDefaultLocale, getNonDefaultLocales } from '@/lib/locale-config'
 import { getEntryLeafRouteSegment } from '@/lib/route-segments'
-import { getActiveArticlesByLocale } from '@/lib/site-content'
+import { getActiveArticlesByLocale, getArticleCollection } from '@/lib/site-content'
+
+type ArticlePathEntry = CollectionEntry<'articles'>
 
 function getArticleLocales(includeDefault = false) {
   const supportedArticleLocales = new Set<string>(SUPPORTED_ARTICLE_LOCALES)
@@ -56,6 +60,33 @@ export function getDefaultArticleIndexPaths() {
       },
     },
   ]
+}
+
+export function getArticleCanonicalParamsForLocale(post: ArticlePathEntry, locale: string) {
+  if ((post.data.locale ?? null) === locale) {
+    return getArticleCanonicalParams(post as never)
+  }
+
+  const defaultArticleLocale = getDefaultArticleLocale()
+
+  if (
+    locale !== defaultArticleLocale ||
+    post.data.kind === 'note' ||
+    !post.data.pillarId
+  ) {
+    return null
+  }
+
+  const pillar = getLearningPathPillarRouteSegment(post.data.pillarId, locale)
+
+  if (!pillar) {
+    return null
+  }
+
+  return {
+    pillar,
+    slug: post.data.articleId,
+  }
 }
 
 export async function getLocalizedArticleNotePaths() {
@@ -207,28 +238,74 @@ export async function getDefaultArticleCanonicalPaths() {
   }
 
   const posts = await getActiveArticlesByLocale(locale)
+  const localizedArticleIds = new Set(posts.map((post) => post.data.articleId))
+  const fallbackPostsByArticleId = new Map<string, ArticlePathEntry>()
+  const allArticles = await getArticleCollection()
 
-  return posts
-    .flatMap((post) => {
-      const params = getArticleCanonicalParams(post)
-
-      if (!params) {
-        return []
+  allArticles
+    .filter((entry) => entry.data.status === 'active' && entry.data.locale !== locale)
+    .sort((left, right) => {
+      if (left.data.locale === 'pt-br' && right.data.locale !== 'pt-br') {
+        return -1
       }
 
-      return [
-        {
-          params: {
-            ...params,
-            section: getArticleSectionSegment(locale),
-          },
-          props: {
-            locale,
-            post,
-          },
-        },
-      ]
+      if (left.data.locale !== 'pt-br' && right.data.locale === 'pt-br') {
+        return 1
+      }
+
+      return 0
     })
+    .forEach((entry) => {
+      if (localizedArticleIds.has(entry.data.articleId) || fallbackPostsByArticleId.has(entry.data.articleId)) {
+        return
+      }
+
+      fallbackPostsByArticleId.set(entry.data.articleId, entry)
+    })
+
+  const localizedPaths = posts.flatMap((post) => {
+    const params = getArticleCanonicalParams(post)
+
+    if (!params) {
+      return []
+    }
+
+    return [
+      {
+        params: {
+          ...params,
+          section: getArticleSectionSegment(locale),
+        },
+        props: {
+          locale,
+          post,
+        },
+      },
+    ]
+  })
+
+  const placeholderPaths = [...fallbackPostsByArticleId.values()].flatMap((post) => {
+    const params = getArticleCanonicalParamsForLocale(post, locale)
+
+    if (!params) {
+      return []
+    }
+
+    return [
+      {
+        params: {
+          ...params,
+          section: getArticleSectionSegment(locale),
+        },
+        props: {
+          comingSoonPost: post,
+          locale,
+        },
+      },
+    ]
+  })
+
+  return [...localizedPaths, ...placeholderPaths]
 }
 
 export async function getLocalizedArticleBranchPaths() {

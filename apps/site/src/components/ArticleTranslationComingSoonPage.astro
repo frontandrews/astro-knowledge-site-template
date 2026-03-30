@@ -1,0 +1,114 @@
+---
+import type { CollectionEntry } from 'astro:content'
+
+import PageHeader from '@/components/ui/PageHeader.astro'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import { getArticleHrefFromEntry, getArticlesIndexHref } from '@/lib/article-links'
+import { getLocaleLabel, resolveLocaleMap } from '@/lib/locale-config'
+import { getArticleCollection } from '@/lib/site-content'
+import { type SiteLocale } from '@/lib/site-copy'
+import { ui } from '@/lib/ui'
+
+type Props = {
+  locale: SiteLocale
+  sourcePost: CollectionEntry<'articles'>
+}
+
+const { locale, sourcePost } = Astro.props
+const currentPath = Astro.url.pathname.replace(/\/+$/, '') || '/'
+const allArticles = await getArticleCollection()
+const publishedVersions = allArticles.filter(
+  (entry) => entry.data.articleId === sourcePost.data.articleId && entry.data.status === 'active',
+)
+const availableOtherLocales = publishedVersions
+  .filter((entry) => entry.data.locale !== locale)
+  .map((entry) => ({
+    href: getArticleHrefFromEntry(entry),
+    locale: entry.data.locale,
+    title: entry.data.title,
+  }))
+  .filter((entry): entry is { href: string; locale: string; title: string } => Boolean(entry.href))
+const primaryAvailableLocale = availableOtherLocales[0] ?? null
+const localeHrefs = resolveLocaleMap((supportedLocale) => {
+  if (supportedLocale === locale) {
+    return currentPath
+  }
+
+  const localizedEntry = availableOtherLocales.find((entry) => entry.locale === supportedLocale)
+
+  return localizedEntry?.href ?? getArticlesIndexHref(supportedLocale)
+})
+const alternateLocaleHrefs = resolveLocaleMap((supportedLocale) => {
+  if (supportedLocale === locale) {
+    return currentPath
+  }
+
+  const localizedEntry = availableOtherLocales.find((entry) => entry.locale === supportedLocale)
+
+  return localizedEntry?.href ?? null
+})
+const copy = locale === 'pt-br'
+  ? {
+      browseLabel: 'Explorar artigos',
+      description: primaryAvailableLocale
+        ? `Este artigo ja esta publicado em ${getLocaleLabel(primaryAvailableLocale.locale)}. A versao em portugues esta a caminho.`
+        : 'Este artigo ainda nao foi publicado em portugues.',
+      kicker: 'Em breve',
+      primaryAction: primaryAvailableLocale
+        ? `Ler em ${getLocaleLabel(primaryAvailableLocale.locale)}`
+        : null,
+      publishedVersionLabel: primaryAvailableLocale
+        ? `Versao publicada agora: ${primaryAvailableLocale.title}`
+        : null,
+      title: 'Versao em portugues em breve',
+    }
+  : {
+      browseLabel: 'Explore articles',
+      description: primaryAvailableLocale
+        ? `This article is already published in ${getLocaleLabel(primaryAvailableLocale.locale)}. The English version is on the way.`
+        : 'This article has not been published in English yet.',
+      kicker: 'Coming soon',
+      primaryAction: primaryAvailableLocale
+        ? `Read in ${getLocaleLabel(primaryAvailableLocale.locale)}`
+        : null,
+      publishedVersionLabel: primaryAvailableLocale
+        ? `Available now: ${primaryAvailableLocale.title}`
+        : null,
+      title: 'English version coming soon',
+    }
+---
+
+<BaseLayout
+  alternateLocaleHrefs={alternateLocaleHrefs}
+  description={copy.description}
+  localeHrefs={localeHrefs}
+  noindex={true}
+  pagefind={false}
+  title={copy.title}
+>
+  <section class={ui.compactSection}>
+    <PageHeader description={copy.description} title={copy.title}>
+      <p class={`${ui.eyebrow} mt-4`}>{copy.kicker}</p>
+    </PageHeader>
+
+    <div class={ui.toolbar}>
+      <div class="max-w-3xl space-y-4">
+        {copy.publishedVersionLabel ? (
+          <p class={ui.bodyCopy}>{copy.publishedVersionLabel}</p>
+        ) : null}
+
+        <div class="flex flex-wrap gap-3">
+          {primaryAvailableLocale ? (
+            <a class={`${ui.controlButton} min-h-11 px-4 text-sm font-semibold`} href={primaryAvailableLocale.href}>
+              {copy.primaryAction}
+            </a>
+          ) : null}
+
+          <a class={`${ui.controlButton} min-h-11 px-4 text-sm font-semibold`} href={getArticlesIndexHref(locale)}>
+            {copy.browseLabel}
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

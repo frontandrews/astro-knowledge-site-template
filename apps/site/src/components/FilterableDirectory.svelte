@@ -527,97 +527,142 @@
   {#each visibleItems as item}
     {#if layout === 'rows'}
       <article class={cn('content-directory-item', rowItemClass, 'relative', isComplete(item) && 'is-complete')} {...getDataHookAttributes(completionDomHooks.item, item.completionId)}>
-        <a class={itemLinkClass} href={item.href}>
+        {#if item.href}
+          <a class={itemLinkClass} href={item.href}>
+            {#if item.completionId}
+              <span
+                aria-hidden="true"
+                class={cn('content-directory-complete-badge', ui.completionBadgeLinear)}
+                {...getDataHookAttributes(completionDomHooks.completeBadge)}
+              >
+                ✓
+              </span>
+            {/if}
+            {#if item.eyebrow || item.badgeLabel}
+              <div class="flex flex-wrap items-center gap-2">
+                {#if item.eyebrow}
+                  <p class={itemEyebrowClass}>{item.eyebrow}</p>
+                {/if}
+                {#if item.badgeLabel}
+                  {#if item.eyebrow}
+                    <span aria-hidden="true" class={itemEyebrowClass}>•</span>
+                  {/if}
+                  <p class={itemEyebrowClass}>{item.badgeLabel}</p>
+                {/if}
+              </div>
+            {/if}
+            <div class="grid min-w-0 gap-2">
+              <h3 class={cn('content-directory-title', ui.linearItemTitle, 'transition-colors duration-150')} {...getDataHookAttributes(completionDomHooks.title)}>
+                {item.title}
+              </h3>
+            </div>
+            {#if item.description}
+              <p class={ui.cardDescription}>{item.description}</p>
+            {/if}
+            {#if item.ctaLabel}
+              {#if isComplete(item)}
+                <span class={cn('content-directory-mobile-complete-text', ui.inlineCta, 'md:hidden')}>
+                  <span>{getCompletedCtaLabel(item)}</span>
+                  <ArrowRightIcon className="size-[0.88rem]" />
+                </span>
+                <span class={ui.completionRailLg}>
+                  <span class={cn('content-directory-complete-text', ui.completionDesktopCtaInteractive)} {...getDataHookAttributes(completionDomHooks.completeText)}>
+                    <span>{getCompletedCtaLabel(item)}</span>
+                    <ArrowRightIcon className="size-[0.88rem]" />
+                  </span>
+                </span>
+              {:else}
+                <span class={cn('content-directory-mobile-default-cta', ui.inlineCta, 'md:hidden')}>
+                  <span>{item.ctaLabel}</span>
+                  <ArrowRightIcon className="size-[0.88rem]" />
+                </span>
+                <span class={ui.completionRailInlineMd}>
+                  <span class={cn('content-directory-default-cta', ui.completionDesktopCtaInteractive)}>
+                    <span>{item.ctaLabel}</span>
+                    <ArrowRightIcon className="size-[0.88rem]" />
+                  </span>
+                </span>
+              {/if}
+            {/if}
+          </a>
+        {:else}
+          <div class={itemLinkClass}>
+            {#if item.eyebrow || item.badgeLabel}
+              <div class="flex flex-wrap items-center gap-2">
+                {#if item.eyebrow}
+                  <p class={itemEyebrowClass}>{item.eyebrow}</p>
+                {/if}
+                {#if item.badgeLabel}
+                  {#if item.eyebrow}
+                    <span aria-hidden="true" class={itemEyebrowClass}>•</span>
+                  {/if}
+                  <p class={itemEyebrowClass}>{item.badgeLabel}</p>
+                {/if}
+              </div>
+            {/if}
+            <div class="grid min-w-0 gap-2">
+              <h3 class={cn('content-directory-title', ui.linearItemTitle)} {...getDataHookAttributes(completionDomHooks.title)}>
+                {item.title}
+              </h3>
+            </div>
+            {#if item.description}
+              <p class={ui.cardDescription}>{item.description}</p>
+            {/if}
+            {#if item.meta}
+              <p class={ui.cardMeta}>{item.meta}</p>
+            {/if}
+          </div>
+        {/if}
+      </article>
+    {:else}
+      {#if item.href}
+        <a class={cn('content-directory-item', itemLinkClass, 'relative', isComplete(item) && 'is-complete')} href={item.href} {...getDataHookAttributes(completionDomHooks.item, item.completionId)}>
           {#if item.completionId}
             <span
               aria-hidden="true"
-              class={cn('content-directory-complete-badge', ui.completionBadgeLinear)}
+              class={cn('content-directory-complete-badge', ui.completionBadgeCard)}
               {...getDataHookAttributes(completionDomHooks.completeBadge)}
             >
               ✓
             </span>
           {/if}
-          {#if item.eyebrow || item.badgeLabel}
-            <div class="flex flex-wrap items-center gap-2">
-              {#if item.eyebrow}
-                <p class={itemEyebrowClass}>{item.eyebrow}</p>
-              {/if}
-              {#if item.badgeLabel}
-                {#if item.eyebrow}
-                  <span aria-hidden="true" class={itemEyebrowClass}>•</span>
-                {/if}
-                <p class={itemEyebrowClass}>{item.badgeLabel}</p>
+          <div class="grid gap-2">
+            <div class="flex items-center justify-between gap-4">
+              <h2 class={cn('content-directory-title', ui.linkCardTitle)}>{item.title}</h2>
+              {#if item.completionId}
+                <span class="content-directory-trailing-arrow">
+                  <ArrowRightIcon className="size-4 shrink-0 text-site-ink-muted transition-colors duration-150 group-hover:text-site-link-hover group-focus-within:text-site-link-hover" />
+                </span>
+                <span class="content-directory-trailing-complete-icon">
+                  <CircleCheckIcon className="size-4 shrink-0 text-site-success" />
+                </span>
+              {:else}
+                <ArrowRightIcon className="size-4 shrink-0 text-site-ink-muted transition-colors duration-150 group-hover:text-site-link-hover group-focus-within:text-site-link-hover" />
               {/if}
             </div>
-          {/if}
-          <div class="grid min-w-0 gap-2">
-            <h3 class={cn('content-directory-title', ui.linearItemTitle, 'transition-colors duration-150')} {...getDataHookAttributes(completionDomHooks.title)}>
-              {item.title}
-            </h3>
-          </div>
-          {#if item.description}
-            <p class={ui.cardDescription}>{item.description}</p>
-          {/if}
-          {#if item.ctaLabel}
-            {#if isComplete(item)}
-              <span class={cn('content-directory-mobile-complete-text', ui.inlineCta, 'md:hidden')}>
-                <span>{getCompletedCtaLabel(item)}</span>
-                <ArrowRightIcon className="size-[0.88rem]" />
-              </span>
-              <span class={ui.completionRailLg}>
-                <span class={cn('content-directory-complete-text', ui.completionDesktopCtaInteractive)} {...getDataHookAttributes(completionDomHooks.completeText)}>
-                  <span>{getCompletedCtaLabel(item)}</span>
-                  <ArrowRightIcon className="size-[0.88rem]" />
-                </span>
-              </span>
-            {:else}
-              <span class={cn('content-directory-mobile-default-cta', ui.inlineCta, 'md:hidden')}>
-                <span>{item.ctaLabel}</span>
-                <ArrowRightIcon className="size-[0.88rem]" />
-              </span>
-              <span class={ui.completionRailInlineMd}>
-                <span class={cn('content-directory-default-cta', ui.completionDesktopCtaInteractive)}>
-                  <span>{item.ctaLabel}</span>
-                  <ArrowRightIcon className="size-[0.88rem]" />
-                </span>
-              </span>
+            {#if item.description}
+              <p class={ui.cardDescription}>{item.description}</p>
             {/if}
-          {/if}
+            {#if item.meta}
+              <p class={ui.cardMeta}>{item.meta}</p>
+            {/if}
+          </div>
         </a>
-      </article>
-    {:else}
-      <a class={cn('content-directory-item', itemLinkClass, 'relative', isComplete(item) && 'is-complete')} href={item.href} {...getDataHookAttributes(completionDomHooks.item, item.completionId)}>
-        {#if item.completionId}
-          <span
-            aria-hidden="true"
-            class={cn('content-directory-complete-badge', ui.completionBadgeCard)}
-            {...getDataHookAttributes(completionDomHooks.completeBadge)}
-          >
-            ✓
-          </span>
-        {/if}
-        <div class="grid gap-2">
-          <div class="flex items-center justify-between gap-4">
-            <h2 class={cn('content-directory-title', ui.linkCardTitle)}>{item.title}</h2>
-            {#if item.completionId}
-              <span class="content-directory-trailing-arrow">
-                <ArrowRightIcon className="size-4 shrink-0 text-site-ink-muted transition-colors duration-150 group-hover:text-site-link-hover group-focus-within:text-site-link-hover" />
-              </span>
-              <span class="content-directory-trailing-complete-icon">
-                <CircleCheckIcon className="size-4 shrink-0 text-site-success" />
-              </span>
-            {:else}
-              <ArrowRightIcon className="size-4 shrink-0 text-site-ink-muted transition-colors duration-150 group-hover:text-site-link-hover group-focus-within:text-site-link-hover" />
+      {:else}
+        <div class={cn('content-directory-item', itemLinkClass, 'relative')} {...getDataHookAttributes(completionDomHooks.item, item.completionId)}>
+          <div class="grid gap-2">
+            <div class="flex items-center justify-between gap-4">
+              <h2 class={cn('content-directory-title', ui.linkCardTitle)}>{item.title}</h2>
+            </div>
+            {#if item.description}
+              <p class={ui.cardDescription}>{item.description}</p>
+            {/if}
+            {#if item.meta}
+              <p class={ui.cardMeta}>{item.meta}</p>
             {/if}
           </div>
-          {#if item.description}
-            <p class={ui.cardDescription}>{item.description}</p>
-          {/if}
-          {#if item.meta}
-            <p class={ui.cardMeta}>{item.meta}</p>
-          {/if}
         </div>
-      </a>
+      {/if}
     {/if}
   {/each}
 </div>

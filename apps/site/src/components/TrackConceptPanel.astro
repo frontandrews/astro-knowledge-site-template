@@ -8,7 +8,8 @@ import { ui } from '@/lib/ui'
 
 type TrackArticleItem = {
   completionId?: string
-  href: string
+  href: string | null
+  meta?: string
   tags: Array<{
     id: string
     label: string

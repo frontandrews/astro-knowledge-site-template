@@ -53,11 +53,15 @@ const sectionCards = getEnabledSections()
     </p>
   </PageHeader>
 
-  <CompactSection className={ui.cardsGrid}>
-    {sectionCards.map((card) => (
-      <LinkCard description={card.description} href={card.href} title={card.title} />
-    ))}
-  </CompactSection>
+  <div data-pagefind-ignore>
+    <CompactSection className={ui.cardsGrid}>
+      {sectionCards.map((card) => (
+        <LinkCard description={card.description} href={card.href} title={card.title} />
+      ))}
+    </CompactSection>
+  </div>
 
-  <RecentlyUpdatedSection items={recentUpdates} locale={locale} />
+  <div data-pagefind-ignore>
+    <RecentlyUpdatedSection items={recentUpdates} locale={locale} />
+  </div>
 </BaseLayout>

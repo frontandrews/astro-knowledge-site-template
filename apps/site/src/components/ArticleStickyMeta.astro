@@ -150,7 +150,7 @@ const controllerId = randomUUID()
 
     <div
       aria-hidden="true"
-      class="article-reading-progress article-reading-progress-mobile pointer-events-none fixed inset-x-0 bottom-0 z-40 border-t border-site-line bg-site-panel px-3 pt-0 pb-0 shadow-[0_-12px_30px_color-mix(in_srgb,var(--site-bg)_35%,transparent)] xl:hidden"
+      class="article-reading-progress article-reading-progress-mobile pointer-events-none fixed inset-x-0 bottom-0 z-40 border-t border-site-line bg-site-panel px-3 pt-0 pb-0 shadow-(--site-shadow-mobile-progress) xl:hidden"
       data-js-only="true"
       {...getDataHookAttributes(articleStickyMetaDomHooks.mobileReadingProgress)}
     >

@@ -20,6 +20,7 @@
   --site-base-highlight-ink: #fde047;
   --site-shadow-dropdown: 0 18px 60px rgba(5, 10, 20, 0.2);
   --site-shadow-header: 0 18px 56px rgba(4, 6, 16, 0.24);
+  --site-shadow-mobile-progress: 0 -12px 30px color-mix(in srgb, var(--site-bg) 35%, transparent);
   --site-shadow-overlay: 0 24px 80px rgba(0, 0, 0, 0.28);
   --site-overlay-backdrop: color-mix(in srgb, var(--site-base-bg) 58%, transparent);
 

@@ -39,7 +39,7 @@ export type DirectoryItem = {
   ctaLabel?: string
   description?: string
   eyebrow?: string
-  href: string
+  href: string | null
   meta?: string
   tags: DirectoryTag[]
   title: string
