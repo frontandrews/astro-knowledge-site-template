@@ -44,9 +44,9 @@ const rowItemClass = ui.linearRow
               </div>
             ) : null}
             <div class="grid min-w-0 gap-2">
-              <h3 class={cn('content-directory-title', ui.linearItemTitle, 'transition-colors duration-150')} {...getDataHookAttributes(completionDomHooks.title)}>
+              <h2 class={cn('content-directory-title', ui.linearItemTitle, 'transition-colors duration-150')} {...getDataHookAttributes(completionDomHooks.title)}>
                 {item.title}
-              </h3>
+              </h2>
             </div>
             {item.description ? <p class={ui.cardDescription}>{item.description}</p> : null}
             {item.ctaLabel ? (
@@ -111,9 +111,9 @@ const rowItemClass = ui.linearRow
               </div>
             ) : null}
             <div class="grid min-w-0 gap-2">
-              <h3 class={cn('content-directory-title', ui.linearItemTitle)} {...getDataHookAttributes(completionDomHooks.title)}>
+              <h2 class={cn('content-directory-title', ui.linearItemTitle)} {...getDataHookAttributes(completionDomHooks.title)}>
                 {item.title}
-              </h3>
+              </h2>
             </div>
             {item.description ? <p class={ui.cardDescription}>{item.description}</p> : null}
             {item.meta ? <p class={ui.cardMeta}>{item.meta}</p> : null}
