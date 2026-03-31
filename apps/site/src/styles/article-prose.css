@@ -1,0 +1,157 @@
+@layer components {
+  .article-prose {
+    width: 100%;
+    margin-inline: auto;
+    max-width: min(100%, var(--site-reading-measure));
+    color: var(--article-body-color);
+    font-size: 1.06rem;
+    letter-spacing: 0.004em;
+    line-height: 1.78;
+  }
+
+  .article-prose > :first-child {
+    margin-top: 0;
+  }
+
+  .article-prose h2 {
+    margin-top: 3rem;
+    margin-bottom: 0.9rem;
+    color: #7aa2f7;
+    font-size: 1.65rem;
+    font-weight: 600;
+    line-height: 1.28;
+    letter-spacing: 0.01em;
+    scroll-margin-top: 7rem;
+  }
+
+  .article-prose h3 {
+    margin-top: 2.4rem;
+    margin-bottom: 0.8rem;
+    color: #7aa2f7;
+    font-size: 1.3rem;
+    font-weight: 600;
+    line-height: 1.35;
+    scroll-margin-top: 7rem;
+  }
+
+  .article-prose :where(p, li, dd, figcaption, td, th) {
+    color: var(--article-body-color);
+    font-size: inherit;
+    line-height: inherit;
+  }
+
+  .article-prose :where(ul, ol) {
+    color: var(--article-body-color);
+  }
+
+  .article-prose p {
+    margin-bottom: 2em;
+  }
+
+  .article-prose ul,
+  .article-prose ol {
+    margin-bottom: 2em;
+    padding-left: 1.5rem;
+  }
+
+  .article-prose ul {
+    list-style-type: disc;
+  }
+
+  .article-prose ol {
+    list-style-type: decimal;
+  }
+
+  .article-prose li + li {
+    margin-top: 0.4rem;
+  }
+
+  .article-prose li > :where(p, ul, ol):last-child {
+    margin-bottom: 0;
+  }
+
+  .article-prose li::marker {
+    color: color-mix(in srgb, var(--article-link) 72%, var(--article-copy-color) 28%);
+  }
+
+  .article-prose blockquote {
+    margin-block: 1.75rem;
+    padding-left: 1rem;
+    border-left: 3px solid var(--article-rule);
+    color: var(--article-heading-color);
+    font-style: italic;
+  }
+
+  .article-prose strong {
+    color: inherit;
+  }
+
+  .article-prose pre {
+    overflow-x: auto;
+    padding: 1rem;
+    border: 1px solid var(--article-rule);
+    border-radius: var(--radius-xs);
+    background: var(--article-surface);
+    color: var(--article-heading-color);
+  }
+
+  .article-prose code {
+    color: inherit;
+  }
+
+  .article-prose :not(pre) > code {
+    background: var(--article-inline-code-bg);
+    border: 1px solid var(--article-inline-code-border);
+    border-radius: 0.45rem;
+    box-shadow: var(--article-inline-code-shadow);
+    color: var(--article-inline-code-ink);
+    font-size: 0.92em;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+    padding: 0.08rem 0.42rem 0.14rem;
+  }
+
+  .article-prose pre code {
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    color: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    padding: 0;
+  }
+
+  .article-prose a {
+    color: var(--article-link);
+    text-decoration-line: underline;
+    text-decoration-color: var(--site-line-strong);
+    text-underline-offset: 0.125rem;
+    transition: color 150ms ease;
+  }
+
+  .article-prose a:hover,
+  .article-prose a:focus-visible {
+    color: var(--article-link-hover);
+  }
+}
+
+@media (min-width: 64rem) {
+  .article-prose {
+    font-size: 1.14rem;
+    line-height: 1.84;
+  }
+
+  .article-prose h2 {
+    font-size: clamp(1.8rem, 2.4vw, 2rem);
+  }
+
+  .article-prose h3 {
+    font-size: clamp(1.38rem, 1.9vw, 1.625rem);
+  }
+
+  .article-prose :where(p, li, dd, figcaption, td, th) {
+    font-size: inherit;
+    line-height: inherit;
+  }
+}
