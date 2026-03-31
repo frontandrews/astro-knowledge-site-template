@@ -120,6 +120,7 @@ function buildContentSecurityPolicy() {
 function buildHeaderBlocks() {
   const commonHeaders = [
     ['Content-Security-Policy', buildContentSecurityPolicy()],
+    ['Cross-Origin-Opener-Policy', 'same-origin'],
     ['Permissions-Policy', 'accelerometer=(), browsing-topics=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()'],
     ['Referrer-Policy', 'strict-origin-when-cross-origin'],
     ['X-Content-Type-Options', 'nosniff'],
@@ -130,7 +131,7 @@ function buildHeaderBlocks() {
   const siteOrigin = tryGetOrigin(siteUrl)
 
   if (siteOrigin?.startsWith('https://')) {
-    commonHeaders.push(['Strict-Transport-Security', 'max-age=31536000'])
+    commonHeaders.push(['Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload'])
   }
 
   return [
